@@ -2,17 +2,17 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-21 04:25 +08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-21 04:45 +08:00
 - Agent / module: E — Administrative Web Development / Valryde Admin
 - Repository: `valryde-web-admin`
-- Branch / HEAD SHA: `feat/56-59-admin-shell-user-accounts` (from `docs/agent-e-bootstrap` @ `1806e17`); implementation commit recorded in the activity log
+- Branch / HEAD SHA: `feat/56-59-admin-shell-user-accounts` (stacked on `docs/agent-e-bootstrap` @ `1806e17d`); code HEAD `22b7fc3`, evidence `f3d5c5b`, plus this status commit
 - Checklist IDs: 56–67
-- GitHub issues / PRs: None opened
+- GitHub issues / PRs: [PR #1](https://github.com/erwin-io/valryde-web-admin/pull/1) docs bootstrap → `main`; [PR #2](https://github.com/erwin-io/valryde-web-admin/pull/2) shell + User Accounts → `docs/agent-e-bootstrap` (stacked). No issue assigned.
 - Implementation progress: IN_PROGRESS
 - Tech Lead review decision (if actually issued): Not reviewed
-- Current objective: Submit the Angular shell, Admin access control, and User Accounts module (IDs 56, 59) for Tech Lead review.
+- Current objective: Tech Lead review of PR #1 then PR #2.
 - Last confirmed result: Angular 21 workspace scaffolded; lint, typecheck, 47 unit tests and production build pass locally; manual flow checked against a synthetic local API only.
-- Next concrete action: Push branches and open PRs (docs bootstrap, then shell + User Accounts) after owner confirmation; then Stage 5 transit route list/details and fleet modules.
+- Next concrete action: Address review feedback; after review, Stage 5 (transit routes/directions list and details, fleet registry). Real-API verification of PR #2 when an Admin account and running `valryde-api` are available.
 - Blocked by / decision owner: None for IDs 56/59 source. Real-API verification needs a running `valryde-api` with an Admin account (owner gate). Agent B contracts still gate IDs 65–66.
 - Execution agent: Claude (took over from Codex 2026-10-21 03:35 +08:00 after Codex usage limit; no approved work rejected).
 - Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
@@ -38,6 +38,11 @@
 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
+| Pre-submission rerun: lint, typecheck, `npm test`, production build, `git diff --check main...HEAD` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 04:30 +08:00 | 47/47 tests; no build warnings; policy SHA-256 unchanged |
+| `npm audit --omit=dev` | Local Windows | PASSED | 2026-10-21 04:30 +08:00 | 0 production vulnerabilities |
+| `npm audit` (incl. dev tooling) | Local Windows | FAILED | 2026-10-21 04:30 +08:00 | 4 dev-only findings (2 high `@modelcontextprotocol/sdk` via `@angular/cli`; 2 moderate `vite` via `@angular/build`), newly published since the 03:55 run; fix requires Angular 22 → Node >=22.22.3 (owner decision) |
+| Screenshot evidence | `ng serve` + synthetic stub (not committed) | PASSED | 2026-10-21 04:28 +08:00 | `docs/testing/evidence/2026-10-21-shell-user-accounts/`; not real-backend evidence |
+| Real backend auth and status-update integration | — | NOT_RUN | — | Owner gate: running `valryde-api` + Admin account |
 | `npm run lint` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 04:20 +08:00 | angular-eslint 21.4.0: all files pass |
 | `npm run typecheck` (app + spec tsconfig) | Local Windows | PASSED | 2026-10-21 04:20 +08:00 | Strict TypeScript; templates are checked by the build |
 | `npm test` (Vitest via `ng test --watch=false`) | Local Windows, jsdom | PASSED | 2026-10-21 04:01 +08:00 | 8 files / 47 tests |
@@ -68,6 +73,17 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-21 04:45 +08:00 — PRs submitted for Tech Lead review
+
+- Action / reason: Tech Lead authorized formal submission of the first slices (not acceptance, not merge).
+- Checklist/issue: PR #1 IDs 56–67 (docs/contract); PR #2 IDs 56, 59. No issue assigned.
+- Files/config/services affected: `docs/testing/evidence/2026-10-21-shell-user-accounts/` (5 synthetic-data screenshots + README), this file. Branches pushed: `docs/agent-e-bootstrap`, `feat/56-59-admin-shell-user-accounts`.
+- Observed result (success/failure/rollback): [PR #1](https://github.com/erwin-io/valryde-web-admin/pull/1) → `main`; [PR #2](https://github.com/erwin-io/valryde-web-admin/pull/2) → `docs/agent-e-bootstrap` (stacked; retarget to `main` after #1 merges). The active `gh` account on this workstation is `seefixmanagement`, which lacks push rights; the push and PR calls used the already-logged-in `erwin-io` account via a per-command `GH_TOKEN`, without changing the stored Git/gh configuration. Port 4200 was held by the `valryde-mobile-commuter` dev server and was left untouched; screenshots used port 4202.
+- Validation and evidence: lint, typecheck, 47/47 tests, production build, diff check and production audit passed. Full `npm audit` now reports 4 dev-tooling advisories (see Latest verification); not in the production bundle.
+- Contracts / risks / dependencies: No contract change. Real backend authentication and status-update integration remain untested (synthetic stub and `HttpTestingController` only). Refresh token in `sessionStorage` flagged for security review.
+- Commit/PR link or SHA (if available): `1806e17` (PR #1 head); `22b7fc3`, `f3d5c5b`, and this status commit (PR #2).
+- Next action / owner gate: Tech Lead review; owner decision on Node upgrade (unblocks Angular 22 and the dev advisories); owner-provided Admin account for real-API verification.
 
 ### 2026-10-21 04:25 +08:00 — Angular shell, Admin access control, and User Accounts module
 
