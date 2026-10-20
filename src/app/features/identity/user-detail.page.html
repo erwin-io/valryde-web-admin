@@ -1,0 +1,78 @@
+<app-page-header
+  [title]="user()?.displayName ?? 'User account'"
+  description="Account identity, roles, verification, and lifecycle. Roles are assigned by the platform and are read-only here."
+  [breadcrumbs]="breadcrumbs()"
+>
+  @if (user(); as current) {
+    @if (statusChange.canChange(current)) {
+      <button mat-stroked-button type="button" (click)="changeStatus(current)">
+        <mat-icon>{{ current.status === 'ACTIVE' ? 'block' : 'check_circle' }}</mat-icon>
+        {{ current.status === 'ACTIVE' ? 'Disable account' : 'Enable account' }}
+      </button>
+    }
+  }
+</app-page-header>
+
+@if (actionProblem(); as problem) {
+  <div class="inline-alert" role="alert">
+    <mat-icon aria-hidden="true">error</mat-icon>
+    <span>
+      The account status was not changed. {{ problem.message }}
+      @if (problem.requestId) {
+        (Request ID: <code>{{ problem.requestId }}</code>)
+      }
+    </span>
+    <button mat-icon-button type="button" aria-label="Dismiss error" (click)="actionProblem.set(null)">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+}
+
+@switch (state()) {
+  @case ('loading') {
+    <app-page-state kind="loading" title="Loading account…" />
+  }
+  @case ('denied') {
+    <app-page-state kind="denied" [problem]="problem()" />
+  }
+  @case ('error') {
+    <app-page-state kind="error" title="This account could not be loaded" [problem]="problem()" (retry)="load()" />
+  }
+  @case ('not-found') {
+    <app-page-state kind="not-found" message="No account with this identifier exists." />
+  }
+  @default {
+    @if (user(); as current) {
+      <section class="panel details" aria-labelledby="identity-title">
+        <h2 id="identity-title">Account</h2>
+        <dl>
+          <dt>Display name</dt>
+          <dd>{{ current.displayName }}</dd>
+          <dt>Email</dt>
+          <dd>{{ current.email }}</dd>
+          <dt>Email verification</dt>
+          <dd>{{ current.emailVerified ? 'Verified' : 'Not verified' }}</dd>
+          <dt>Status</dt>
+          <dd>
+            <app-status-badge
+              [label]="statusPresentation[current.status].label"
+              [icon]="statusPresentation[current.status].icon"
+              [tone]="statusPresentation[current.status].tone"
+            />
+          </dd>
+          <dt>Roles</dt>
+          <dd>{{ roleList(current) }}</dd>
+          <dt>Created</dt>
+          <dd>{{ current.createdAt | date: 'medium' }}</dd>
+          <dt>Last updated</dt>
+          <dd>{{ current.updatedAt | date: 'medium' }}</dd>
+          <dt>Account ID</dt>
+          <dd><code>{{ current.id }}</code></dd>
+        </dl>
+        @if (!statusChange.canChange(current)) {
+          <p class="note">This is your account. Administrators cannot disable their own account.</p>
+        }
+      </section>
+    }
+  }
+}

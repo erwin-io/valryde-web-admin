@@ -4,9 +4,24 @@ Administrative web console for the Valryde public jeepney route live tracking an
 
 ## Current state
 
-Repository governance and documentation structure are bootstrapped. Application source has not yet been scaffolded; feature implementation waits for the full Agent E development directive.
+The Angular application shell, Admin authentication, and the User Accounts module (checklist IDs 56 and 59) are implemented against Agent A's merged API. Other modules follow the staged plan in the [Agent E handoff](handoffs/AGENT_E_ADMIN_WEB_HANDOFF.md); Tracking Operations stays hidden until Agent B contracts are approved.
 
-Agent E owns MVP checklist IDs **56–67**. The planned baseline is Angular, TypeScript, Angular Material, Angular CDK, custom SCSS, and MapLibre/OpenFreeMap.
+Agent E owns MVP checklist IDs **56–67**. Stack: Angular 21 (strict TypeScript, standalone components, signals), Angular Material and CDK, custom SCSS, Vitest, and angular-eslint. MapLibre/OpenFreeMap is added with the route geometry module. Angular 21 is used because Angular 22 requires Node.js 22.22.3 or later and the current workstation runs 22.17.1.
+
+## Development
+
+Requires Node.js `^22.12.0 || >=24.0.0`. npm 10.9.x has a peer-resolution crash with this dependency tree; use npm 11 (`npx npm@11 install`) if `npm install` fails.
+
+```bash
+npm install
+npm start          # http://localhost:4200, proxies /api to http://localhost:3000 (valryde-api)
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+The client calls the same-origin `/api` base path. Production hosting must serve or reverse-proxy the Agent A API under `/api`. No secrets or environment credentials belong in this repository.
 
 ## Planned navigation
 

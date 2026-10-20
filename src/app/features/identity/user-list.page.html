@@ -1,0 +1,148 @@
+<app-page-header
+  title="User accounts"
+  description="Monitor every Valryde account and enable or disable sign-in access. Roles are assigned by the platform and cannot be changed here."
+  [breadcrumbs]="[{ label: 'Identity & Access' }, { label: 'User accounts' }]"
+/>
+
+@if (actionProblem(); as problem) {
+  <div class="inline-alert" role="alert">
+    <mat-icon aria-hidden="true">error</mat-icon>
+    <span>
+      The account status was not changed. {{ problem.message }}
+      @if (problem.requestId) {
+        (Request ID: <code>{{ problem.requestId }}</code>)
+      }
+    </span>
+    <button mat-icon-button type="button" aria-label="Dismiss error" (click)="actionProblem.set(null)">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+}
+
+<section class="panel" aria-label="User accounts">
+  <div class="filters" role="search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
+      <mat-label>Search name or email</mat-label>
+      <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+      <input
+        matInput
+        type="search"
+        [ngModel]="filters().search"
+        (ngModelChange)="updateFilter('search', $event)"
+      />
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Role</mat-label>
+      <mat-select [ngModel]="filters().role" (ngModelChange)="updateFilter('role', $event)">
+        <mat-option value="">All roles</mat-option>
+        @for (role of roles; track role) {
+          <mat-option [value]="role">{{ roleLabels[role] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Status</mat-label>
+      <mat-select [ngModel]="filters().status" (ngModelChange)="updateFilter('status', $event)">
+        <mat-option value="">All statuses</mat-option>
+        <mat-option value="ACTIVE">Active</mat-option>
+        <mat-option value="DISABLED">Disabled</mat-option>
+      </mat-select>
+    </mat-form-field>
+    @if (hasFilters()) {
+      <button mat-button type="button" (click)="clearFilters()">Clear filters</button>
+    }
+  </div>
+
+  @switch (state()) {
+    @case ('loading') {
+      <app-page-state kind="loading" title="Loading user accounts…" />
+    }
+    @case ('denied') {
+      <app-page-state kind="denied" [problem]="problem()" />
+    }
+    @case ('error') {
+      <app-page-state
+        kind="error"
+        title="User accounts could not be loaded"
+        [problem]="problem()"
+        (retry)="load()"
+      />
+    }
+    @default {
+      @if (users().length === 0) {
+        <app-page-state kind="empty" title="No user accounts yet" />
+      } @else if (filtered().length === 0) {
+        <app-page-state kind="filtered-empty">
+          <button mat-stroked-button type="button" (click)="clearFilters()">Clear filters</button>
+        </app-page-state>
+      }
+      <div class="table-wrap" [hidden]="filtered().length === 0">
+        <table mat-table [dataSource]="dataSource" matSort aria-label="User accounts">
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let user">
+              <a class="primary-cell" [routerLink]="['/identity/users', user.id]">{{ user.displayName }}</a>
+              <span class="secondary-cell">{{ user.email }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="roles">
+            <th mat-header-cell *matHeaderCellDef>Roles</th>
+            <td mat-cell *matCellDef="let user">{{ roleList(user) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+            <td mat-cell *matCellDef="let user">
+              @let status = statusOf(user);
+              <app-status-badge [label]="status.label" [icon]="status.icon" [tone]="status.tone" />
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="emailVerified">
+            <th mat-header-cell *matHeaderCellDef class="optional">Email</th>
+            <td mat-cell *matCellDef="let user" class="optional">
+              {{ user.emailVerified ? 'Verified' : 'Not verified' }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="optional">Created</th>
+            <td mat-cell *matCellDef="let user" class="optional">{{ user.createdAt | date: 'mediumDate' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Actions</span></th>
+            <td mat-cell *matCellDef="let user" class="actions-cell">
+              <button
+                mat-icon-button
+                type="button"
+                [matMenuTriggerFor]="rowMenu"
+                [matMenuTriggerData]="{ user }"
+                [attr.aria-label]="'Actions for ' + user.displayName"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="25" aria-label="Select page of user accounts" />
+      </div>
+    }
+  }
+</section>
+
+<mat-menu #rowMenu="matMenu" xPosition="before">
+  <ng-template matMenuContent let-user="user">
+    <a mat-menu-item [routerLink]="['/identity/users', user.id]">
+      <mat-icon>visibility</mat-icon> View details
+    </a>
+    @if (statusChange.canChange(user)) {
+      <button mat-menu-item type="button" (click)="changeStatus(user)">
+        <mat-icon>{{ user.status === 'ACTIVE' ? 'block' : 'check_circle' }}</mat-icon>
+        {{ user.status === 'ACTIVE' ? 'Disable account' : 'Enable account' }}
+      </button>
+    } @else {
+      <button mat-menu-item type="button" disabled>
+        <mat-icon>block</mat-icon> You cannot disable your own account
+      </button>
+    }
+  </ng-template>
+</mat-menu>
