@@ -7,7 +7,7 @@
 - Repository: `valryde-web-admin`
 - Branch / HEAD SHA: `feat/60-jeepney-fleet-monitoring` from `main` @ `075b377` (PR #3 merge)
 - Checklist IDs: 56–67
-- GitHub issues / PRs: PR #1 merged (`b1c381f`); PR #2 merged (`fc55582`); PR #3 merged (`075b377`); checklist 60 PR opened from this branch (link in activity log). No issue assigned.
+- GitHub issues / PRs: PR #1 merged (`b1c381f`); PR #2 merged (`fc55582`); PR #3 merged (`075b377`); [PR #4](https://github.com/erwin-io/valryde-web-admin/pull/4) checklist 60 → `main`, under review. No issue assigned.
 - Implementation progress: IN_PROGRESS
 - Tech Lead review decision (if actually issued): PRs #2 and #3 merged; Admin foundation accepted for development with production acceptance OPERATOR-GATED. Checklist 60 PR: Not reviewed.
 - Current objective: AGENT_E_CHECKLIST60_READY_FOR_REVIEW — read-only Jeepney and Fleet Group monitoring.
@@ -92,7 +92,7 @@
 - Observed result (success/failure/rollback): Implemented. Re-read Agent A `main` `827738c`: route files unchanged in scope; no G1/G2/G3 endpoints exist (only the proposal). Consumed `GET /api/jeepneys`, `GET /api/fleet-groups`, `GET /api/jeepneys/{id}/effective-route`. `operatorId` references `operators.id` and is shown only as an opaque record ID with a "name not available" note. The only jeepney→group association the API returns (`effectiveRouteDirection.groupId` when `source = GROUP`) is linked; membership, driver assignment, GPS and tracking are shown as explicit gates. Fixed a missing-space rendering issue in the operator note found during the visual check.
 - Validation and evidence: 82/82 tests (loading, success, empty, 401, 403, 500 + retry, search/status filters, sort, 25-row pagination, missing optional fields, 409 route conflict, not-found, no fabricated driver/GPS/location columns, nav links only to implemented routes); lint, typecheck, build, diff check pass; screenshots with synthetic fixtures at 1280 and 1024 px.
 - Contracts / risks / dependencies: No API, DB, RBAC or cross-agent contract change. No Traccar identifiers or telemetry used. No auth/storage/Angular/Node change. Route path renamed from planned `/fleet/vehicles` to `/fleet/jeepneys` (docs updated).
-- Commit/PR link or SHA (if available): this branch; PR link follows in the next status update.
+- Commit/PR link or SHA (if available): `487d544`; [PR #4](https://github.com/erwin-io/valryde-web-admin/pull/4).
 - Next action / owner gate: Tech Lead review. Real backend verification remains OPERATOR-GATED.
 
 ### 2026-10-21 11:20 +08:00 — Operator and Driver monitoring slice (IDs 57, 58)
