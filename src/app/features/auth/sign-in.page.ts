@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -75,7 +76,10 @@ export function signInMessage(err: unknown): string {
     case 'ADMIN_ROLE_REQUIRED':
       return problem.message;
     default:
-      if (problem.status === 429) return 'Too many sign-in attempts. Wait a minute and try again.';
+      // Agent A defect D1: rate limits currently arrive as 500 with a retry-after header, not 429.
+      if (problem.status === 429 || (err instanceof HttpErrorResponse && err.headers.has('retry-after'))) {
+        return 'Too many sign-in attempts. Wait a minute and try again.';
+      }
       return problem.requestId
         ? `${problem.message} (Request ID: ${problem.requestId})`
         : problem.message;

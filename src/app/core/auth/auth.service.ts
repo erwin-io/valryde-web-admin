@@ -78,6 +78,7 @@ export class AuthService {
         tap((tokens) => {
           if (!isAdmin(tokens.user)) {
             this.clear();
+            void this.revoke(tokens.refreshToken);
             throw NOT_ADMIN;
           }
           this.store(tokens);
@@ -90,6 +91,8 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    // A pending refresh rotates the token server-side; wait so the newest token is the one revoked.
+    if (this.refreshInFlight) await firstValueFrom(this.refreshInFlight).catch(() => null);
     const refreshToken = readRefreshToken();
     this.clear();
     if (refreshToken) await this.revoke(refreshToken);

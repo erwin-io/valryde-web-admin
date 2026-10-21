@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 
 import { tokens, user } from '../../../testing/fixtures';
 import { AuthService, NOT_ADMIN, REFRESH_KEY } from './auth.service';
@@ -57,6 +58,37 @@ describe('AuthService', () => {
     http
       .expectOne('/api/auth/refresh')
       .flush({ error: { code: 'SESSION_REVOKED' } }, { status: 401, statusText: 'Unauthorized' });
+    await expect(restore).resolves.toBeNull();
+    expect(sessionStorage.getItem(REFRESH_KEY)).toBeNull();
+  });
+
+  it('revokes the rotated token when sign-out races an in-flight refresh', async () => {
+    const login = auth.login('admin@example.test', 'correct horse battery');
+    http.expectOne('/api/auth/login').flush(tokens());
+    await login;
+
+    const refresh = firstValueFrom(auth.refresh()).catch(() => null);
+    const logout = auth.logout();
+    http.expectOne('/api/auth/refresh').flush(tokens(user(), '2'));
+    await refresh;
+    await Promise.resolve();
+    const revoke = http.expectOne('/api/auth/logout');
+    expect(revoke.request.body).toEqual({ refreshToken: tokens(user(), '2').refreshToken });
+    revoke.flush(null, { status: 204, statusText: 'No Content' });
+    await logout;
+    expect(auth.user()).toBeNull();
+    expect(auth.token()).toBeNull();
+    expect(sessionStorage.getItem(REFRESH_KEY)).toBeNull();
+  });
+
+  it('revokes a refreshed session whose user is no longer an Admin', async () => {
+    sessionStorage.setItem(REFRESH_KEY, 'stored-refresh-token-value');
+    const restore = auth.ensureSession();
+    const demoted = user({ roles: ['OPERATOR'] });
+    http.expectOne('/api/auth/refresh').flush(tokens(demoted, '3'));
+    const revoke = http.expectOne('/api/auth/logout');
+    expect(revoke.request.body).toEqual({ refreshToken: tokens(demoted, '3').refreshToken });
+    revoke.flush(null, { status: 204, statusText: 'No Content' });
     await expect(restore).resolves.toBeNull();
     expect(sessionStorage.getItem(REFRESH_KEY)).toBeNull();
   });

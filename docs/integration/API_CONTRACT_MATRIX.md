@@ -60,3 +60,21 @@ Vehicle application statuses are `PENDING|APPROVED|REJECTED`. GPS verification s
 ## Missing contracts
 
 Dashboard aggregates, stops, operator/driver domain details, assignment listings, audit listing, general configuration, report/export, historical route views, component-specific health, latest-state, live map, deviations, and Pusher events are unavailable. Their screens remain blocked, partial, or absent from production navigation.
+
+## Compatibility check — Agent A `main` `4a9a152` (API PR #6 handoff)
+
+Checked 2026-10-21 against `AGENT_A_FRONTEND_API_INTEGRATION_HANDOFF.md` §1, §4.3 and the merged route source. Auth and Admin-user source is unchanged since `711f4c4`.
+
+| Admin client use | Agent A contract | Status |
+|---|---|---|
+| `POST /auth/login`, reject non-`ADMIN` client-side | §1.1 "Admin web must reject sign-in client-side when ADMIN is absent" | Compatible; client also revokes the issued refresh token |
+| `POST /auth/refresh` rotation, serialized | §1.1 "Serialize refresh across concurrent requests" | Compatible (single in-flight refresh) |
+| `401 SESSION_REVOKED` → sign out locally | §1.2 | Compatible |
+| `POST /auth/logout`, clear locally regardless of result | §1.1 | Compatible |
+| `GET /admin/users/` unpaginated, filter client-side | §4.3 class 2 | Compatible; trailing-slash path verified by `inject()` |
+| `PATCH /admin/users/{id}/status`, self-disable `400` | §4.3 class 1 | Compatible; RBAC verified (`docs/security/ADMIN_AUTH_AND_DEPENDENCY_REVIEW.md` §2) |
+| User detail composed from list | §4.3 class 2 | Compatible |
+| Role change, Admin creation, deletion, server search | §4.3 class 4/6 | Not implemented (correct) |
+| Error envelope, branch on `code`, show `requestId` | §1 rule 3 | Compatible |
+| Rate limit as `500` + `retry-after` (defect D1) | §1.3 | Handled in sign-in copy |
+| Restore = refresh then `GET /auth/me` | §1.1 | Client uses the `user` returned by refresh; `GET /auth/me` not needed for the same data |

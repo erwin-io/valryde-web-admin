@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 
 import { apiError, user } from '../../../testing/fixtures';
@@ -84,6 +84,15 @@ describe('signInMessage', () => {
 
   it('explains rate limiting', () => {
     expect(signInMessage(new HttpErrorResponse({ status: 429 }))).toContain('Too many sign-in attempts');
+  });
+
+  it('explains rate limiting reported as 500 with retry-after (Agent A defect D1)', () => {
+    const err = new HttpErrorResponse({
+      status: 500,
+      headers: new HttpHeaders({ 'retry-after': '60' }),
+      error: apiError('INTERNAL_ERROR', 'An unexpected error occurred'),
+    });
+    expect(signInMessage(err)).toContain('Too many sign-in attempts');
   });
 
   it('includes the request ID for unknown errors', () => {
