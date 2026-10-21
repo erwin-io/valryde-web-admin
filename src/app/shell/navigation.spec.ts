@@ -1,12 +1,18 @@
+import { Routes } from '@angular/router';
+
 import { routes } from '../app.routes';
 import { NAVIGATION } from './navigation';
 
 describe('NAVIGATION', () => {
-  const shellPaths = routes.find((r) => r.path === '')?.children?.map((r) => `/${r.path}`) ?? [];
+  const shellRoutes = routes.find((r) => r.path === '')?.children ?? [];
 
-  it('links only to implemented shell routes', () => {
+  it('links only to implemented shell routes', async () => {
     for (const item of NAVIGATION.flatMap((g) => g.items)) {
-      expect(shellPaths).toContain(item.route);
+      const direct = shellRoutes.some((r) => `/${r.path}` === item.route);
+      const lazy = shellRoutes.find((r) => r.loadChildren && item.route.startsWith(`/${r.path}/`));
+      const children = lazy ? ((await (lazy.loadChildren as () => Promise<Routes>)()) ?? []) : [];
+      const viaLazy = !!lazy && children.some((c) => `/${lazy.path}/${c.path}` === item.route);
+      expect(direct || viaLazy, item.route).toBe(true);
     }
   });
 

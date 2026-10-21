@@ -1,0 +1,115 @@
+<app-page-header
+  [title]="route() ? route()!.routeCode + ' · ' + route()!.publicName : 'Route'"
+  description="Official route record and its directions."
+  [breadcrumbs]="breadcrumbs()"
+>
+  @if (route(); as r) {
+    <a mat-flat-button [routerLink]="['/transit/routes', r.id, 'edit']"><mat-icon>edit</mat-icon> Edit route</a>
+  }
+</app-page-header>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-page-state kind="loading" title="Loading route…" />
+  }
+  @case ('denied') {
+    <app-page-state kind="denied" [problem]="problem()" />
+  }
+  @case ('error') {
+    <app-page-state kind="error" title="This route could not be loaded" [problem]="problem()" (retry)="load()" />
+  }
+  @case ('not-found') {
+    <app-page-state kind="not-found" message="No route with this identifier exists." />
+  }
+  @default {
+    @if (route(); as r) {
+      <section class="panel details" aria-labelledby="route-title">
+        <h2 id="route-title">Route</h2>
+        <dl>
+          <dt>Route code</dt>
+          <dd><code>{{ r.routeCode }}</code></dd>
+          <dt>Public name</dt>
+          <dd>{{ r.publicName }}</dd>
+          <dt>Status</dt>
+          <dd>
+            @let badge = statusOf(r);
+            <app-status-badge [label]="badge.label" [icon]="badge.icon" [tone]="badge.tone" />
+          </dd>
+          <dt>Route color</dt>
+          <dd><span class="swatch" [style.background]="r.routeColorHex" aria-hidden="true"></span><code>{{ r.routeColorHex }}</code></dd>
+          <dt>Description</dt>
+          <dd>
+            @if (r.description) {
+              {{ r.description }}
+            } @else {
+              <span class="unavailable">No description</span>
+            }
+          </dd>
+          <dt>Created</dt>
+          <dd>{{ r.createdAt | date: 'medium' }}</dd>
+          <dt>Last updated</dt>
+          <dd>{{ r.updatedAt | date: 'medium' }}</dd>
+        </dl>
+      </section>
+
+      <section class="panel details-table" aria-labelledby="directions-title">
+        <div class="section-heading">
+          <h2 id="directions-title">Directions ({{ r.directions.length }})</h2>
+        </div>
+        @if (r.directions.length === 0) {
+          <app-page-state kind="empty" title="No directions yet" message="Directions are created with their route line in the geometry editor." />
+        } @else {
+          <div class="table-wrap">
+            <table mat-table [dataSource]="r.directions" aria-label="Route directions">
+              <ng-container matColumnDef="directionLabel">
+                <th mat-header-cell *matHeaderCellDef>Direction</th>
+                <td mat-cell *matCellDef="let d">{{ d.directionLabel }}</td>
+              </ng-container>
+              <ng-container matColumnDef="endpoints">
+                <th mat-header-cell *matHeaderCellDef>From / to</th>
+                <td mat-cell *matCellDef="let d">{{ d.originName }} → {{ d.destinationName }}</td>
+              </ng-container>
+              <ng-container matColumnDef="points">
+                <th mat-header-cell *matHeaderCellDef class="optional">Route line</th>
+                <td mat-cell *matCellDef="let d" class="optional">{{ pointCount(d) }} points · {{ d.corridorM }} m corridor</td>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let d">
+                  @let dBadge = statusOf(d);
+                  <app-status-badge [label]="dBadge.label" [icon]="dBadge.icon" [tone]="dBadge.tone" />
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Actions</span></th>
+                <td mat-cell *matCellDef="let d" class="actions-cell">
+                  <a
+                    mat-icon-button
+                    [routerLink]="['/transit/directions', d.id, 'edit']"
+                    [attr.aria-label]="'Edit direction ' + d.directionLabel"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </a>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="directionColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: directionColumns"></tr>
+            </table>
+          </div>
+        }
+      </section>
+
+      <aside class="contract-gate" aria-labelledby="gate-title">
+        <mat-icon aria-hidden="true">lock_clock</mat-icon>
+        <div>
+          <h2 id="gate-title">Route lines are managed separately</h2>
+          <p>
+            Adding a direction requires its route line, and editing route lines or corridor width belongs to the
+            geometry editor, which is planned as a separate reviewed change. Vehicle assignments to this route are
+            not listed because the API has no read endpoint for them.
+          </p>
+        </div>
+      </aside>
+    }
+  }
+}
