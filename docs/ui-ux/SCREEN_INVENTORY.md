@@ -16,8 +16,8 @@
 | VEH-01 | Vehicle registry | Search/filter permitted jeepneys | loading, empty, failed, ready | `GET /api/jeepneys` |
 | VEH-02 | Vehicle details | Inspect vehicle, route, and workflow context | partial, loading, failed, ready | jeepney list + effective route + application lists |
 | GROUP-01 | Fleet groups | Review and manage groups | loading, empty, failed, ready | fleet-group GET/POST/PATCH |
-| OP-01 | Operators | Monitor Operator accounts | loading, empty, failed, ready | filtered Admin users; domain detail blocked |
-| DRV-01 | Drivers | Monitor Driver accounts | loading, empty, failed, ready | filtered Admin users; assignments incomplete |
+| OP-01 | Operators | Monitor Operator accounts | loading, empty, failed, ready | filtered Admin users (implemented); `operators.id` not linkable to accounts until G1 — contract-gate notice shown |
+| DRV-01 | Drivers | Monitor Driver accounts | loading, empty, failed, ready | filtered Admin users (implemented); `drivers.id` not linkable to accounts until G1 — contract-gate notice shown |
 | APP-01 | Vehicle applications | Review application queue | loading, empty, failed, ready | vehicle-application GET |
 | APP-02 | Vehicle review | Approve/reject a pending application | loading, reviewable, completed, saving, conflict | Admin review PATCH |
 | GPS-01 | GPS setup queue | Filter setup and verification states | loading, empty, failed, ready | GPS request GET |

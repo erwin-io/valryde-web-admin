@@ -17,6 +17,13 @@ export interface NavGroup {
 export const NAVIGATION: NavGroup[] = [
   { label: null, items: [{ label: 'Dashboard', icon: 'dashboard', route: '/dashboard' }] },
   {
+    label: 'Fleet Management',
+    items: [
+      { label: 'Operators', icon: 'business', route: '/fleet/operators' },
+      { label: 'Drivers', icon: 'badge', route: '/fleet/drivers' },
+    ],
+  },
+  {
     label: 'Identity & Access',
     items: [{ label: 'User accounts', icon: 'manage_accounts', route: '/identity/users' }],
   },

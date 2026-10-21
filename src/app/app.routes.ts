@@ -27,6 +27,20 @@ export const routes: Routes = [
           import('./features/dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
       {
+        path: 'fleet/operators',
+        title: 'Operators · Valryde Admin',
+        data: { role: 'OPERATOR' },
+        loadComponent: () =>
+          import('./features/fleet/role-directory.page').then((m) => m.RoleDirectoryPage),
+      },
+      {
+        path: 'fleet/drivers',
+        title: 'Drivers · Valryde Admin',
+        data: { role: 'DRIVER' },
+        loadComponent: () =>
+          import('./features/fleet/role-directory.page').then((m) => m.RoleDirectoryPage),
+      },
+      {
         path: 'identity/users',
         title: 'User accounts · Valryde Admin',
         loadComponent: () =>
