@@ -1,0 +1,122 @@
+// Agent E read-only probe of Agent A main (scratchpad copy only; never committed to valryde-api).
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+import { buildApp } from '../src/app.js';
+import type { AppConfig } from '../src/config.js';
+import type { Role } from '../src/domain/identity.js';
+import { MemoryIdentityRepository } from './support/memory-identity-repository.js';
+
+const config: AppConfig = {
+  environment: 'test',
+  host: '127.0.0.1',
+  port: 3000,
+  logLevel: 'silent',
+  corsOrigins: [],
+  databaseUrl: 'postgresql://unused',
+  databaseSsl: false,
+  databaseSchema: 'dbo',
+  jwtSecret: 'test-only-secret-with-at-least-32-characters',
+  jwtIssuer: 'valryde-api-test',
+  jwtAudience: 'valryde-test-clients',
+  accessTokenTtlSeconds: 900,
+  refreshTokenTtlDays: 30,
+  authChallengeTtlMinutes: 30,
+  authResendCooldownSeconds: 60,
+  googleClientIds: [],
+  email: { deliveryMode: 'disabled' },
+};
+
+describe('Agent E probe: Admin user status RBAC', () => {
+  let repository: MemoryIdentityRepository;
+  let app: Awaited<ReturnType<typeof buildApp>>;
+
+  beforeEach(async () => {
+    repository = new MemoryIdentityRepository();
+    app = await buildApp({ config, repository, logger: false });
+  });
+  afterEach(async () => app.close());
+
+  async function account(email: string, extraRole?: Role) {
+    const created = await repository.createUser({
+      email,
+      passwordHash: 'not-used',
+      displayName: email,
+      role: 'COMMUTER',
+      emailVerifiedAt: new Date(),
+    });
+    if (extraRole) await repository.addRole(created.id, extraRole);
+    const user = (await repository.findUserById(created.id))!;
+    const token = app.jwt.sign({ sub: user.id, roles: user.roles, ver: user.credentialsVersion, type: 'access' });
+    return { user, headers: { authorization: `Bearer ${token}` } };
+  }
+
+  const patch = (id: string, payload: unknown, headers?: Record<string, string>) =>
+    app.inject({ method: 'PATCH', url: `/api/admin/users/${id}/status`, payload: payload as object, headers });
+  const code = (r: { json: <T>() => T }) => r.json<{ error: { code: string } }>().error.code;
+
+  it('rejects an unauthenticated status change with 401 AUTH_REQUIRED', async () => {
+    const target = await account('t@example.com');
+    const r = await patch(target.user.id, { status: 'DISABLED' });
+    expect([r.statusCode, code(r)]).toEqual([401, 'AUTH_REQUIRED']);
+  });
+
+  it.each(['OPERATOR', 'DRIVER', undefined] as const)('rejects a %s caller with 403 FORBIDDEN', async (role) => {
+    const target = await account('t@example.com');
+    const caller = await account('c@example.com', role);
+    const r = await patch(target.user.id, { status: 'DISABLED' }, caller.headers);
+    expect([r.statusCode, code(r)]).toEqual([403, 'FORBIDDEN']);
+    expect((await repository.findUserById(target.user.id))!.status).toBe('ACTIVE');
+  });
+
+  it('rejects Admin self-disable with 400 VALIDATION_ERROR and leaves the account active', async () => {
+    const admin = await account('a@example.com', 'ADMIN');
+    const r = await patch(admin.user.id, { status: 'DISABLED' }, admin.headers);
+    expect([r.statusCode, code(r)]).toEqual([400, 'VALIDATION_ERROR']);
+    expect((await repository.findUserById(admin.user.id))!.status).toBe('ACTIVE');
+  });
+
+  it('rejects a disabled Admin token with 401 SESSION_REVOKED', async () => {
+    const admin = await account('a@example.com', 'ADMIN');
+    const other = await account('o@example.com', 'ADMIN');
+    expect((await patch(admin.user.id, { status: 'DISABLED' }, other.headers)).statusCode).toBe(200);
+    const target = await account('t@example.com');
+    const r = await patch(target.user.id, { status: 'DISABLED' }, admin.headers);
+    expect([r.statusCode, code(r)]).toEqual([401, 'SESSION_REVOKED']);
+  });
+
+  it('validates the body and path', async () => {
+    const admin = await account('a@example.com', 'ADMIN');
+    const target = await account('t@example.com');
+    expect((await patch(target.user.id, { status: 'DELETED' }, admin.headers)).statusCode).toBe(400);
+    // Unknown properties are stripped (AJV removeAdditional), not rejected: confirm they have no effect.
+    const smuggled = await patch(target.user.id, { status: 'DISABLED', roles: ['ADMIN'] }, admin.headers);
+    expect(smuggled.statusCode).toBe(200);
+    expect((await repository.findUserById(target.user.id))!.roles).toEqual(['COMMUTER']);
+    expect((await patch('not-a-uuid', { status: 'DISABLED' }, admin.headers)).statusCode).toBe(400);
+    expect((await patch('00000000-0000-4000-8000-000000000999', { status: 'DISABLED' }, admin.headers)).statusCode).toBe(404);
+  });
+
+  it('accepts the Admin client paths and returns the documented DTOs', async () => {
+    const admin = await account('a@example.com', 'ADMIN');
+    const target = await account('t@example.com');
+    const list = await app.inject({ method: 'GET', url: '/api/admin/users/', headers: admin.headers });
+    expect(list.statusCode).toBe(200);
+    expect(Object.keys(list.json<{ users: object[] }>().users[0]).sort()).toEqual(
+      ['createdAt', 'displayName', 'email', 'emailVerified', 'id', 'roles', 'status', 'updatedAt'],
+    );
+    const r = await patch(target.user.id, { status: 'DISABLED' }, admin.headers);
+    expect(r.statusCode).toBe(200);
+    expect(r.json<{ user: { status: string } }>().user.status).toBe('DISABLED');
+    const back = await patch(target.user.id, { status: 'ACTIVE' }, admin.headers);
+    expect(back.json<{ user: { status: string } }>().user.status).toBe('ACTIVE');
+  });
+
+  it('reports rate limiting on login as 500 with retry-after (defect D1)', async () => {
+    let last;
+    for (let i = 0; i < 11; i += 1) {
+      last = await app.inject({ method: 'POST', url: '/api/auth/login', payload: { email: 'x@example.com', password: 'wrong-password-123' } });
+    }
+    expect(last!.statusCode).toBe(500);
+    expect(last!.headers['retry-after']).toBeDefined();
+  });
+});

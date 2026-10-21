@@ -1,0 +1,84 @@
+@use '@angular/material' as mat;
+
+// Valryde Admin tokens (docs/ui-ux/DESIGN_SYSTEM.md). Light theme only for the MVP.
+:root {
+  --vr-primary: #006b67;
+  --vr-primary-dark: #004d4a;
+  --vr-accent: #c47a00;
+  --vr-surface: #ffffff;
+  --vr-surface-muted: #f6f7f8;
+  --vr-text: #1b1f23;
+  --vr-text-secondary: #5e6872;
+  --vr-border: #d9dee3;
+  --vr-error: #b3261e;
+  --vr-error-bg: #fcebea;
+  --vr-success: #2e7d32;
+  --vr-success-bg: #e8f3e9;
+  --vr-warning: #8a5600;
+  --vr-warning-bg: #fdf3e1;
+  --vr-info-bg: #e5f1f0;
+  --vr-neutral-bg: #eef0f2;
+}
+
+html {
+  color-scheme: light;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$cyan-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: (
+        plain-family: 'Roboto, "Segoe UI", Arial, sans-serif',
+        brand-family: 'Roboto, "Segoe UI", Arial, sans-serif',
+      ),
+      density: 0,
+    )
+  );
+  @include mat.theme-overrides(
+    (
+      primary: #006b67,
+      on-primary: #ffffff,
+      error: #b3261e,
+      surface: #ffffff,
+      on-surface: #1b1f23,
+      on-surface-variant: #5e6872,
+      outline-variant: #d9dee3,
+    )
+  );
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--vr-text);
+  background: var(--vr-surface-muted);
+  font: var(--mat-sys-body-large);
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+code {
+  font-family: 'Roboto Mono', Consolas, monospace;
+  font-size: 0.9em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--vr-primary-dark);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

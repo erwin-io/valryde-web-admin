@@ -2,18 +2,18 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-21 03:35 +08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-21 10:30 +08:00
 - Agent / module: E — Administrative Web Development / Valryde Admin
 - Repository: `valryde-web-admin`
-- Branch / HEAD SHA: `docs/agent-e-bootstrap` / `27f9c795b9b7fefed81d72b5d4ef29149ff782d5`
+- Branch / HEAD SHA: `feat/56-59-admin-shell-user-accounts` (base `main` @ `b1c381f`, PR #1 merged); security-review commit recorded in the activity log
 - Checklist IDs: 56–67
-- GitHub issues / PRs: None opened
+- GitHub issues / PRs: [PR #1](https://github.com/erwin-io/valryde-web-admin/pull/1) merged (`b1c381f`); [PR #2](https://github.com/erwin-io/valryde-web-admin/pull/2) open, base `main`, under Tech Lead security/integration review. No issue assigned.
 - Implementation progress: IN_PROGRESS
 - Tech Lead review decision (if actually issued): Not reviewed
-- Current objective: Implement the Angular Material shell, Admin access controls, and first independently testable User Accounts management module.
-- Last confirmed result: Complete UX/navigation/screen/workflow/component/module/API/tracking/test contract authored against merged Agent A `main` at `711f4c4`; required documents and formatting checks passed.
-- Next concrete action: Scaffold strict Angular/Material/CDK application code, then implement and test the Admin shell and User Accounts module.
-- Blocked by / decision owner: Agent B live tracking/realtime contracts and several dashboard/reporting/health/detail APIs remain pending Tech Lead approval/implementation; they do not block the shell or User Accounts module.
+- Current objective: AGENT_E_ADMIN_FOUNDATION_SECURITY_REVIEW_READY — return PR #2 to Agent G for final merge review.
+- Last confirmed result: Auth security review done; defects S1/S2/S3 fixed with regression tests; 50/50 tests, lint, typecheck, build pass; backend RBAC/self-disable verified by isolated `inject()` probe against Agent A `main` `4a9a152`.
+- Next concrete action: Agent G merge review of PR #2. Then (after acceptance) Angular 22 upgrade PR if the owner approves the Node change, and Stage 5. Real-API run per `docs/testing/REAL_API_INTEGRATION_PROCEDURE.md` when the owner provides a test backend/account.
+- Blocked by / decision owner: Real backend integration OPERATOR-GATED (owner: local test backend + test Admin). Owner decision: Node ≥22.22.3/24.15 for Angular 22 (fixes 4 dev-only advisories). Tech Lead decision: httpOnly-cookie refresh contract (Agent A) and hosting CSP (infra).
 - Execution agent: Claude (took over from Codex 2026-10-21 03:35 +08:00 after Codex usage limit; no approved work rejected).
 - Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
 
@@ -21,10 +21,10 @@
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
 |---:|---|---|---|---|
-| 56 | Admin Login & Dashboard | IN_PROGRESS | UX contract complete; Agent A auth contract verified | Implement/test sign-in, guard, shell; live dashboard metrics remain gated |
+| 56 | Admin Login & Dashboard | IN_PROGRESS | Sign-in, session restore/refresh, Admin guard, interceptor, shell, access-denied, dashboard shortcuts; `src/app/core`, `src/app/shell`, `src/app/features/auth`, `src/app/features/dashboard`; unit tests | Tech Lead review; dashboard metrics gated on aggregation contracts |
 | 57 | Operator Management | NOT_STARTED | Scope recorded in handoff | Full directive; contract matrix |
 | 58 | Driver Monitoring | NOT_STARTED | Scope recorded in handoff | Full directive; contract matrix |
-| 59 | Commuter User Monitoring | IN_PROGRESS | Account management UX and frozen Admin-user API documented | Implement/test User Accounts list and status flow |
+| 59 | Commuter User Monitoring | READY_FOR_REVIEW | User Accounts list (search, role/status filters, sort, pagination), detail, enable/disable with confirmation and self-disable guard; `src/app/features/identity`; unit tests + security review fixes S1–S3 | Tech Lead review; real-API check is an owner gate |
 | 60 | Jeepney & Fleet Group Monitoring | NOT_STARTED | Scope recorded in handoff | Full directive; contract matrix |
 | 61 | Official Transit Route & Direction Management | NOT_STARTED | Scope and server-owned route rules recorded | Full directive; verify accepted API contract |
 | 62 | Route Polyline / Corridor / Geofence Management | NOT_STARTED | Map/geometry documentation area prepared | Full directive; approved geometry/geofence contracts |
@@ -38,6 +38,22 @@
 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
+| Security-review rerun: `npm test` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 10:12 +08:00 | 8 files / 50 tests (3 new regression tests; 2 failed before the fix) |
+| `npm run lint`, `npm run typecheck`, `npm run build` | Local Windows | PASSED | 2026-10-21 10:12 +08:00 | No warnings; initial 313.96 kB raw / 84.79 kB transfer |
+| `npm audit --omit=dev` / `npm audit` | Local Windows | PASSED / FAILED | 2026-10-21 10:05 +08:00 | 0 production; 4 dev-only (MCP SDK 1.31.0 via @angular/cli, vite 7.3.6 via @angular/build), pinned exactly by Angular 21.2.27; analysis in `docs/security/ADMIN_AUTH_AND_DEPENDENCY_REVIEW.md` §6 |
+| Agent A RBAC probe + Agent A `test/auth.test.ts` | Isolated `git archive` of `valryde-api` `main` `4a9a152` in scratchpad, in-memory repository, `inject()` | PASSED | 2026-10-21 10:07 +08:00 | 18/18: unauthenticated 401, non-Admin 403, self-disable 400, disabled-Admin token 401, validation 400/404, DTO keys, D1 rate-limit 500+retry-after. Nothing written to `valryde-api` |
+| Real backend auth and status-update integration | — | OWNER_VERIFICATION_PENDING | — | Procedure ready: `docs/testing/REAL_API_INTEGRATION_PROCEDURE.md` |
+| Pre-submission rerun: lint, typecheck, `npm test`, production build, `git diff --check main...HEAD` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 04:30 +08:00 | 47/47 tests; no build warnings; policy SHA-256 unchanged |
+| `npm audit --omit=dev` | Local Windows | PASSED | 2026-10-21 04:30 +08:00 | 0 production vulnerabilities |
+| `npm audit` (incl. dev tooling) | Local Windows | FAILED | 2026-10-21 04:30 +08:00 | 4 dev-only findings (2 high `@modelcontextprotocol/sdk` via `@angular/cli`; 2 moderate `vite` via `@angular/build`), newly published since the 03:55 run; fix requires Angular 22 → Node >=22.22.3 (owner decision) |
+| Screenshot evidence | `ng serve` + synthetic stub (not committed) | PASSED | 2026-10-21 04:28 +08:00 | `docs/testing/evidence/2026-10-21-shell-user-accounts/`; not real-backend evidence |
+| Real backend auth and status-update integration | — | NOT_RUN | — | Owner gate: running `valryde-api` + Admin account |
+| `npm run lint` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 04:20 +08:00 | angular-eslint 21.4.0: all files pass |
+| `npm run typecheck` (app + spec tsconfig) | Local Windows | PASSED | 2026-10-21 04:20 +08:00 | Strict TypeScript; templates are checked by the build |
+| `npm test` (Vitest via `ng test --watch=false`) | Local Windows, jsdom | PASSED | 2026-10-21 04:01 +08:00 | 8 files / 47 tests |
+| `npm run build` (production) | Local Windows | PASSED | 2026-10-21 03:59 +08:00 | No warnings; initial 313.86 kB raw / 84.64 kB transfer |
+| `npm audit` | Local Windows | PASSED | 2026-10-21 03:55 +08:00 | 0 vulnerabilities (maplibre-gl removed until the geometry slice; 5.x has critical GHSA-jrc7-96c5-q579, use >=6.5) |
+| Manual browser check: sign-in, guard redirect, session restore on reload, user list, row menu, disable confirmation + snackbar, self-disable blocked, detail page, overlay drawer | `ng serve` + synthetic Node mock API on 127.0.0.1:3000 (scratchpad, not committed) | PASSED | 2026-10-21 04:15 +08:00 | 1024 px and 375 px viewports; not a real-API or deployed-environment result |
 | Claude takeover recovery: repo/branch/PR inspection, policy SHA-256 recheck, Agent A `origin/main` recheck, toolchain check | Local Windows workspace | PASSED | 2026-10-21 03:35 +08:00 | HEAD `27f9c79`; bootstrap/UX docs still uncommitted; no PRs in `valryde-web-admin`; policy hash unchanged; Agent A `origin/main` still `711f4c4`; Node 22.17.1 / npm 10.9.2; no Angular CLI installed |
 | Workspace and top-level file inspection | Local Windows workspace | PASSED | 2026-10-21 02:44 +08:00 | Assigned repository exists; initial tracked files were README, LICENSE, and `.gitignore` |
 | `git status --short --branch` and history/remote inspection | `valryde-web-admin` | PASSED | 2026-10-21 02:44 +08:00 | Clean `main` initially at `27f9c79`, tracking `origin/main`; history and remote preserved; bootstrap branch created |
@@ -45,7 +61,7 @@
 | Governance, Agent E handoff, Agent A OpenAPI map/status, and Agent B status inspection | Read-only `valryde-api` reference | PASSED | 2026-10-21 02:44 +08:00 | Scope/dependency decisions reflected in local handoff and integration gate |
 | Required-file, local-link, and tracked-file integrity checks | `valryde-web-admin` | PASSED | 2026-10-21 02:44 +08:00 | All required files exist; local Markdown links resolve; original `LICENSE` and `.gitignore` unchanged |
 | UX contract required-document and trailing-whitespace checks | `valryde-web-admin` | PASSED | 2026-10-21 03:20 +08:00 | All ten directive-required UX/architecture/integration/testing documents exist and passed formatting inspection |
-| Application lint / typecheck / tests / build | Not applicable: no application scaffold or source exists | NOT_APPLICABLE | 2026-10-21 02:44 +08:00 | Documentation-only bootstrap; no implementation verification claimed |
+| Application lint / typecheck / tests / build (bootstrap era) | Not applicable at that time: no application scaffold or source existed | NOT_APPLICABLE | 2026-10-21 02:44 +08:00 | Documentation-only bootstrap; no implementation verification claimed |
 
 ## Shared contract / risk changes
 
@@ -62,6 +78,39 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-21 10:30 +08:00 — Admin foundation security and integration review
+
+- Action / reason: Tech Lead follow-up after PR #1 merged (`b1c381f`) and PR #2 was retargeted to `main`: assess auth security, dev-dependency advisories, and API compatibility with Agent A's merged frontend handoff (API PR #6).
+- Checklist/issue: IDs 56, 59; PR #2.
+- Files/config/services affected: `src/app/core/auth/auth.service.ts` (+spec), `src/app/features/auth/sign-in.page.ts` (+spec), `docs/security/ADMIN_AUTH_AND_DEPENDENCY_REVIEW.md` (new), `docs/testing/REAL_API_INTEGRATION_PROCEDURE.md` (new), `docs/testing/evidence/2026-10-21-security-review/`, `docs/integration/API_CONTRACT_MATRIX.md`, this file.
+- Observed result (success/failure/rollback): Three client defects confirmed and fixed: S1 sign-out during an in-flight refresh revoked the stale token and left the rotated session alive (and could restore local sign-in); S2 a refresh returning a non-Admin user did not revoke the new session; S3 rate-limited sign-in (Agent A D1, `500` + `retry-after`) showed a generic error. No architecture or contract change. Backend: non-Admin and unauthenticated status changes and Admin self-disable are rejected; unknown body fields are stripped rather than rejected (no effect, reported to Agent A).
+- Validation and evidence: S1/S2 regression tests failed before and pass after the fix; full suite 50/50; lint, typecheck, build pass; 18/18 backend probe + Agent A auth tests in an isolated export.
+- Contracts / risks / dependencies: Refresh token in `sessionStorage` retained (interim); risks and safest target (httpOnly `__Host-` cookie, shorter Admin TTL — needs Agent A contract change) documented. Dev-only advisories cannot be cleared within Angular 21 without forced overrides; Angular 22 recommended after acceptance; Node 24.15.0 already installed via nvm but switching is global (owner decision). GitHub active account is now `erwin-io`; pushes use the standard credential helper.
+- Commit/PR link or SHA (if available): PR #2 branch; see `git log` for the security-review commit.
+- Next action / owner gate: Agent G final merge review of PR #2. Real-API run is OPERATOR-GATED.
+
+### 2026-10-21 04:45 +08:00 — PRs submitted for Tech Lead review
+
+- Action / reason: Tech Lead authorized formal submission of the first slices (not acceptance, not merge).
+- Checklist/issue: PR #1 IDs 56–67 (docs/contract); PR #2 IDs 56, 59. No issue assigned.
+- Files/config/services affected: `docs/testing/evidence/2026-10-21-shell-user-accounts/` (5 synthetic-data screenshots + README), this file. Branches pushed: `docs/agent-e-bootstrap`, `feat/56-59-admin-shell-user-accounts`.
+- Observed result (success/failure/rollback): [PR #1](https://github.com/erwin-io/valryde-web-admin/pull/1) → `main`; [PR #2](https://github.com/erwin-io/valryde-web-admin/pull/2) → `docs/agent-e-bootstrap` (stacked; retarget to `main` after #1 merges). The active `gh` account on this workstation is `seefixmanagement`, which lacks push rights; the push and PR calls used the already-logged-in `erwin-io` account via a per-command `GH_TOKEN`, without changing the stored Git/gh configuration. Port 4200 was held by the `valryde-mobile-commuter` dev server and was left untouched; screenshots used port 4202.
+- Validation and evidence: lint, typecheck, 47/47 tests, production build, diff check and production audit passed. Full `npm audit` now reports 4 dev-tooling advisories (see Latest verification); not in the production bundle.
+- Contracts / risks / dependencies: No contract change. Real backend authentication and status-update integration remain untested (synthetic stub and `HttpTestingController` only). Refresh token in `sessionStorage` flagged for security review.
+- Commit/PR link or SHA (if available): `1806e17` (PR #1 head); `22b7fc3`, `f3d5c5b`, and this status commit (PR #2).
+- Next action / owner gate: Tech Lead review; owner decision on Node upgrade (unblocks Angular 22 and the dev advisories); owner-provided Admin account for real-API verification.
+
+### 2026-10-21 04:25 +08:00 — Angular shell, Admin access control, and User Accounts module
+
+- Action / reason: Development directive and Tech Lead release (recorded in `handoffs/AGENT_E_DEVELOPMENT_DIRECTIVE.md`) authorize Stage 3–4 and the first management module. Committed the documentation bootstrap as `1806e17` on `docs/agent-e-bootstrap` (trailing blank lines trimmed; shared policy byte-identical, SHA-256 unchanged), then branched `feat/56-59-admin-shell-user-accounts`.
+- Checklist/issue: IDs 56 and 59; no GitHub issue assigned yet.
+- Files/config/services affected: Angular 21.2 workspace (`angular.json`, `package.json`, lockfile, tsconfig, `eslint.config.js`, `proxy.conf.json`); `src/app/core` (API base path, error envelope, auth service, interceptor, guard, return-URL check); `src/app/shell` (toolbar, responsive drawer, navigation config); `src/app/shared/ui` (page header, status badge, page state, confirm dialog); `src/app/features/{auth,dashboard,identity}`; `src/testing/fixtures.ts`; README, acceptance matrix, `.gitignore`, this file.
+- Observed result (success/failure/rollback): Implemented. Angular 22 was rejected by the CLI (requires Node >=22.22.3; workstation has 22.17.1), so Angular 21.2.27 was used without changing the system Node. npm 10.9.2 crashed in peer resolution; npm 11.6.2 via npx installed cleanly. maplibre-gl 5.x had a critical advisory; it was removed from this slice and will be added at >=6.15 with the geometry editor.
+- Validation and evidence: lint, typecheck, 47/47 unit tests, production build and npm audit passed (see Latest verification). Manual flow passed against a synthetic local mock only.
+- Contracts / risks / dependencies: Consumes only `POST /api/auth/login|refresh|logout` and `GET /api/admin/users/`, `PATCH /api/admin/users/{id}/status` exactly as on Agent A main `711f4c4`. No role mutation, user creation, or detail endpoint invented; detail page composes from the list. Security choices for review: access token in memory, refresh token in `sessionStorage` (tab-scoped, survives reload); non-Admin logins are revoked server-side immediately; `returnUrl` limited to internal paths; route guard is UX only, API remains the authority. Navigation exposes only Dashboard and User accounts.
+- Commit/PR link or SHA (if available): See branch `feat/56-59-admin-shell-user-accounts`; no PR yet.
+- Next action / owner gate: Owner confirms pushing and opening PRs; Tech Lead review. Real-API sign-in needs a running `valryde-api` and a permanent Admin account (owner gate).
 
 ### 2026-10-21 03:35 +08:00 — Execution handover from Codex to Claude
 

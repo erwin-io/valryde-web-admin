@@ -1,0 +1,104 @@
+.panel {
+  background: var(--vr-surface);
+  border: 1px solid var(--vr-border);
+  border-radius: 8px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--vr-border);
+
+  .search {
+    flex: 1 1 280px;
+  }
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.primary-cell {
+  display: block;
+  color: var(--mat-sys-primary);
+  font-weight: 500;
+}
+
+.secondary-cell {
+  color: var(--vr-text-secondary);
+  font-size: 13px;
+}
+
+.actions-cell {
+  width: 56px;
+  text-align: right;
+}
+
+// Secondary columns collapse on tablet; identity, status, and actions stay available.
+@media (max-width: 1199.98px) {
+  .optional {
+    display: none;
+  }
+}
+
+.inline-alert {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 8px 8px 8px 16px;
+  color: var(--vr-error);
+  background: var(--vr-error-bg);
+  border-radius: 4px;
+
+  span {
+    flex: 1;
+  }
+}
+
+.details {
+  max-width: 880px;
+  padding: 24px;
+
+  h2 {
+    margin: 0 0 16px;
+    font: var(--mat-sys-title-medium);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: minmax(140px, 200px) 1fr;
+    gap: 12px 24px;
+    margin: 0;
+
+    @media (max-width: 599.98px) {
+      grid-template-columns: 1fr;
+      gap: 4px;
+
+      dd {
+        margin-bottom: 12px;
+      }
+    }
+  }
+
+  dt {
+    color: var(--vr-text-secondary);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .note {
+    margin: 24px 0 0;
+    color: var(--vr-text-secondary);
+  }
+}
