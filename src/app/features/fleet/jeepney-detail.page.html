@@ -1,0 +1,126 @@
+<app-page-header
+  [title]="jeepney()?.plateNo ?? 'Jeepney'"
+  description="Registration record and server-resolved route assignment. This view is read-only."
+  [breadcrumbs]="breadcrumbs()"
+/>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-page-state kind="loading" title="Loading jeepney…" />
+  }
+  @case ('denied') {
+    <app-page-state kind="denied" [problem]="problem()" />
+  }
+  @case ('error') {
+    <app-page-state kind="error" title="This jeepney could not be loaded" [problem]="problem()" (retry)="load()" />
+  }
+  @case ('not-found') {
+    <app-page-state kind="not-found" message="No jeepney with this identifier is visible to your account." />
+  }
+  @default {
+    @if (jeepney(); as j) {
+      <section class="panel details" aria-labelledby="registration-title">
+        <h2 id="registration-title">Registration</h2>
+        <dl>
+          <dt>Plate number</dt>
+          <dd>{{ j.plateNo }}</dd>
+          <dt>Status</dt>
+          <dd>
+            @if (badge(); as b) {
+              <app-status-badge [label]="b.label" [icon]="b.icon" [tone]="b.tone" />
+            }
+          </dd>
+          <dt>Color</dt>
+          <dd><span class="swatch" [style.background]="j.colorHex" aria-hidden="true"></span><code>{{ j.colorHex }}</code></dd>
+          <dt>Description</dt>
+          <dd>
+            @if (j.description) {
+              {{ j.description }}
+            } @else {
+              <span class="unavailable">No description</span>
+            }
+          </dd>
+          <dt>Approved</dt>
+          <dd>
+            @if (j.approvedAt) {
+              {{ j.approvedAt | date: 'medium' }}
+            } @else {
+              <span class="unavailable">Not approved</span>
+            }
+          </dd>
+          <dt>Operator</dt>
+          <dd>
+            @if (j.operatorId) {
+              Operator record <code>{{ j.operatorId }}</code>
+              <span class="unavailable note-line">Name not available until the operator directory API exists.</span>
+            } @else {
+              <span class="unavailable">No operator linked</span>
+            }
+          </dd>
+          <dt>Registered</dt>
+          <dd>{{ j.createdAt | date: 'medium' }}</dd>
+          <dt>Last updated</dt>
+          <dd>{{ j.updatedAt | date: 'medium' }}</dd>
+          <dt>Jeepney ID</dt>
+          <dd><code>{{ j.id }}</code></dd>
+        </dl>
+      </section>
+
+      <section class="panel details" aria-labelledby="route-title">
+        <h2 id="route-title">Effective route</h2>
+        @switch (routeState()) {
+          @case ('loading') {
+            <app-page-state kind="loading" title="Resolving route…" />
+          }
+          @case ('none') {
+            <p class="unavailable">No route assigned. This jeepney is not available to commuters.</p>
+          }
+          @case ('conflict') {
+            <div class="inline-alert" role="alert">
+              <mat-icon aria-hidden="true">warning</mat-icon>
+              <span>
+                Route assignment conflict: more than one group route applies and there is no direct assignment.
+                The operator must set a direct route.
+              </span>
+            </div>
+          }
+          @case ('error') {
+            <app-page-state kind="error" title="The route could not be resolved" [problem]="routeProblem()" (retry)="loadRoute()" />
+          }
+          @default {
+            @if (route(); as r) {
+              <dl>
+                <dt>Direction</dt>
+                <dd>{{ r.direction.directionLabel }}</dd>
+                <dt>From / to</dt>
+                <dd>{{ r.direction.originName }} → {{ r.direction.destinationName }}</dd>
+                <dt>Assigned via</dt>
+                <dd>
+                  @if (r.source === 'GROUP' && r.groupId) {
+                    Fleet group — <a [routerLink]="['/fleet/groups', r.groupId]">view group</a>
+                  } @else {
+                    Direct assignment
+                  }
+                </dd>
+                <dt>Active since</dt>
+                <dd>{{ r.activeFrom | date: 'medium' }}</dd>
+              </dl>
+            }
+          }
+        }
+      </section>
+
+      <aside class="contract-gate details" aria-labelledby="gate-title">
+        <mat-icon aria-hidden="true">lock_clock</mat-icon>
+        <div>
+          <h2 id="gate-title">Not available in this view</h2>
+          <p>
+            Driver assignment, group membership, GPS device status, and live location are not shown. The current
+            API has no read endpoint for assignments or membership, and live tracking depends on contracts that
+            are not yet approved.
+          </p>
+        </div>
+      </aside>
+    }
+  }
+}

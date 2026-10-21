@@ -19,6 +19,8 @@ export const NAVIGATION: NavGroup[] = [
   {
     label: 'Fleet Management',
     items: [
+      { label: 'Jeepneys', icon: 'directions_bus', route: '/fleet/jeepneys' },
+      { label: 'Fleet groups', icon: 'workspaces', route: '/fleet/groups' },
       { label: 'Operators', icon: 'business', route: '/fleet/operators' },
       { label: 'Drivers', icon: 'badge', route: '/fleet/drivers' },
     ],

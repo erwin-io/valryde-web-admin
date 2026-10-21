@@ -27,6 +27,30 @@ export const routes: Routes = [
           import('./features/dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
       {
+        path: 'fleet/jeepneys',
+        title: 'Jeepneys · Valryde Admin',
+        loadComponent: () =>
+          import('./features/fleet/jeepney-list.page').then((m) => m.JeepneyListPage),
+      },
+      {
+        path: 'fleet/jeepneys/:jeepneyId',
+        title: 'Jeepney · Valryde Admin',
+        loadComponent: () =>
+          import('./features/fleet/jeepney-detail.page').then((m) => m.JeepneyDetailPage),
+      },
+      {
+        path: 'fleet/groups',
+        title: 'Fleet groups · Valryde Admin',
+        loadComponent: () =>
+          import('./features/fleet/group-list.page').then((m) => m.GroupListPage),
+      },
+      {
+        path: 'fleet/groups/:groupId',
+        title: 'Fleet group · Valryde Admin',
+        loadComponent: () =>
+          import('./features/fleet/group-detail.page').then((m) => m.GroupDetailPage),
+      },
+      {
         path: 'fleet/operators',
         title: 'Operators · Valryde Admin',
         data: { role: 'OPERATOR' },

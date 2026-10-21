@@ -1,0 +1,22 @@
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border: 1px solid var(--vr-border);
+  border-radius: 3px;
+}
+
+.unavailable {
+  color: var(--vr-text-secondary);
+  font-style: italic;
+}
+
+.details + .details {
+  margin-top: 16px;
+}
+
+.note-line {
+  display: block;
+}
