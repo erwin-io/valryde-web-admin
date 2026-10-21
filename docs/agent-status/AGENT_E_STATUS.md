@@ -7,7 +7,7 @@
 - Repository: `valryde-web-admin`
 - Branch / HEAD SHA: `feat/57-58-operator-driver-monitoring` from `main` @ `fc55582` (PR #2 merge)
 - Checklist IDs: 56–67
-- GitHub issues / PRs: PR #1 merged (`b1c381f`); PR #2 merged (`fc55582`); Operator/Driver monitoring PR opened from this branch (link in activity log). No issue assigned.
+- GitHub issues / PRs: PR #1 merged (`b1c381f`); PR #2 merged (`fc55582`); [PR #3](https://github.com/erwin-io/valryde-web-admin/pull/3) Operator/Driver monitoring → `main`, under review. No issue assigned.
 - Implementation progress: IN_PROGRESS
 - Tech Lead review decision (if actually issued): PR #2 accepted for development and merged at `fc55582`; production acceptance OPERATOR-GATED (real Admin login/session, real status updates with isolated dev users, hosting CSP, refresh-token storage decision). Next PR: Not reviewed.
 - Current objective: Submit Operator and Driver monitoring (IDs 57, 58) at account level, with fleet context gated on Agent A G1.
@@ -89,7 +89,7 @@
 - Observed result (success/failure/rollback): Implemented `/fleet/operators` and `/fleet/drivers` as account-level monitoring from `GET /api/admin/users/` (role-filtered, search, status filter, sort, pagination), linking to the existing account record rather than duplicating status controls. Verified in Agent A migrations that `jeepneys.operator_id`/`fleet_groups.operator_id` reference `operators.id` and assignments reference `drivers.id`, neither of which is the user ID, and no merged endpoint maps them; G1 is only a proposal (valryde-api PR #8). Fleet context is therefore shown as an explicit contract gate; no fleet data is inferred.
 - Validation and evidence: 59/59 tests (role filtering incl. multi-role accounts, link target, gate copy, filters, empty/403/error states, navigation only links implemented routes); lint, typecheck, build pass; screenshots against the synthetic stub.
 - Contracts / risks / dependencies: No contract change; consumes only `GET /api/admin/users/`. Agent A D1 fix (API PR #7) is open; the sign-in client already handles both `429` and `500` + `retry-after`. Angular 22 and cookie-auth remain separate future PRs.
-- Commit/PR link or SHA (if available): this branch; PR link follows in the next status update.
+- Commit/PR link or SHA (if available): `7e02a1e`; [PR #3](https://github.com/erwin-io/valryde-web-admin/pull/3).
 - Next action / owner gate: Tech Lead review; real-API verification still OPERATOR-GATED.
 
 ### 2026-10-21 10:30 +08:00 — Admin foundation security and integration review
