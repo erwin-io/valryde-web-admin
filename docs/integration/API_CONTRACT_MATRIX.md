@@ -78,3 +78,11 @@ Checked 2026-10-21 against `AGENT_A_FRONTEND_API_INTEGRATION_HANDOFF.md` §1, §
 | Error envelope, branch on `code`, show `requestId` | §1 rule 3 | Compatible |
 | Rate limit as `500` + `retry-after` (defect D1) | §1.3 | Handled in sign-in copy |
 | Restore = refresh then `GET /auth/me` | §1.1 | Client uses the `user` returned by refresh; `GET /auth/me` not needed for the same data |
+
+## Checklist 60 consumption — Agent A `main` `827738c`
+
+| Endpoint | Fields used | Not available (shown as gated or omitted) |
+|---|---|---|
+| `GET /jeepneys` | `id`, `plateNo`, `colorHex`, `description`, `status` (6 values), `approvedAt`, `operatorId` (shown as an opaque operator record ID), `createdAt`, `updatedAt` | Operator name (G1), active driver (G3), group membership (G2), GPS/application status (IDs 63–64 modules), location/online/compliance (Agent B) |
+| `GET /fleet-groups` | `id`, `name`, `description`, `status`, `operatorId` (opaque), `createdAt`, `updatedAt` | Members, member counts, group route assignment (no read endpoint) |
+| `GET /jeepneys/{id}/effective-route` | `source`, `groupId` (only jeepney→group link the API returns), `activeFrom`, `direction.directionLabel/originName/destinationName`; `null` → no route; `409 ROUTE_ASSIGNMENT_CONFLICT` → conflict notice | Route geometry is fetched but not rendered (map arrives with IDs 61–62) |

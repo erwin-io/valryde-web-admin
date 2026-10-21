@@ -13,9 +13,10 @@
 | ROUTE-03 | Create/edit route | Manage approved metadata/status/color | pristine, dirty, invalid, saving, conflict | POST/PATCH Admin transit routes |
 | ROUTE-04 | Direction editor | Manage endpoints, corridor, status | pristine, dirty, invalid, saving | POST/PATCH route direction |
 | ROUTE-05 | Geometry editor | Display/edit/import one LineString | loading, editing, invalid, dirty, saving, recovery | direction PATCH; no stop contract |
-| VEH-01 | Vehicle registry | Search/filter permitted jeepneys | loading, empty, failed, ready | `GET /api/jeepneys` |
-| VEH-02 | Vehicle details | Inspect vehicle, route, and workflow context | partial, loading, failed, ready | jeepney list + effective route + application lists |
-| GROUP-01 | Fleet groups | Review and manage groups | loading, empty, failed, ready | fleet-group GET/POST/PATCH |
+| VEH-01 | Vehicle registry | Search/filter permitted jeepneys | loading, empty, failed, ready | `GET /api/jeepneys` — implemented read-only |
+| VEH-02 | Vehicle details | Inspect vehicle, route, and workflow context | partial, loading, failed, ready | jeepney list + `GET /api/jeepneys/{id}/effective-route` — implemented read-only; application/GPS context deferred to IDs 63–64; driver assignment gated (no read endpoint) |
+| GROUP-01 | Fleet groups | Review and manage groups | loading, empty, failed, ready | `GET /api/fleet-groups` — implemented read-only; create/edit deferred to a later reviewed slice |
+| GROUP-02 | Fleet group details | Inspect one group | loading, not found, failed, ready | composed from group list; membership gated (Agent A G2) |
 | OP-01 | Operators | Monitor Operator accounts | loading, empty, failed, ready | filtered Admin users (implemented); `operators.id` not linkable to accounts until G1 — contract-gate notice shown |
 | DRV-01 | Drivers | Monitor Driver accounts | loading, empty, failed, ready | filtered Admin users (implemented); `drivers.id` not linkable to accounts until G1 — contract-gate notice shown |
 | APP-01 | Vehicle applications | Review application queue | loading, empty, failed, ready | vehicle-application GET |

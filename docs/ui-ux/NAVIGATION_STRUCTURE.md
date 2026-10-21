@@ -9,9 +9,10 @@ Production navigation exposes only functional MVP routes. Disabled placeholders 
 | Transit Network | `/transit/routes/:routeId` | Route details | Agent A available through Admin list payload |
 | Transit Network | `/transit/routes/:routeId/edit` | Route metadata editor | Agent A available |
 | Transit Network | `/transit/directions/:directionId/geometry` | Geometry editor | Agent A available; active-assignment warning data incomplete |
-| Fleet Management | `/fleet/vehicles` | Jeepney registry | Agent A available |
-| Fleet Management | `/fleet/vehicles/:vehicleId` | Vehicle details | Partial; compose list plus effective-route endpoints |
-| Fleet Management | `/fleet/groups` | Fleet groups | Agent A available |
+| Fleet Management | `/fleet/jeepneys` | Jeepney registry | Implemented read-only (ID 60); path renamed from planned `/fleet/vehicles` to match the domain term |
+| Fleet Management | `/fleet/jeepneys/:jeepneyId` | Jeepney details | Implemented read-only: list composition + effective route; driver/GPS/tracking gated |
+| Fleet Management | `/fleet/groups` | Fleet groups | Implemented read-only (ID 60) |
+| Fleet Management | `/fleet/groups/:groupId` | Fleet group details | Implemented read-only; membership gated on Agent A G2 |
 | Fleet Management | `/fleet/operators` | Operators | Implemented (account-level, links to account record); fleet context gated on Agent A G1 directory (API PR #8, proposal) |
 | Fleet Management | `/fleet/drivers` | Drivers | Implemented (account-level, links to account record); assignments/membership gated on Agent A G1/G2 |
 | Applications & Approvals | `/applications/vehicles` | Vehicle applications | Agent A available |

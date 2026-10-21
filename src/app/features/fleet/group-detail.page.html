@@ -1,0 +1,67 @@
+<app-page-header
+  [title]="group()?.name ?? 'Fleet group'"
+  description="Fleet group record. This view is read-only."
+  [breadcrumbs]="breadcrumbs()"
+/>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-page-state kind="loading" title="Loading fleet group…" />
+  }
+  @case ('denied') {
+    <app-page-state kind="denied" [problem]="problem()" />
+  }
+  @case ('error') {
+    <app-page-state kind="error" title="This fleet group could not be loaded" [problem]="problem()" (retry)="load()" />
+  }
+  @case ('not-found') {
+    <app-page-state kind="not-found" message="No fleet group with this identifier is visible to your account." />
+  }
+  @default {
+    @if (group(); as g) {
+      <section class="panel details" aria-labelledby="group-title">
+        <h2 id="group-title">Group</h2>
+        <dl>
+          <dt>Name</dt>
+          <dd>{{ g.name }}</dd>
+          <dt>Status</dt>
+          <dd>
+            @if (badge(); as b) {
+              <app-status-badge [label]="b.label" [icon]="b.icon" [tone]="b.tone" />
+            }
+          </dd>
+          <dt>Description</dt>
+          <dd>
+            @if (g.description) {
+              {{ g.description }}
+            } @else {
+              <span class="unavailable">No description</span>
+            }
+          </dd>
+          <dt>Operator</dt>
+          <dd>
+            Operator record <code>{{ g.operatorId }}</code>
+            <span class="unavailable note-line">Name not available until the operator directory API exists.</span>
+          </dd>
+          <dt>Created</dt>
+          <dd>{{ g.createdAt | date: 'medium' }}</dd>
+          <dt>Last updated</dt>
+          <dd>{{ g.updatedAt | date: 'medium' }}</dd>
+          <dt>Group ID</dt>
+          <dd><code>{{ g.id }}</code></dd>
+        </dl>
+      </section>
+
+      <aside class="contract-gate details" aria-labelledby="gate-title">
+        <mat-icon aria-hidden="true">lock_clock</mat-icon>
+        <div>
+          <h2 id="gate-title">Members not available yet</h2>
+          <p>
+            The drivers and jeepneys in this group, and any route assigned to it, are not shown. The current API
+            has no read endpoint for group membership or group route assignment.
+          </p>
+        </div>
+      </aside>
+    }
+  }
+}

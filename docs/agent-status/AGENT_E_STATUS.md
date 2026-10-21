@@ -2,18 +2,18 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-21 11:20 +08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-21 18:45 +08:00
 - Agent / module: E — Administrative Web Development / Valryde Admin
 - Repository: `valryde-web-admin`
-- Branch / HEAD SHA: `feat/57-58-operator-driver-monitoring` from `main` @ `fc55582` (PR #2 merge)
+- Branch / HEAD SHA: `feat/60-jeepney-fleet-monitoring` from `main` @ `075b377` (PR #3 merge)
 - Checklist IDs: 56–67
-- GitHub issues / PRs: PR #1 merged (`b1c381f`); PR #2 merged (`fc55582`); [PR #3](https://github.com/erwin-io/valryde-web-admin/pull/3) Operator/Driver monitoring → `main`, under review. No issue assigned.
+- GitHub issues / PRs: PR #1 merged (`b1c381f`); PR #2 merged (`fc55582`); PR #3 merged (`075b377`); checklist 60 PR opened from this branch (link in activity log). No issue assigned.
 - Implementation progress: IN_PROGRESS
-- Tech Lead review decision (if actually issued): PR #2 accepted for development and merged at `fc55582`; production acceptance OPERATOR-GATED (real Admin login/session, real status updates with isolated dev users, hosting CSP, refresh-token storage decision). Next PR: Not reviewed.
-- Current objective: Submit Operator and Driver monitoring (IDs 57, 58) at account level, with fleet context gated on Agent A G1.
-- Last confirmed result: 10 test files / 59 tests, lint, typecheck, production build pass; synthetic-stub screenshots captured.
-- Next concrete action: Tech Lead review. Then, as separate PRs: jeepney/fleet-group monitoring (ID 60, merged APIs), Angular 22 migration (owner Node decision), cookie-auth proposal (Agent A contract). Wire operator/driver fleet context when G1 merges.
-- Blocked by / decision owner: Operator/driver fleet context — Agent A G1 directory (valryde-api PR #8, proposal) and G2 membership. Real-API verification, hosting CSP, refresh-token storage — owner/Tech Lead (OPERATOR-GATED).
+- Tech Lead review decision (if actually issued): PRs #2 and #3 merged; Admin foundation accepted for development with production acceptance OPERATOR-GATED. Checklist 60 PR: Not reviewed.
+- Current objective: AGENT_E_CHECKLIST60_READY_FOR_REVIEW — read-only Jeepney and Fleet Group monitoring.
+- Last confirmed result: 13 test files / 82 tests, lint, typecheck, production build, diff check pass; synthetic-fixture screenshots captured.
+- Next concrete action: Tech Lead review of the checklist 60 PR. Separate future PRs: transit routes (61–62), applications/GPS (63–64), Angular 22 (owner Node decision), cookie-auth proposal (Agent A contract), G1/G2 wiring once Agent A implements them.
+- Blocked by / decision owner: Operator names, driver assignment and group membership — Agent A G1/G2/G3 implementation (G1 proposal merged via API PR #8, endpoints not implemented). Production gates (real Admin login/status tests, hosting CSP, refresh-token storage) — owner/Tech Lead.
 - Execution agent: Claude (took over from Codex 2026-10-21 03:35 +08:00 after Codex usage limit; no approved work rejected).
 - Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
 
@@ -22,10 +22,10 @@
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
 |---:|---|---|---|---|
 | 56 | Admin Login & Dashboard | IN_PROGRESS | Sign-in, session restore/refresh, Admin guard, interceptor, shell, access-denied, dashboard shortcuts; `src/app/core`, `src/app/shell`, `src/app/features/auth`, `src/app/features/dashboard`; unit tests | Tech Lead review; dashboard metrics gated on aggregation contracts |
-| 57 | Operator Management | READY_FOR_REVIEW | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | Fleet context gated on Agent A G1 |
-| 58 | Driver Monitoring | READY_FOR_REVIEW | `/fleet/drivers` account-level list, same component; unit tests | Assignment/membership gated on Agent A G1/G2 |
+| 57 | Operator Management | READY_FOR_REVIEW (merged `075b377`) | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | Fleet context gated on Agent A G1 |
+| 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | Assignment/membership gated on Agent A G1/G2 |
 | 59 | Commuter User Monitoring | READY_FOR_REVIEW (merged `fc55582`; production acceptance operator-gated) | User Accounts list (search, role/status filters, sort, pagination), detail, enable/disable with confirmation and self-disable guard; `src/app/features/identity`; unit tests + security review fixes S1–S3 | Tech Lead review; real-API check is an owner gate |
-| 60 | Jeepney & Fleet Group Monitoring | NOT_STARTED | Scope recorded in handoff | Full directive; contract matrix |
+| 60 | Jeepney & Fleet Group Monitoring | READY_FOR_REVIEW | Read-only `/fleet/jeepneys`, `/fleet/jeepneys/:id` (with effective route), `/fleet/groups`, `/fleet/groups/:id`; `src/app/features/fleet/{fleet.models,fleet.service,jeepney-*,group-*}`; unit tests | Membership/driver/operator names gated on Agent A G1–G3; create/edit is a later slice |
 | 61 | Official Transit Route & Direction Management | NOT_STARTED | Scope and server-owned route rules recorded | Full directive; verify accepted API contract |
 | 62 | Route Polyline / Corridor / Geofence Management | NOT_STARTED | Map/geometry documentation area prepared | Full directive; approved geometry/geofence contracts |
 | 63 | GPS Device Management & Mapping | NOT_STARTED | Dependency/gate recorded | Approved Agent A/B contracts and full directive |
@@ -38,6 +38,9 @@
 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
+| Checklist 60: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`, `git diff --check` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 18:40 +08:00 | 13 files / 82 tests (+23); no build warnings; initial 315.63 kB raw / 85.25 kB transfer |
+| `npm audit --omit=dev` / `npm audit` | Local Windows | PASSED / FAILED | 2026-10-21 18:40 +08:00 | 0 production; same 2 dev-only packages (MCP SDK via @angular/cli, vite via @angular/build), now reported as 4 high; unchanged by this PR |
+| Checklist 60 screenshots | `ng serve` + synthetic fixtures (not committed) | PASSED | 2026-10-21 18:35 +08:00 | `docs/testing/evidence/2026-10-21-jeepney-fleet-monitoring/`; no console errors; not real-backend evidence |
 | Operator/Driver slice: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 11:10 +08:00 | 10 files / 59 tests (+9); no build warnings; initial 314.85 kB raw / 85.04 kB transfer |
 | Operator/Driver screenshots | `ng serve` + synthetic stub (not committed) | PASSED | 2026-10-21 11:15 +08:00 | `docs/testing/evidence/2026-10-21-operator-driver-monitoring/`; no console errors; not real-backend evidence |
 | Security-review rerun: `npm test` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 10:12 +08:00 | 8 files / 50 tests (3 new regression tests; 2 failed before the fix) |
@@ -80,6 +83,17 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-21 18:45 +08:00 — Checklist 60 read-only Jeepney and Fleet Group monitoring
+
+- Action / reason: Tech Lead release after PR #3 merged (`075b377`): read-only Jeepney and Fleet Group monitoring from merged Agent A contracts only.
+- Checklist/issue: ID 60; no issue assigned.
+- Files/config/services affected: `src/app/features/fleet/fleet.models.ts`, `fleet.service.ts`, `fleet.scss`, `jeepney-list.page.*`, `jeepney-detail.page.*`, `group-list.page.*`, `group-detail.page.*`, `group-pages.spec.ts`; `src/app/app.routes.ts`; `src/app/shell/navigation.ts`; `src/testing/fixtures.ts`; navigation, screen inventory, acceptance and API matrix docs; README; evidence; this file.
+- Observed result (success/failure/rollback): Implemented. Re-read Agent A `main` `827738c`: route files unchanged in scope; no G1/G2/G3 endpoints exist (only the proposal). Consumed `GET /api/jeepneys`, `GET /api/fleet-groups`, `GET /api/jeepneys/{id}/effective-route`. `operatorId` references `operators.id` and is shown only as an opaque record ID with a "name not available" note. The only jeepney→group association the API returns (`effectiveRouteDirection.groupId` when `source = GROUP`) is linked; membership, driver assignment, GPS and tracking are shown as explicit gates. Fixed a missing-space rendering issue in the operator note found during the visual check.
+- Validation and evidence: 82/82 tests (loading, success, empty, 401, 403, 500 + retry, search/status filters, sort, 25-row pagination, missing optional fields, 409 route conflict, not-found, no fabricated driver/GPS/location columns, nav links only to implemented routes); lint, typecheck, build, diff check pass; screenshots with synthetic fixtures at 1280 and 1024 px.
+- Contracts / risks / dependencies: No API, DB, RBAC or cross-agent contract change. No Traccar identifiers or telemetry used. No auth/storage/Angular/Node change. Route path renamed from planned `/fleet/vehicles` to `/fleet/jeepneys` (docs updated).
+- Commit/PR link or SHA (if available): this branch; PR link follows in the next status update.
+- Next action / owner gate: Tech Lead review. Real backend verification remains OPERATOR-GATED.
 
 ### 2026-10-21 11:20 +08:00 — Operator and Driver monitoring slice (IDs 57, 58)
 
