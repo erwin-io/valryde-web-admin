@@ -4,8 +4,8 @@
 |---|---|---|---|
 | W-01 Admin sign-in | auth service, guard, interceptor, non-Admin rejection tests | keyboard and tablet shell | Implemented; unit tests passing; manual check against synthetic local API only |
 | W-02 Vehicle registry | typed adapter, loading/error/empty/filter tests | table at desktop/tablet | Planned |
-| W-03 Operator context | role filtering and safe missing-contract state | related links | Planned |
-| W-04 Driver context | role filtering and missing-assignment state | related links | Planned |
+| W-03 Operator context | role filtering and safe missing-contract state | related links | Account level implemented; unit tests passing; fleet links gated on G1 |
+| W-04 Driver context | role filtering and missing-assignment state | related links | Account level implemented; unit tests passing; assignments gated on G1/G2 |
 | W-05 Route details | nested direction rendering and failure states | hierarchy clarity | Planned |
 | W-06 Geometry edit | LineString validation, dirty guard, save/error recovery | MapLibre pointer/keyboard checks | Planned |
 | W-07 Application review | allowed decisions, confirmation, 409 preservation | review layout | Planned |

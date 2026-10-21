@@ -12,8 +12,8 @@ Production navigation exposes only functional MVP routes. Disabled placeholders 
 | Fleet Management | `/fleet/vehicles` | Jeepney registry | Agent A available |
 | Fleet Management | `/fleet/vehicles/:vehicleId` | Vehicle details | Partial; compose list plus effective-route endpoints |
 | Fleet Management | `/fleet/groups` | Fleet groups | Agent A available |
-| Fleet Management | `/fleet/operators` | Operators | Account-level view available; operator-domain detail contract missing |
-| Fleet Management | `/fleet/drivers` | Drivers | Account-level view available; assignment detail contract incomplete |
+| Fleet Management | `/fleet/operators` | Operators | Implemented (account-level, links to account record); fleet context gated on Agent A G1 directory (API PR #8, proposal) |
+| Fleet Management | `/fleet/drivers` | Drivers | Implemented (account-level, links to account record); assignments/membership gated on Agent A G1/G2 |
 | Applications & Approvals | `/applications/vehicles` | Vehicle applications | Agent A available |
 | Applications & Approvals | `/applications/vehicles/:applicationId` | Vehicle application review | Agent A list + review available |
 | Applications & Approvals | `/applications/gps` | GPS setup queue | Agent A available |
