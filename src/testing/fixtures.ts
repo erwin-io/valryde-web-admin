@@ -1,5 +1,6 @@
 import { AuthTokens, PublicUser } from '../app/core/auth/auth.models';
 import { FleetGroup, Jeepney } from '../app/features/fleet/fleet.models';
+import { AdminTransitRoute, RouteDirection } from '../app/features/transit/transit.models';
 
 export function user(overrides: Partial<PublicUser> = {}): PublicUser {
   return {
@@ -53,6 +54,37 @@ export function fleetGroup(overrides: Partial<FleetGroup> = {}): FleetGroup {
     status: 'ACTIVE',
     createdAt: '2026-10-01T00:00:00.000Z',
     updatedAt: '2026-10-01T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+export function direction(overrides: Partial<RouteDirection> = {}): RouteDirection {
+  return {
+    id: '40000000-0000-4000-8000-000000000001',
+    routeId: '50000000-0000-4000-8000-000000000001',
+    directionLabel: 'Northbound',
+    originName: 'Bulacao',
+    destinationName: 'Colon',
+    geometry: { type: 'LineString', coordinates: [[123.86, 10.26], [123.88, 10.28], [123.9, 10.3]] },
+    corridorM: 100,
+    status: 'ACTIVE',
+    createdAt: '2026-10-01T00:00:00.000Z',
+    updatedAt: '2026-10-01T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+export function transitRoute(overrides: Partial<AdminTransitRoute> = {}): AdminTransitRoute {
+  return {
+    id: '50000000-0000-4000-8000-000000000001',
+    routeCode: '10F',
+    publicName: 'Bulacao - Colon',
+    description: 'Synthetic test route',
+    routeColorHex: '#43A047',
+    status: 'ACTIVE',
+    createdAt: '2026-10-01T00:00:00.000Z',
+    updatedAt: '2026-10-02T00:00:00.000Z',
+    directions: [direction()],
     ...overrides,
   };
 }
