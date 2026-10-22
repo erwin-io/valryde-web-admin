@@ -1,6 +1,6 @@
-# Real API Integration Procedure — Admin sign-in and User Accounts
+# Real API Integration Procedure — Admin web
 
-**Purpose:** repeatable verification of PR #2 (IDs 56, 59) against a real local `valryde-api`, replacing the synthetic stub used so far.
+**Purpose:** repeatable verification of the Admin web (IDs 56, 59 from PR #2; 60; 61 from PR #5; 63–64 from PR #6) against a real local `valryde-api`, replacing the synthetic stubs used so far.
 **State:** `OPERATOR-GATED` — not yet run. Requires an owner-approved local test backend and test Admin account.
 **Never** run this against production, a shared database, or real user records.
 
@@ -67,6 +67,19 @@ Record pass/fail, time, and request IDs only. Use browser DevTools → Network t
 | 13 | Revocation | After 12, replay the old refresh token with `POST /api/auth/refresh` (DevTools) | `401 SESSION_REVOKED` |
 | 14 | Rate limit | 11 wrong sign-ins within a minute | Server `500` + `retry-after` (Agent A D1); UI shows "Too many sign-in attempts" |
 | 15 | W-11 | Stop the API, click Try again on the user list | Network error state with retry; no crash |
+| 16 | ID 60 | Open Fleet Management → Jeepneys, then a jeepney | List and detail load; effective route shows direct/group/none or the 409 conflict notice |
+| 17 | ID 61 | Create route `ZZ-TEST-1` (test-only code), then open it | `POST /api/admin/transit-routes` 201; detail shows Draft; list re-read includes it |
+| 18 | ID 61 | Create `ZZ-TEST-1` again | `409 CONFLICT` shown on the route-code field; values kept |
+| 19 | ID 61 | Edit the test route name and status → Inactive | Only changed fields in the PATCH body; confirmation shown; detail re-read shows the change |
+| 20 | ID 61 | On a route with ≥ 2 directions, rename one to the other's label | Blocked client-side; no PATCH sent (Agent A D3 would return 500) |
+| 21 | ID 64 | As U1 (Operator), submit a vehicle application for a test jeepney; as A1 approve it | Review PATCH 200; status re-read Approved; jeepney status updated by server |
+| 22 | ID 64 | Approve the same application again from a second stale tab | `409 CONFLICT`; page re-reads and shows the existing decision |
+| 23 | ID 63–64 | As U1 request GPS setup; as A1 approve, schedule (date), mark installed | Each transition confirmed and re-read; invalid transition attempts return 409 |
+| 24 | ID 63 | Map a test device (test IMEI/serial/Traccar ID only) | 201; mapping shown once; repeating with the same IMEI → `409 DEVICE_MAPPING_CONFLICT` |
+| 25 | ID 63 | Verify with one check failing, then with all four passing | First → Failed; second → Verified and jeepney Active. Physical device reporting is **not** proven by this; that is a hardware gate |
+| 26 | RBAC | Repeat any Admin write with U1's token (DevTools) | `403 FORBIDDEN`; nothing changes |
+
+Test data for cases 17–25 must use obviously synthetic values (route codes starting `ZZ-TEST`, IMEIs from a test range agreed with the operator, Traccar IDs that do not exist in a production Traccar). There is no delete for routes, applications, requests or mappings: use a disposable database.
 
 ## 6. Evidence and reporting
 
