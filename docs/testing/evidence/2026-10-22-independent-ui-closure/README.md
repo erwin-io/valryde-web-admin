@@ -1,7 +1,9 @@
 # Independent UI Closure Browser Evidence
 
-**Date:** 2026-10-22 (Asia/Manila)  
-**Scope:** IDs 56–64 and bounded ID 67  
+**Date:** 2026-10-22 (Asia/Manila)
+
+**Scope:** IDs 56–64 and bounded ID 67
+
 **Environment:** Angular development server on localhost plus a temporary synthetic Node API fixture. The fixture was removed after the run; no real API, credentials, private data, Traccar service, or backend write was used.
 
 ## Viewports checked

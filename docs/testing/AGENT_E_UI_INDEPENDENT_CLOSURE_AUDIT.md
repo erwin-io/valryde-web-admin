@@ -1,7 +1,9 @@
 # Agent E Independent UI Closure Audit
 
-**Directive:** `VALRYDE-CODEX-E-INDEPENDENT-CLOSURE-003`  
-**Baseline:** merged `main` `498abf4f2f5976296d8cb6e621c125c6fef8f1d8`  
+**Directive:** `VALRYDE-CODEX-E-INDEPENDENT-CLOSURE-003`
+
+**Baseline:** merged `main` `498abf4f2f5976296d8cb6e621c125c6fef8f1d8`
+
 **Checkpoint:** `AGENT_E_UI_INDEPENDENT_SCOPE_COMPLETE`
 
 This audit distinguishes independently executable Admin UI work from backend, tracking, hardware, deployment, and owner gates. `READY_FOR_REVIEW` is not a Tech Lead acceptance decision.
