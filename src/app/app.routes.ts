@@ -65,6 +65,11 @@ export const routes: Routes = [
           import('./features/fleet/role-directory.page').then((m) => m.RoleDirectoryPage),
       },
       {
+        path: 'applications',
+        loadChildren: () =>
+          import('./features/applications/applications.routes').then((m) => m.APPLICATION_ROUTES),
+      },
+      {
         path: 'identity/users',
         title: 'User accounts · Valryde Admin',
         loadComponent: () =>

@@ -15,10 +15,10 @@ Production navigation exposes only functional MVP routes. Disabled placeholders 
 | Fleet Management | `/fleet/groups/:groupId` | Fleet group details | Implemented read-only; membership gated on Agent A G2 |
 | Fleet Management | `/fleet/operators` | Operators | Implemented (account-level, links to account record); fleet context gated on Agent A G1 directory (API PR #8, proposal) |
 | Fleet Management | `/fleet/drivers` | Drivers | Implemented (account-level, links to account record); assignments/membership gated on Agent A G1/G2 |
-| Applications & Approvals | `/applications/vehicles` | Vehicle applications | Agent A available |
-| Applications & Approvals | `/applications/vehicles/:applicationId` | Vehicle application review | Agent A list + review available |
-| Applications & Approvals | `/applications/gps` | GPS setup queue | Agent A available |
-| Applications & Approvals | `/applications/gps/:requestId` | GPS installation review | Agent A transitions/mapping/verification available |
+| Applications & Approvals | `/applications/vehicles` | Vehicle applications | Implemented (ID 64); `?filter=` preset |
+| Applications & Approvals | `/applications/vehicles/:applicationId` | Vehicle application review | Implemented (ID 64): approve/reject only |
+| Applications & Approvals | `/applications/gps` | GPS setup queue | Implemented (IDs 63–64); needs-action filter |
+| Applications & Approvals | `/applications/gps/:requestId` | GPS installation review | Implemented (IDs 63–64): server-allowed transitions, device mapping, verification; mapping not re-readable (no GET) |
 | Identity & Access | `/identity/users` | User accounts | Agent A available; first implemented module |
 | Tracking Operations | — | Live map/history/compliance | Hidden until Agent B contracts are approved |
 | System Administration | `/system/health` | Integration status | Base API health only; component health blocked |

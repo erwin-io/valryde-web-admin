@@ -1,0 +1,86 @@
+<app-page-header
+  title="GPS installations"
+  description="GPS setup requests for approved vehicles: approval, scheduling, installation, device mapping, and verification."
+  [breadcrumbs]="[{ label: 'Applications & Approvals' }, { label: 'GPS installations' }]"
+/>
+
+<section class="panel" aria-label="GPS installation requests">
+  <div class="filters" role="search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
+      <mat-label>Search plate</mat-label>
+      <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+      <input matInput type="search" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Status</mat-label>
+      <mat-select [ngModel]="status()" (ngModelChange)="status.set($event)">
+        <mat-option value="">All statuses</mat-option>
+        <mat-option value="ACTION">Needs Admin action</mat-option>
+        @for (entry of statuses; track entry[0]) {
+          <mat-option [value]="entry[0]">{{ entry[1].label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    @if (hasFilters()) {
+      <button mat-button type="button" (click)="clearFilters()">Clear filters</button>
+    }
+  </div>
+
+  @switch (state()) {
+    @case ('loading') {
+      <app-page-state kind="loading" title="Loading GPS installations…" />
+    }
+    @case ('denied') {
+      <app-page-state kind="denied" [problem]="problem()" />
+    }
+    @case ('error') {
+      <app-page-state kind="error" title="GPS installations could not be loaded" [problem]="problem()" (retry)="load()" />
+    }
+    @default {
+      @if (rows().length === 0) {
+        <app-page-state kind="empty" title="No GPS installation requests yet" />
+      } @else if (filtered().length === 0) {
+        <app-page-state kind="filtered-empty">
+          <button mat-stroked-button type="button" (click)="clearFilters()">Clear filters</button>
+        </app-page-state>
+      }
+      <div class="table-wrap" [hidden]="filtered().length === 0">
+        <table mat-table [dataSource]="dataSource" matSort aria-label="GPS installation requests">
+          <ng-container matColumnDef="plateNo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Jeepney</th>
+            <td mat-cell *matCellDef="let row">
+              <a class="primary-cell" [routerLink]="['/applications/gps', row.id]">{{ row.plateNo }}</a>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Installation</th>
+            <td mat-cell *matCellDef="let row">
+              @let badge = statusOf(row);
+              <app-status-badge [label]="badge.label" [icon]="badge.icon" [tone]="badge.tone" />
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="verificationStatus">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Verification</th>
+            <td mat-cell *matCellDef="let row">
+              @let vBadge = verificationOf(row);
+              <app-status-badge [label]="vBadge.label" [icon]="vBadge.icon" [tone]="vBadge.tone" />
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="scheduledAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="optional">Scheduled</th>
+            <td mat-cell *matCellDef="let row" class="optional">
+              {{ row.scheduledAt ? (row.scheduledAt | date: 'medium') : '—' }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="updatedAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="optional">Updated</th>
+            <td mat-cell *matCellDef="let row" class="optional">{{ row.updatedAt | date: 'mediumDate' }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="25" aria-label="Select page of GPS installations" />
+      </div>
+    }
+  }
+</section>
