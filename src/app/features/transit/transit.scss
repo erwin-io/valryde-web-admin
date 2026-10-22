@@ -1,0 +1,75 @@
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border: 1px solid var(--vr-border);
+  border-radius: 3px;
+}
+
+.unavailable {
+  color: var(--vr-text-secondary);
+  font-style: italic;
+}
+
+.panel + .panel,
+.panel + .contract-gate {
+  margin-top: 16px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px 8px;
+
+  h2 {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+  }
+}
+
+.form-panel {
+  max-width: 720px;
+  padding: 24px;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .color-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+
+    mat-form-field {
+      flex: 1;
+    }
+
+    input[type='color'] {
+      width: 56px;
+      height: 56px;
+      padding: 4px;
+      border: 1px solid var(--vr-border);
+      border-radius: 4px;
+      background: var(--vr-surface);
+      cursor: pointer;
+    }
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.form-note {
+  margin: 0 0 16px;
+  color: var(--vr-text-secondary);
+}

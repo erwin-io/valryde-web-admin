@@ -8,10 +8,10 @@
 | USER-01 | User accounts | Search/filter all accounts and change supported status | loading, empty, filtered-empty, failed, ready | `GET /api/admin/users/` |
 | USER-02 | User details | Show identity, roles, verification, and lifecycle | loading, not found, ready | composed from Admin user list; no detail endpoint |
 | USER-03 | Account status confirmation | Enable/disable a non-self account | confirm, saving, conflict/error, success | `PATCH /api/admin/users/{id}/status` |
-| ROUTE-01 | Routes & directions | Review canonical network records | loading, empty, failed, ready | `GET /api/admin/transit-routes` |
-| ROUTE-02 | Route details | Inspect metadata and directions | loading, not found, ready | composed from Admin route list |
-| ROUTE-03 | Create/edit route | Manage approved metadata/status/color | pristine, dirty, invalid, saving, conflict | POST/PATCH Admin transit routes |
-| ROUTE-04 | Direction editor | Manage endpoints, corridor, status | pristine, dirty, invalid, saving | POST/PATCH route direction |
+| ROUTE-01 | Routes & directions | Review canonical network records | loading, empty, failed, ready | `GET /api/admin/transit-routes` — implemented |
+| ROUTE-02 | Route details | Inspect metadata and directions | loading, not found, ready | composed from Admin route list — implemented |
+| ROUTE-03 | Create/edit route | Manage approved metadata/status/color | pristine, dirty, invalid, saving, conflict | POST/PATCH Admin transit routes — implemented; duplicate code 409 mapped to field |
+| ROUTE-04 | Direction editor | Manage label, endpoints, status | pristine, dirty, invalid, saving | PATCH route direction — implemented (metadata/status only); create requires geometry (ID 62); duplicate label blocked client-side (Agent A D3) |
 | ROUTE-05 | Geometry editor | Display/edit/import one LineString | loading, editing, invalid, dirty, saving, recovery | direction PATCH; no stop contract |
 | VEH-01 | Vehicle registry | Search/filter permitted jeepneys | loading, empty, failed, ready | `GET /api/jeepneys` — implemented read-only |
 | VEH-02 | Vehicle details | Inspect vehicle, route, and workflow context | partial, loading, failed, ready | jeepney list + `GET /api/jeepneys/{id}/effective-route` — implemented read-only; application/GPS context deferred to IDs 63–64; driver assignment gated (no read endpoint) |

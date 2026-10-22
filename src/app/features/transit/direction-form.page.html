@@ -1,0 +1,87 @@
+<app-page-header
+  title="Edit direction"
+  description="Update the direction name, endpoint names, or lifecycle status. The route line and corridor are edited in the geometry editor."
+  [breadcrumbs]="breadcrumbs()"
+/>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-page-state kind="loading" title="Loading direction…" />
+  }
+  @case ('denied') {
+    <app-page-state kind="denied" [problem]="problem()" />
+  }
+  @case ('error') {
+    <app-page-state kind="error" title="This direction could not be loaded" [problem]="problem()" (retry)="load()" />
+  }
+  @case ('not-found') {
+    <app-page-state kind="not-found" message="No direction with this identifier exists." />
+  }
+  @default {
+    <section class="panel form-panel" aria-labelledby="form-title">
+      <h2 id="form-title" class="cdk-visually-hidden">Direction details</h2>
+
+      @if (route(); as r) {
+        <p class="form-note">Route <strong>{{ r.routeCode }}</strong> · {{ r.publicName }} ({{ statusMeta[r.status].label }})</p>
+      }
+
+      @if (saveProblem(); as problem) {
+        <div class="inline-alert" role="alert">
+          <mat-icon aria-hidden="true">error</mat-icon>
+          <span>
+            The direction was not saved. {{ problem.message }}
+            @if (problem.requestId) {
+              (Request ID: <code>{{ problem.requestId }}</code>)
+            }
+          </span>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Direction name</mat-label>
+          <input matInput formControlName="directionLabel" maxlength="120" required />
+          <mat-hint>For example Northbound. Must be unique within the route.</mat-hint>
+          @if (form.controls.directionLabel.hasError('duplicate')) {
+            <mat-error>Another direction on this route already uses this name.</mat-error>
+          } @else if (form.controls.directionLabel.invalid) {
+            <mat-error>Enter a direction name of up to 120 characters.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Origin</mat-label>
+          <input matInput formControlName="originName" maxlength="160" required />
+          @if (form.controls.originName.invalid) {
+            <mat-error>Enter an origin name of up to 160 characters.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Destination</mat-label>
+          <input matInput formControlName="destinationName" maxlength="160" required />
+          @if (form.controls.destinationName.invalid) {
+            <mat-error>Enter a destination name of up to 160 characters.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            @for (s of statuses; track s) {
+              <mat-option [value]="s">{{ statusMeta[s].label }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Commuters see Active directions on Active routes.</mat-hint>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <a mat-button [routerLink]="route() ? ['/transit/routes', route()!.id] : ['/transit/routes']">Cancel</a>
+          <button mat-flat-button type="submit" [disabled]="saving() || !form.dirty">
+            {{ saving() ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+}

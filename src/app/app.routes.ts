@@ -27,6 +27,10 @@ export const routes: Routes = [
           import('./features/dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
       {
+        path: 'transit',
+        loadChildren: () => import('./features/transit/transit.routes').then((m) => m.TRANSIT_ROUTES),
+      },
+      {
         path: 'fleet/jeepneys',
         title: 'Jeepneys · Valryde Admin',
         loadComponent: () =>

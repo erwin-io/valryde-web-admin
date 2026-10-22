@@ -5,10 +5,12 @@ Production navigation exposes only functional MVP routes. Disabled placeholders 
 | Group | Route | Screen | Contract state |
 |---|---|---|---|
 | Dashboard | `/dashboard` | System overview | Shell available; live metrics blocked pending aggregation contracts |
-| Transit Network | `/transit/routes` | Routes & directions list | Agent A available |
-| Transit Network | `/transit/routes/:routeId` | Route details | Agent A available through Admin list payload |
-| Transit Network | `/transit/routes/:routeId/edit` | Route metadata editor | Agent A available |
-| Transit Network | `/transit/directions/:directionId/geometry` | Geometry editor | Agent A available; active-assignment warning data incomplete |
+| Transit Network | `/transit/routes` | Routes & directions list | Implemented (ID 61) |
+| Transit Network | `/transit/routes/new` | Create route | Implemented (ID 61) |
+| Transit Network | `/transit/routes/:routeId` | Route details | Implemented (ID 61), composed from Admin list payload |
+| Transit Network | `/transit/routes/:routeId/edit` | Route metadata editor | Implemented (ID 61); route code immutable |
+| Transit Network | `/transit/directions/:directionId/edit` | Direction metadata/status editor | Implemented (ID 61); geometry and corridor excluded |
+| Transit Network | `/transit/directions/:directionId/geometry` | Geometry editor | ID 62, separate reviewed PR; direction creation needs geometry; active-assignment warning data unavailable |
 | Fleet Management | `/fleet/jeepneys` | Jeepney registry | Implemented read-only (ID 60); path renamed from planned `/fleet/vehicles` to match the domain term |
 | Fleet Management | `/fleet/jeepneys/:jeepneyId` | Jeepney details | Implemented read-only: list composition + effective route; driver/GPS/tracking gated |
 | Fleet Management | `/fleet/groups` | Fleet groups | Implemented read-only (ID 60) |

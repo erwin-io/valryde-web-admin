@@ -1,0 +1,107 @@
+<app-page-header
+  [title]="isEdit() ? 'Edit route' : 'New route'"
+  [description]="isEdit() ? 'Update the route name, description, color, or lifecycle status. The route code cannot be changed.' : 'Create an official route. New routes start as Draft and are not visible to commuters.'"
+  [breadcrumbs]="breadcrumbs()"
+/>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-page-state kind="loading" title="Loading route…" />
+  }
+  @case ('denied') {
+    <app-page-state kind="denied" [problem]="problem()" />
+  }
+  @case ('error') {
+    <app-page-state kind="error" title="This route could not be loaded" [problem]="problem()" (retry)="load()" />
+  }
+  @case ('not-found') {
+    <app-page-state kind="not-found" message="No route with this identifier exists." />
+  }
+  @default {
+    <section class="panel form-panel" aria-labelledby="form-title">
+      <h2 id="form-title" class="cdk-visually-hidden">Route details</h2>
+
+      @if (saveProblem(); as problem) {
+        <div class="inline-alert" role="alert">
+          <mat-icon aria-hidden="true">error</mat-icon>
+          <span>
+            The route was not saved. {{ problem.message }}
+            @if (problem.requestId) {
+              (Request ID: <code>{{ problem.requestId }}</code>)
+            }
+          </span>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Route code</mat-label>
+          <input matInput formControlName="routeCode" maxlength="32" required />
+          @if (!isEdit()) {
+            <mat-hint>Unique, for example 10F. Cannot be changed later.</mat-hint>
+          } @else {
+            <mat-hint>Route codes cannot be changed.</mat-hint>
+          }
+          @if (form.controls.routeCode.hasError('duplicate')) {
+            <mat-error>This route code is already in use.</mat-error>
+          } @else if (form.controls.routeCode.invalid) {
+            <mat-error>Enter a route code of up to 32 characters.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Public name</mat-label>
+          <input matInput formControlName="publicName" maxlength="160" required />
+          <mat-hint>Shown to commuters, for example Bulacao — Colon.</mat-hint>
+          @if (form.controls.publicName.invalid) {
+            <mat-error>Enter a public name of up to 160 characters.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Description (optional)</mat-label>
+          <textarea matInput formControlName="description" rows="3" maxlength="2000"></textarea>
+          @if (form.controls.description.invalid) {
+            <mat-error>Descriptions are limited to 2,000 characters.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="color-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Route color</mat-label>
+            <input matInput formControlName="routeColorHex" maxlength="7" required />
+            <mat-hint>Hex color used on maps, for example #43A047.</mat-hint>
+            @if (form.controls.routeColorHex.invalid) {
+              <mat-error>Use a six-digit hex color such as #43A047.</mat-error>
+            }
+          </mat-form-field>
+          <input
+            type="color"
+            aria-label="Pick route color"
+            [value]="form.controls.routeColorHex.valid ? form.controls.routeColorHex.value : '#000000'"
+            (input)="setColor($any($event.target).value)"
+          />
+        </div>
+
+        @if (isEdit()) {
+          <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              @for (s of statuses; track s) {
+                <mat-option [value]="s">{{ statusMeta[s].label }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>Commuters see Active routes that have at least one Active direction.</mat-hint>
+          </mat-form-field>
+        }
+
+        <div class="form-actions">
+          <a mat-button [routerLink]="isEdit() && original() ? ['/transit/routes', original()!.id] : ['/transit/routes']">Cancel</a>
+          <button mat-flat-button type="submit" [disabled]="saving() || (isEdit() && !form.dirty)">
+            {{ saving() ? 'Saving…' : isEdit() ? 'Save changes' : 'Create route' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+}
