@@ -3,13 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  OnInit,
   computed,
   effect,
   inject,
   input,
   signal,
-  viewChild,
+  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -17,55 +16,23 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
-
+import { Observable, Subscription } from 'rxjs';
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
-import { PublicUser, UserStatus } from '../../core/auth/auth.models';
+import { UserStatus } from '../../core/auth/auth.models';
 import { PageHeader } from '../../shared/ui/page-header';
 import { PageState } from '../../shared/ui/page-state';
 import { StatusBadge } from '../../shared/ui/status-badge';
-import { AdminUsersService } from '../identity/admin-users.service';
-import { STATUS_PRESENTATION, filterUsers } from '../identity/user-presentation';
+import { STATUS_PRESENTATION } from '../identity/user-presentation';
+import { DirectoryPage, DirectoryQuery, DriverEntry, OperatorEntry } from './directory.models';
+import { DirectoryService } from './directory.service';
 
 export type DirectoryRole = 'OPERATOR' | 'DRIVER';
+type Entry = OperatorEntry | DriverEntry;
 
-interface DirectoryCopy {
-  title: string;
-  description: string;
-  noun: string;
-  gatedMessage: string;
-}
-
-// Operator/driver business records (operators.id, drivers.id) are not reachable from user accounts
-// until Agent A's G1 directory endpoints are merged (valryde-api PR #8 is a proposal only).
-export const DIRECTORY_COPY: Record<DirectoryRole, DirectoryCopy> = {
-  OPERATOR: {
-    title: 'Operators',
-    description: 'Monitor accounts that hold the Operator role. Account status is managed from the account record.',
-    noun: 'operator',
-    gatedMessage:
-      'Operator business records — associated drivers, fleet groups, and jeepneys — are not available yet. ' +
-      'Fleet records reference an operator ID that the current API does not link to a user account; this ' +
-      'needs the Operator directory API, which is still a proposal.',
-  },
-  DRIVER: {
-    title: 'Drivers',
-    description: 'Monitor accounts that hold the Driver role. Account status is managed from the account record.',
-    noun: 'driver',
-    gatedMessage:
-      'Driver business records — operator association, group membership, and jeepney assignment — are not ' +
-      'available yet. Assignments reference a driver ID that the current API does not link to a user ' +
-      'account; this needs the Driver directory API, which is still a proposal.',
-  },
-};
-
-type LoadState = 'loading' | 'ready' | 'error' | 'denied';
-
-/** OP-01 / DRV-01: account-level Operator and Driver monitoring from the Admin user list. */
 @Component({
   selector: 'app-role-directory-page',
   imports: [
@@ -77,7 +44,6 @@ type LoadState = 'loading' | 'ready' | 'error' | 'denied';
     MatInputModule,
     MatPaginatorModule,
     MatSelectModule,
-    MatSortModule,
     MatTableModule,
     PageHeader,
     PageState,
@@ -86,78 +52,101 @@ type LoadState = 'loading' | 'ready' | 'error' | 'denied';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './role-directory.page.html',
-  styleUrl: '../identity/identity.scss',
+  styleUrls: ['../identity/identity.scss', './fleet.scss'],
 })
-export class RoleDirectoryPage implements OnInit {
-  private readonly service = inject(AdminUsersService);
+export class RoleDirectoryPage {
+  private readonly service = inject(DirectoryService);
   private readonly destroyRef = inject(DestroyRef);
-
-  /** Bound from route data. */
+  private request?: Subscription;
   readonly role = input.required<DirectoryRole>();
-
-  protected readonly copy = computed(() => DIRECTORY_COPY[this.role()]);
+  readonly operatorId = input<string>('');
+  protected readonly title = computed(() => (this.role() === 'OPERATOR' ? 'Operators' : 'Drivers'));
   protected readonly breadcrumbs = computed(() => [
     { label: 'Fleet Management' },
-    { label: this.copy().title },
+    { label: this.title() },
   ]);
-  protected readonly statusOf = (user: PublicUser) => STATUS_PRESENTATION[user.status];
-  protected readonly columns = ['user', 'status', 'emailVerified', 'createdAt'];
-
-  protected readonly state = signal<LoadState>('loading');
+  protected readonly statusMeta = STATUS_PRESENTATION;
+  protected readonly columns = ['user', 'businessStatus', 'accountStatus', 'context', 'createdAt'];
+  protected readonly state = signal<'loading' | 'ready' | 'error' | 'denied'>('loading');
   protected readonly problem = signal<ApiProblem | null>(null);
-  private readonly users = signal<PublicUser[]>([]);
+  protected readonly entries = signal<Entry[]>([]);
   protected readonly search = signal('');
   protected readonly status = signal<UserStatus | ''>('');
-  protected readonly members = computed(() =>
-    filterUsers(this.users(), { search: '', role: this.role(), status: '' }),
+  protected readonly associated = signal<'' | 'true' | 'false'>('');
+  protected readonly page = signal(1);
+  protected readonly pageSize = signal(20);
+  protected readonly total = signal(0);
+  protected readonly hasFilters = computed(
+    () => !!(this.search().trim() || this.status() || this.associated()),
   );
-  protected readonly filtered = computed(() =>
-    filterUsers(this.members(), { search: this.search(), role: '', status: this.status() }),
-  );
-  protected readonly hasFilters = computed(() => !!(this.search().trim() || this.status()));
-
-  protected readonly dataSource = new MatTableDataSource<PublicUser>([]);
-  private readonly paginator = viewChild(MatPaginator);
-  private readonly sort = viewChild(MatSort);
 
   constructor() {
-    this.dataSource.sortingDataAccessor = (user, column) =>
-      column === 'user' ? user.displayName.toLowerCase() : String(user[column as keyof PublicUser]);
     effect(() => {
-      this.dataSource.data = this.filtered();
-      this.dataSource.paginator?.firstPage();
-    });
-    effect(() => {
-      this.dataSource.paginator = this.paginator() ?? null;
-      this.dataSource.sort = this.sort() ?? null;
+      const role = this.role();
+      const operatorId = this.operatorId();
+      this.search.set('');
+      this.status.set('');
+      this.associated.set('');
+      this.page.set(1);
+      untracked(() => this.load(role, operatorId));
     });
   }
 
-  ngOnInit(): void {
+  protected accountId(entry: Entry): string {
+    return 'ownerUserId' in entry ? entry.ownerUserId : entry.userId;
+  }
+  protected badge(status: UserStatus) {
+    return this.statusMeta[status];
+  }
+  protected operator(entry: Entry): OperatorEntry | null {
+    return 'ownerUserId' in entry ? entry : null;
+  }
+  protected driver(entry: Entry): DriverEntry | null {
+    return 'driverId' in entry ? entry : null;
+  }
+  protected applyFilters(): void {
+    this.page.set(1);
     this.load();
   }
-
-  protected load(): void {
-    this.state.set('loading');
-    this.problem.set(null);
-    this.service
-      .list()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (users) => {
-          this.users.set(users);
-          this.state.set('ready');
-        },
-        error: (err: unknown) => {
-          const problem = toApiProblem(err);
-          this.problem.set(problem);
-          this.state.set(problem.status === 403 ? 'denied' : 'error');
-        },
-      });
+  protected changePage(event: PageEvent): void {
+    this.page.set(event.pageIndex + 1);
+    this.pageSize.set(event.pageSize);
+    this.load();
   }
-
   protected clearFilters(): void {
     this.search.set('');
     this.status.set('');
+    this.associated.set('');
+    this.applyFilters();
+  }
+  protected load(role = this.role(), operatorId = this.operatorId()): void {
+    this.request?.unsubscribe();
+    this.state.set('loading');
+    this.problem.set(null);
+    this.entries.set([]);
+    const query: DirectoryQuery = {
+      page: this.page(),
+      pageSize: this.pageSize(),
+      ...(this.search().trim() ? { q: this.search().trim() } : {}),
+      ...(this.status() ? { status: this.status() as UserStatus } : {}),
+      ...(operatorId ? { operatorId } : {}),
+      ...(this.associated() ? { associated: this.associated() === 'true' } : {}),
+    };
+    const result: Observable<DirectoryPage<Entry>> =
+      role === 'OPERATOR' ? this.service.operators(query) : this.service.drivers(query);
+    this.request = result.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: ({ entries, pagination }) => {
+        this.entries.set(entries);
+        this.total.set(pagination.total);
+        this.page.set(pagination.page);
+        this.pageSize.set(pagination.pageSize);
+        this.state.set('ready');
+      },
+      error: (err: unknown) => {
+        const problem = toApiProblem(err);
+        this.problem.set(problem);
+        this.state.set(problem.status === 403 ? 'denied' : 'error');
+      },
+    });
   }
 }

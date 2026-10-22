@@ -29,7 +29,7 @@
 | `POST /fleet-groups/{id}/drivers` | OPERATOR, ADMIN | `{driverId}` |
 | `POST /fleet-groups/{id}/jeepneys` | OPERATOR, ADMIN | `{jeepneyId}`; ambiguity protected |
 
-There are no dedicated operator, driver, jeepney-detail, group-detail, membership-list, or server-pagination endpoints.
+G1 update verified against merged API `810c8a1`: `GET /operators` (ADMIN) and `GET /drivers` (ADMIN/OPERATOR) return business records with `{operators|drivers, pagination:{page,pageSize,total,totalPages}}`. Both accept `q`, business `status`, one-based `page`, and `pageSize` (1–100). Driver filters additionally accept Admin `operatorId` and `associated` (including false). Driver responses include `driverId`, `userId`, `userStatus`, `emailVerified`, `operatorId`, `activeJeepneyId`, and `groupIds`; operators include `operatorId`, `ownerUserId`, `userStatus`, and server counts. Account links always use account IDs. The admin directory uses these endpoints without falling back to user enumeration. G2 membership and G3/G4 assignment reads are merged upstream but remain follow-up UI work.
 
 ## Transit
 
