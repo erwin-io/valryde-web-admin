@@ -30,6 +30,13 @@ export const NAVIGATION: NavGroup[] = [
     ],
   },
   {
+    label: 'Applications & Approvals',
+    items: [
+      { label: 'Vehicle applications', icon: 'assignment', route: '/applications/vehicles' },
+      { label: 'GPS installations', icon: 'satellite_alt', route: '/applications/gps' },
+    ],
+  },
+  {
     label: 'Identity & Access',
     items: [{ label: 'User accounts', icon: 'manage_accounts', route: '/identity/users' }],
   },
