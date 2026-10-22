@@ -45,7 +45,7 @@ Submission (`POST /vehicle-applications`, `POST /gps-setup-requests`) is DRIVER/
 |---|---|---|
 | E1 Admin auth and User Accounts acceptance | 56, 59 | **BACKEND_FIXTURE_BLOCKED** until Agent A fixture PR #15 merges. Fixtures are not on `main` `827738c`; owner-created accounts are not required. A local `valryde-api` was previously observed running (not started by Agent E); unauthenticated read-only probes only: health `200`, protected Admin endpoints `401 AUTH_REQUIRED`. Procedure: `docs/testing/REAL_API_INTEGRATION_PROCEDURE.md`. Refresh-token storage, cookie contract, CSP and Angular major unchanged. |
 | E2 Official routes and directions | 61 | PR #5 **merged** at `8018e88`. Direction *creation* deferred to ID 62 because it requires geometry. |
-| E3 Applications and GPS workflow | 63, 64 (+56 dashboard counts) | PR #6 open, reconciled with `main` `8018e88` at `cc14c9c`. Physical connectivity and GPS fix remain hardware/operator gates. |
+| E3 Applications and GPS workflow | 63, 64 (+56 dashboard counts) | PR #6 merged into `main` at `341ebc77f18d1c5ef923f556b2f1d87947cba9cc`. Physical connectivity and GPS fix remain hardware/operator gates. |
 | E4 Reports / export | 67 | **BACKEND_CONTRACT_BLOCKED.** No reporting, export, audit-read or component-health endpoint exists; only `GET /api/health` (API + DB). Client-side CSV of list payloads was not built: no approved export scope, field set or privacy review. See `REPORTING_EXPORT_HEALTH_REQUIREMENTS.md`. |
 | ID 62 Geometry | 62 | **Proposal only** (section 5). No geometry editor implemented. |
 

@@ -9,9 +9,9 @@
 
 ## Recovered state
 
-- `main` fast-forwarded cleanly to merged PR #5 at `8018e88afd7d19de7d4841c21e3cf85610e67cf1`.
-- PR #6 remains open/mergeable at `cc14c9cebd48fd6fcdc1663b00e8a76b80ec5e8f`.
-- PR #7 began takeover at `bb1612793ce8518e774e23866d4d118f1094d455` and contains the newest Agent E status history.
+- `main` now includes PR #6 at `341ebc77f18d1c5ef923f556b2f1d87947cba9cc`.
+- PR #6 merged from verified head `cc14c9cebd48fd6fcdc1663b00e8a76b80ec5e8f`.
+- PR #7 began takeover at `bb1612793ce8518e774e23866d4d118f1094d455`, received the takeover package through `8bcfb8c`, and was normally merged with latest `origin/main` without conflicts.
 - No uncommitted Claude work existed. The prior Codex/Claude bootstrap and implementation are preserved in branch/merge history.
 - No repeated conflict resolution or route/GPS reimplementation was performed.
 
@@ -40,7 +40,7 @@
 
 ## Recommended resume order
 
-1. Tech Lead reviews PRs #6 and #7; do not self-merge.
+1. Tech Lead reviews the post-PR-#6 reconciliation of PR #7; do not self-merge.
 2. After Agent A PR #15 merges, follow its approved seed/cleanup instructions and execute all 26 real-API cases in an isolated database.
 3. Submit sanitized evidence and update acceptance/status.
 4. Implement only the bounded checklist 62 editor operations the Tech Lead approves.
