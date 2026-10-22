@@ -2,21 +2,20 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23 09:30 +08:00
-- Agent / module: E — Administrative Web Development / Valryde Admin
-- Repository: `valryde-web-admin`
-- Branch / implementation SHA: `feat/62-67-independent-ui-closure` (PR #8) from `2c6a4f2`; E8-01/E8-02 correction commit follows this record
-- Checklist IDs: 56–67
-- GitHub issues / PRs: PRs #1–#7 merged. [PR #8](https://github.com/erwin-io/valryde-web-admin/pull/8) is open for final independent UI closure. No issue assigned.
-- Implementation progress: READY_FOR_REVIEW
-- Tech Lead review decision (if actually issued): PRs #1–#7 merged. PR #8: CHANGES REQUIRED by Agent G (E8-01 save concurrency, E8-02 canvas clarity) — corrected, awaiting re-review. Production acceptance remains OPERATOR-GATED.
-- Current objective: `AGENT_E_PR8_GEOMETRY_CORRECTED_READY_FOR_REVIEW`.
-- Last confirmed result: E8-01/E8-02 corrected. Clean `npm ci` (npm 11.6.2, Node v24.15.0); lint, strict app/spec typecheck, 23 files / 154 tests, production build, prod audit 0, diff check and Markdown links pass; browser acceptance at 1440×900, 768×1024, 375×812 against a synthetic stub.
-- Next concrete action: Agent G re-review of PR #8; owner/upstream agents resolve backend, tracking, basemap-provider and hardware gates.
-- Blocked by / decision owner: Real authenticated API evidence still requires an approved Admin fixture/credentials. G1/G2/G3/G10/G11 and D3 belong to Agent A; IDs 65–66 and tracking/health/history contracts belong to Agent B; hardware and physical verification remain Agent F/owner gates.
-- Execution agent: Claude (takeover round 2, `VALRYDE-CLAUDE-E-TAKEOVER-ROUND2-001`, sole active Agent E owner); Codex paused. Codex takeover history preserved.
-- Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
-
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T03:34:00+08:00
+- Agent / module: E — Admin Web; Codex; VALRYDE-E-RAPID-DELIVERY-003.
+- Repository: erwin-io/valryde-web-admin.
+- Branch / HEAD SHA: codex/admin-account-detail-races, base 1eb94279f5670ad71078b2ec27ba117905a75898, working changes.
+- Checklist IDs: 59 (also protects account lifecycle entry for 57).
+- GitHub issues / PRs: #9 directories, #10 transit, #11 GPS, #12 tracking preparation OPEN; no acceptance on new changes.
+- Implementation progress: READY_FOR_REVIEW (account detail correction).
+- Tech Lead review decision: pending.
+- Current objective: fix route-reused account detail, stale list/status responses and duplicate confirmation/write actions.
+- Last confirmed result: corrected focused five-test run passed, followed by lint, strict typecheck, full 24-file/159-test suite, production build (392.86 kB initial) and diff check. Initial setup/timing failures are preserved in history. Synthetic SPA browser check pending committed source; real API remains blocked.
+- Next concrete action: finish identity tests/build and synthetic SPA route-reuse browser regression; submit focused PR and exact acceptance evidence.
+- Blocked by / decision owner: real API unavailable at localhost:3000 and temporary fixture credentials absent. Authenticated acceptance remains blocked; user was asked for API URL/secure credential source without secrets. Operator profile editing/geofence API and actual B gateway remain absent; physical GPS/deployment are external gates.
+- Recovery/ownership: original clean Claude checkout at 8138c97 preserved; zero initial stashes/unpushed commits. Recovered unfinished G1 files in isolated worktree. Seven linked worktrees now preserve separate E feature slices; no other repo modified. No admin-referencing Claude command line/concurrent edit observed; process-level inactivity unprovable.
+- Dependencies: API origin/main read-only at 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; B proposed gateway; F physical evidence; G review/merge. Standalone baseline DOCX/checklist unavailable; canonical E handoff reviewed.
 ## Checklist coverage
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
@@ -104,6 +103,19 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 03:42 +08:00 — Account detail release gates passed
+- Corrected missing provideRouter test setup. Focused 5 tests passed. Full rerun after browser load settled: lint, strict typecheck, 24 files / 159 tests and production build (392.86 kB initial) passed; diff check passed. Initial failed full run retained above/below as historical evidence.
+- Five added tests cover input reuse/read cancellation, duplicate status action, late response isolation and denied record actions. Existing auth/role/self-disable regressions stay intact; no token policy/backend change.
+- Submit focused ID 59 PR and run synthetic SPA route-reuse browser regression against committed production source. Real authenticated API remains blocked by runtime/fixture credentials; no accepted/completion-ready claim.
+
+
+### 2026-10-23 03:34 +08:00 — ID 59 account detail race correction
+- Inspection found OnInit-only detail loading: Angular reuse for another userId could keep the previous account visible. Late prior-account status responses could also replace the current record. These are UI defects, separate from external auth/provider gates.
+- Implemented input-driven reload, cancellation of previous read, clear old record/action error during load, captured ID lookup, status-response/error identity guard, and busy guard/disabled button across confirmation/write. API role/status semantics unchanged.
+- Added five regressions: reused input, canceled read, duplicate action, late status response, denial/error recovery. Initial full run failed because new test omitted provideRouter; fixed the test setup. Baseline timing failures/cascading TestBed failures retained as failed evidence. Lint/typecheck passed; corrected focused run pending. No real API/hardware acceptance claim.
+- Concurrent browser evidence in the separate secondary worktree is explicitly synthetic. Directory/transit/GPS/summary/default tracking flows have passed earlier runs; harness improvements add settled responsive layout and non-Admin login rejection. Source remains isolated and original Claude work untouched.
+
 
 ### 2026-10-23 09:30 +08:00 — Claude takeover round 2: PR #8 corrections E8-01 and E8-02
 

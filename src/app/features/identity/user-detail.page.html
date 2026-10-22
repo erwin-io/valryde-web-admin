@@ -5,7 +5,7 @@
 >
   @if (user(); as current) {
     @if (statusChange.canChange(current)) {
-      <button mat-stroked-button type="button" (click)="changeStatus(current)">
+      <button mat-stroked-button type="button" [disabled]="actionBusy()" (click)="changeStatus(current)">
         <mat-icon>{{ current.status === 'ACTIVE' ? 'block' : 'check_circle' }}</mat-icon>
         {{ current.status === 'ACTIVE' ? 'Disable account' : 'Enable account' }}
       </button>
