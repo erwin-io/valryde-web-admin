@@ -1,7 +1,7 @@
 # Real API Integration Procedure — Admin web
 
 **Purpose:** repeatable verification of the Admin web (IDs 56, 59 from PR #2; 60; 61 from PR #5; 63–64 from PR #6) against a real local `valryde-api`, replacing the synthetic stubs used so far.
-**State:** `OPERATOR-GATED` — not yet run. Requires an owner-approved local test backend and test Admin account.
+**State:** `OPERATOR-GATED` — not yet run. Per Tech Lead direction (2026-10-22) the test Admin and test users must come from **Agent A's approved development fixtures** when they exist, not from owner-created accounts. None exist on `valryde-api` `main` `827738c`.
 **Never** run this against production, a shared database, or real user records.
 
 ## 1. Preconditions (owner/operator)
@@ -11,7 +11,7 @@
 | API source | `valryde-api` `main` at or after `4a9a152`, in its own checkout. Agent E does not modify it. |
 | Runtime | Node.js ≥ 22.12, PostgreSQL 16 with `postgis`, `citext`, `pgcrypto`; Mailpit (`compose.mailpit.yaml`). |
 | Database | A **local, disposable** application database. Not the Traccar database, not shared. |
-| Accounts | One test Admin (A1), one second test Admin (A2), one test Commuter or Driver (U1). All test-only addresses (for example `*@example.test`). |
+| Accounts | From Agent A's approved development fixtures: one test Admin (A1), optionally a second (A2), one test Commuter/Driver/Operator (U1). Test-only addresses (for example `*@example.test`). |
 | Secrets | `.env` values and passwords stay on the operator's machine. Do not paste them into chat, commits, PRs, screenshots, or the status file. |
 
 ## 2. Start the API (operator, in `valryde-api`)
@@ -32,7 +32,9 @@ npm run dev
 
 Check `http://127.0.0.1:3000/api/health` returns `{"status":"ok","database":"ok"}`.
 
-## 3. Create test accounts (operator, local database only)
+## 3. Test accounts (local database only)
+
+Use Agent A's development fixtures once approved; the steps below are the current manual reference from Agent A's handoff and are superseded by the fixtures.
 
 - **A1 (first Admin):** `npm run admin:bootstrap` with `ADMIN_BOOTSTRAP_EMAIL`, `ADMIN_BOOTSTRAP_DISPLAY_NAME`, `ADMIN_BOOTSTRAP_PASSWORD`, `ADMIN_BOOTSTRAP_CONFIRM=CREATE_FIRST_ADMIN` set as temporary shell variables (never in `.env`). Works only on an empty Admin set.
 - **U1:** `POST /api/auth/register` with role `COMMUTER`, then verify through Mailpit (`http://127.0.0.1:8025`) and `POST /api/auth/verify-email`.

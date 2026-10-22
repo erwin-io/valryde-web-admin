@@ -43,9 +43,9 @@ Submission (`POST /vehicle-applications`, `POST /gps-setup-requests`) is DRIVER/
 
 | Package | Checklist | Result |
 |---|---|---|
-| E1 Admin auth and User Accounts acceptance | 56, 59 | **OPERATOR-GATED.** No owner test credentials or isolated test backend were provided. A local `valryde-api` was observed running (not started by Agent E); unauthenticated read-only probes only: health `200`, protected Admin endpoints `401 AUTH_REQUIRED`. Procedure extended in `docs/testing/REAL_API_INTEGRATION_PROCEDURE.md`. Refresh-token storage, cookie contract, CSP and Angular major unchanged. |
-| E2 Official routes and directions | 61 | PR #5. Direction *creation* deferred to ID 62 because it requires geometry. |
-| E3 Applications and GPS workflow | 63, 64 (+56 dashboard counts) | PR #6. Physical connectivity and GPS fix remain hardware/operator gates. |
+| E1 Admin auth and User Accounts acceptance | 56, 59 | **OPERATOR-GATED** on Agent A's approved development fixtures (Tech Lead direction 2026-10-22; none exist on `main` `827738c`), not owner-created accounts. A local `valryde-api` was observed running (not started by Agent E); unauthenticated read-only probes only: health `200`, protected Admin endpoints `401 AUTH_REQUIRED`. Procedure extended in `docs/testing/REAL_API_INTEGRATION_PROCEDURE.md`. Refresh-token storage, cookie contract, CSP and Angular major unchanged. |
+| E2 Official routes and directions | 61 | PR #5 **merged** at `8018e88`. Direction *creation* deferred to ID 62 because it requires geometry. |
+| E3 Applications and GPS workflow | 63, 64 (+56 dashboard counts) | PR #6 open, reconciled with `main` `8018e88` at `cc14c9c`. Physical connectivity and GPS fix remain hardware/operator gates. |
 | E4 Reports / export | 67 | **Nothing implemented.** No reporting, export, audit-read or component-health endpoint exists; only `GET /api/health` (API + DB). Client-side CSV of list payloads was not built: no approved export scope, field set or privacy review. |
 | ID 62 Geometry | 62 | **Proposal only** (section 5). No geometry editor implemented. |
 

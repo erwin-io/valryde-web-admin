@@ -2,18 +2,18 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-22 16:30 +08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-22 18:30 +08:00
 - Agent / module: E — Administrative Web Development / Valryde Admin
 - Repository: `valryde-web-admin`
-- Branch / HEAD SHA: batch from `main` @ `812bbab` (PR #4 merge): `feat/61-official-route-management`, `feat/63-64-gps-admin-workflows`, `feat/56-59-admin-integration` (this status update)
+- Branch / HEAD SHA: `feat/56-59-admin-integration` (PR #7) reconciled with `main` @ `8018e88`; PR #6 `feat/63-64-gps-admin-workflows` @ `cc14c9c`
 - Checklist IDs: 56–67
-- GitHub issues / PRs: PRs #1–#4 merged (latest `812bbab`). Open for review: [PR #5](https://github.com/erwin-io/valryde-web-admin/pull/5) ID 61, [PR #6](https://github.com/erwin-io/valryde-web-admin/pull/6) IDs 63–64 (+56 dashboard), [PR #7](https://github.com/erwin-io/valryde-web-admin/pull/7) batch inventory/status. No issue assigned.
+- GitHub issues / PRs: PRs #1–#5 merged (PR #5 at `8018e88`). Open: [PR #6](https://github.com/erwin-io/valryde-web-admin/pull/6) IDs 63–64 (+56) reconciled at `cc14c9c`; [PR #7](https://github.com/erwin-io/valryde-web-admin/pull/7) batch inventory/status. No issue assigned.
 - Implementation progress: IN_PROGRESS
-- Tech Lead review decision (if actually issued): PR #4 merged (`812bbab`); independent UI batch approved for development. PRs #5–#7: Not reviewed. Production acceptance of the Admin foundation remains OPERATOR-GATED.
-- Current objective: AGENT_E_INDEPENDENT_UI_BATCH_READY — Tech Lead review of PRs #5, #6, #7.
+- Tech Lead review decision (if actually issued): PR #5 merged (`8018e88`). PRs #6 and #7: CHANGES REQUIRED (reconcile with main) — addressed, awaiting re-review. Production acceptance of the Admin foundation remains OPERATOR-GATED.
+- Current objective: AGENT_E_PR6_CONFLICT_RESOLVED_READY_FOR_REVIEW and AGENT_E_PR7_CONFLICT_RESOLVED_READY_FOR_REVIEW.
 - Last confirmed result: PR #5 103 tests and PR #6 109 tests passing with lint/typecheck/build/diff-check/prod audit; stub browser flows verified; live local API unauthenticated probes returned 401 on protected Admin endpoints.
 - Next concrete action: Tech Lead review. After merges: update acceptance rows W-07/W-08, run the real-API procedure when the owner provides a test backend/Admin, and build ID 62 only after the proposal is approved.
-- Blocked by / decision owner: Real authenticated API runs — owner (test backend + Admin credentials). ID 62 — Tech Lead approval of the geometry proposal. ID 67 — no reporting/export contract (Agent A/Tech Lead). G1/G2/G3/G10/G11 and D3 — Agent A. Hosting CSP, refresh-token storage — owner/Tech Lead.
+- Blocked by / decision owner: Real authenticated API runs — Agent A approved development fixtures (none on `main` `827738c`; not owner-created accounts). ID 62 — Tech Lead approval of the geometry proposal. ID 67 — no reporting/export contract. G1/G2/G3/G10/G11 and D3 — Agent A. Hosting CSP, refresh-token storage — owner/Tech Lead.
 - Execution agent: Claude (took over from Codex 2026-10-21 03:35 +08:00 after Codex usage limit; no approved work rejected).
 - Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
 
@@ -26,7 +26,7 @@
 | 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | Assignment/membership gated on Agent A G1/G2 |
 | 59 | Commuter User Monitoring | READY_FOR_REVIEW (merged `fc55582`; production acceptance operator-gated) | User Accounts list (search, role/status filters, sort, pagination), detail, enable/disable with confirmation and self-disable guard; `src/app/features/identity`; unit tests + security review fixes S1–S3 | Tech Lead review; real-API check is an owner gate |
 | 60 | Jeepney & Fleet Group Monitoring | READY_FOR_REVIEW (merged `812bbab`) | Read-only `/fleet/jeepneys`, `/fleet/jeepneys/:id` (with effective route), `/fleet/groups`, `/fleet/groups/:id`; `src/app/features/fleet/{fleet.models,fleet.service,jeepney-*,group-*}`; unit tests | Membership/driver/operator names gated on Agent A G1–G3; create/edit is a later slice |
-| 61 | Official Transit Route & Direction Management | READY_FOR_REVIEW | PR #5: route list/detail/create/edit, direction metadata/status editor; 103 tests | Direction creation needs geometry (ID 62) |
+| 61 | Official Transit Route & Direction Management | READY_FOR_REVIEW (merged `8018e88`) | PR #5: route list/detail/create/edit, direction metadata/status editor; 103 tests | Direction creation needs geometry (ID 62) |
 | 62 | Route Polyline / Corridor / Geofence Management | NOT_STARTED | Contract inventory + UI proposal in `docs/integration/ADMIN_BATCH_CONTRACT_INVENTORY.md` §5 | Tech Lead approval of proposal |
 | 63 | GPS Device Management & Mapping | READY_FOR_REVIEW | PR #6: device mapping + verification | Mapping read/unmap missing (G10); hardware gates |
 | 64 | GPS Setup Request Approval & Installation Status | READY_FOR_REVIEW | PR #6: application review, GPS transitions, queues; 109 tests | Real API OPERATOR-GATED |
@@ -38,6 +38,7 @@
 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
+| PR #6 after merging `main` `8018e88`: lint, typecheck, `npm test`, build, diff check, prod audit | Local Windows, Node v24.15.0 | PASSED | 2026-10-22 18:15 +08:00 | 19 files / 130 tests (PR #5 + #6 suites); initial 316.57 kB; GitHub mergeable/CLEAN; full audit 4 dev-only findings (MCP SDK, vite) unchanged |
 | PR #5 (ID 61): lint, typecheck, `npm test`, build, diff check, prod audit | Local Windows, Node v24.15.0 (active nvm version; not changed by Agent E) | PASSED | 2026-10-22 | 16 files / 103 tests; initial 316.38 kB |
 | PR #6 (IDs 63–64): lint, typecheck, `npm test`, build, diff check, prod audit | Local Windows, Node v24.15.0 | PASSED | 2026-10-22 | 16 files / 109 tests; initial 315.80 kB; one real UX bug (409 transition error hidden after re-read) found and fixed |
 | Stub browser flows (routes; applications/GPS) | `ng serve` + synthetic stub; proxy verified not to reach real API | PASSED | 2026-10-22 | Evidence READMEs under `docs/testing/evidence/2026-10-22-*`; screenshots partly unavailable (app window hidden) |
@@ -88,6 +89,17 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-22 18:30 +08:00 — PR #6 and PR #7 reconciled with main after PR #5 merge
+
+- Action / reason: Agent G CHANGES REQUIRED — reconcile PRs #6 and #7 with `main` after PR #5 merged at `8018e88`.
+- Checklist/issue: PR #6 (IDs 63, 64, 56 dashboard); PR #7 (batch docs).
+- Files/config/services affected: PR #6 — merge commit `7ea76c4` (git auto-merged `src/app/app.routes.ts`, `src/app/shell/navigation.ts`, `src/app/shell/navigation.spec.ts`, `docs/ui-ux/NAVIGATION_STRUCTURE.md`, `docs/ui-ux/SCREEN_INVENTORY.md`; no manual conflicts) and `cc14c9c` (acceptance rows W-07/W-08). PR #7 — merge of `main` (no conflicts; status history kept: all prior entries plus the batch entry), then reference updates in the contract inventory, integration procedure, README and this file.
+- Observed result (success/failure/rollback): Both Transit Network and Applications & Approvals are reachable from the drawer on the merged code. PR #6 is mergeable/CLEAN on GitHub. Real-login gating changed per Tech Lead: test accounts come from Agent A's approved development fixtures (none on `main` `827738c`), not owner-created accounts.
+- Validation and evidence: PR #6 merged tree passes lint, typecheck, 130/130 tests, production build, diff check and production audit (Node v24.15.0).
+- Contracts / risks / dependencies: No code or contract change beyond the merge; no force push.
+- Commit/PR link or SHA (if available): PR #6 `cc14c9c`; PR #7 this branch.
+- Next action / owner gate: Agent G re-review of PRs #6 and #7; Agent A development fixtures for the real-API procedure.
 
 ### 2026-10-22 16:30 +08:00 — Independent Admin UI batch (IDs 56, 59, 61, 62, 63, 64, 67)
 
