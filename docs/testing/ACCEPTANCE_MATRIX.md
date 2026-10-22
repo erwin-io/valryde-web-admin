@@ -6,8 +6,8 @@
 | W-02 Vehicle registry | typed adapter, loading/error/empty/filter tests | table at desktop/tablet | Implemented read-only (ID 60); unit tests passing; synthetic-stub screenshots at 1280/1024 px |
 | W-03 Operator context | role filtering and safe missing-contract state | related links | Account level implemented; unit tests passing; fleet links gated on G1 |
 | W-04 Driver context | role filtering and missing-assignment state | related links | Account level implemented; unit tests passing; assignments gated on G1/G2 |
-| W-05 Route details | nested direction rendering and failure states | hierarchy clarity | Planned |
-| W-06 Geometry edit | LineString validation, dirty guard, save/error recovery | MapLibre pointer/keyboard checks | Planned |
+| W-05 Route details | nested direction rendering and failure states | hierarchy clarity | Implemented (ID 61); unit tests passing; synthetic-stub screenshots |
+| W-06 Geometry edit | LineString validation, dirty guard, save/error recovery | MapLibre pointer/keyboard checks | Proposal only (ID 62); dirty guard implemented for ID 61 forms |
 | W-07 Application review | allowed decisions, confirmation, 409 preservation | review layout | Planned |
 | W-08 GPS installation | transition/mapping/verification validation | multi-step clarity | Planned |
 | W-09 Live tracking | ordering, freshness, disconnect, reconcile | map bounds and stale state | BLOCKED by Agent B |
