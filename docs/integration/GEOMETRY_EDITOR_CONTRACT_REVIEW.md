@@ -1,6 +1,6 @@
 # Checklist 62 — Geometry Editor Contract Review
 
-**Review baseline:** `valryde-api` `main` at `827738c0f2c33ad3082f6a4a38a8e35669d4b0ea` on 2026-10-22. This is a bounded frontend contract review, not implementation approval for stops, arbitrary geofences, geometry history, or tracking behavior.
+**Review baseline:** `valryde-api` `main` at `827738c0f2c33ad3082f6a4a38a8e35669d4b0ea` on 2026-10-22. The bounded existing-direction foundation is implemented under `VALRYDE-CODEX-E-INDEPENDENT-CLOSURE-003`; this is not approval for stops, arbitrary geofences, geometry history, corridor persistence, or tracking behavior.
 
 ## Authoritative model
 
@@ -49,10 +49,17 @@ An `ACTIVE` direction can be patched by the current backend. The client can warn
 
 Agent B consumes canonical route direction/corridor data for tracking compliance. The editor changes only Agent A's canonical direction contract. OFF_ROUTE/re-entry rules, latest-state processing, compliance events, Pusher payloads, and tracker data remain Agent B-owned and are not recalculated or previewed by the editor.
 
+## Implemented decisions
+
+- MapLibre 6.15.0 is lazy-loaded with the geometry page; its worker is served as a same-origin build asset.
+- The initial style is an empty local style, so no coordinate or usage data is transmitted to a tile provider before a style/attribution policy is approved.
+- Mouse users can click and drag vertices. The keyboard-accessible alternative provides previous/next selection, exact longitude/latitude inputs, four-direction nudge buttons, and removal.
+- Save is enabled only for a valid, dirty draft of an existing direction and uses `PATCH /api/admin/route-directions/{directionId}` with a `geometry`-only body.
+- An Active route/direction receives a generic visibility warning. The warning explicitly says assignment-specific impact is unavailable.
+
 ## Remaining approval inputs
 
 - Exact Philippines camera bounds.
-- Approved OpenFreeMap-compatible style URL and attribution.
-- MapLibre version at least 6.15 and dependency review.
-- Accessible keyboard alternative for vertex operations.
-- Tech Lead decision on whether generic active-route warning is sufficient while G11 remains open.
+- Approved external basemap style URL, tile-provider privacy terms, hosting CSP and attribution.
+- Tech Lead acceptance of the generic active-route warning while G11 remains open.
+- Separate corridor persistence, direction-creation, and assignment-impact product decisions.

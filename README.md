@@ -4,9 +4,9 @@ Administrative web console for the Valryde public jeepney route live tracking an
 
 ## Current state
 
-The Angular application shell, Admin authentication, and the User Accounts module (checklist IDs 56 and 59) are implemented against Agent A's merged API (merged in PR #2). Operator and Driver monitoring (IDs 57, 58) is implemented at account level; their fleet context waits for Agent A's directory API. Jeepney and Fleet Group monitoring (ID 60) is implemented read-only. Official route and direction management (ID 61) is implemented (PR #5); the vehicle application / GPS installation workflow (IDs 63–64) merged in PR #6 at `341ebc7`; route geometry (ID 62) is a proposal and reports/export (ID 67) has no backend contract yet. See [`docs/integration/ADMIN_BATCH_CONTRACT_INVENTORY.md`](docs/integration/ADMIN_BATCH_CONTRACT_INVENTORY.md). Other modules follow the staged plan in the [Agent E handoff](handoffs/AGENT_E_ADMIN_WEB_HANDOFF.md); Tracking Operations stays hidden until Agent B contracts are approved.
+The Angular application shell, Admin authentication, account/fleet monitoring (IDs 56–60), route/direction management (ID 61), and vehicle application / GPS installation workflow (IDs 63–64) are implemented against Agent A's approved APIs. The bounded ID 62 foundation edits an existing direction's GeoJSON LineString with MapLibre and the approved direction PATCH. The bounded ID 67 subset provides a current transit snapshot, print layout, and explicit-field CSV from the already-loaded route response. See the [independent closure audit](docs/testing/AGENT_E_UI_INDEPENDENT_CLOSURE_AUDIT.md). Tracking, deviation/history, corridor/geofence persistence, broad reports, audit, and component health stay hidden until their exact Agent A/B or product contracts are approved.
 
-Agent E owns MVP checklist IDs **56–67**. Stack: Angular 21 (strict TypeScript, standalone components, signals), Angular Material and CDK, custom SCSS, Vitest, and angular-eslint. MapLibre/OpenFreeMap is added with the route geometry module. Angular 21 is used because Angular 22 requires Node.js 22.22.3 or later and the current workstation runs 22.17.1.
+Agent E owns MVP checklist IDs **56–67**. Stack: Angular 21 (strict TypeScript, standalone components, signals), Angular Material and CDK, custom SCSS, MapLibre 6.15, Vitest, and angular-eslint. MapLibre is lazy-loaded with the geometry page and uses a same-origin worker. No external basemap is configured until a tile-provider privacy, CSP, and attribution policy is approved.
 
 ## Development
 
@@ -23,7 +23,7 @@ npm run build
 
 The client calls the same-origin `/api` base path. Production hosting must serve or reverse-proxy the Agent A API under `/api`. No secrets or environment credentials belong in this repository.
 
-## Planned navigation
+## Navigation
 
 The application will use a collapsible Angular Material navigation drawer organized into:
 
@@ -31,11 +31,10 @@ The application will use a collapsible Angular Material navigation drawer organi
 - Transit Network
 - Fleet Management
 - Applications & Approvals
-- Tracking Operations
 - Identity & Access
 - System Administration
 
-Page availability remains gated by approved product scope and backend contracts. A formal transit-stop registry, booking/transactions, payments, revenue analytics, and advanced dispatch are not part of the authorized MVP scope.
+Tracking Operations remains hidden until Agent B contracts are approved. Page availability remains gated by approved product scope and backend contracts. A formal transit-stop registry, booking/transactions, payments, revenue analytics, and advanced dispatch are not part of the authorized MVP scope.
 
 ## Governance and project records
 

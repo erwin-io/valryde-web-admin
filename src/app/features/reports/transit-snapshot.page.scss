@@ -1,0 +1,14 @@
+.report { overflow: hidden; }
+td strong, td span { display: block; }
+td span { color: var(--vr-text-secondary); font-size: 13px; }
+
+@media print {
+  :host { color: #000; }
+  .filters, mat-paginator, .no-print { display: none !important; }
+  .report { border: 0; }
+  table { font-size: 10pt; }
+}
+
+@media (max-width: 700px) {
+  .mat-column-endpoints, .mat-column-geometry { display: none; }
+}

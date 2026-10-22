@@ -92,7 +92,8 @@ describe('transit route pages', () => {
       const el = f.nativeElement as HTMLElement;
       expect(el.querySelector(`a[href="/transit/routes/${r10.id}/edit"]`)).not.toBeNull();
       expect(el.querySelector(`a[href="/transit/directions/${direction().id}/edit"]`)).not.toBeNull();
-      expect(el.querySelector('.contract-gate')?.textContent).toContain('Route lines are managed separately');
+      expect(el.querySelector(`a[href="/transit/directions/${direction().id}/geometry"]`)).not.toBeNull();
+      expect(el.querySelector('.contract-gate')?.textContent).toContain('Geometry scope is intentionally bounded');
       expect(text(f)).not.toMatch(/add direction|new direction/i);
     });
 

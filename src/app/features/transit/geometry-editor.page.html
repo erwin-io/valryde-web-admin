@@ -1,0 +1,90 @@
+<app-page-header
+  [title]="direction() ? direction()!.directionLabel + ' route line' : 'Route line editor'"
+  description="Edit the canonical GeoJSON LineString for one direction. Coordinates use longitude first, then latitude."
+  [breadcrumbs]="breadcrumbs()"
+>
+  @if (state() === 'ready') {
+    <button mat-button type="button" (click)="close()">Close</button>
+    <button mat-flat-button type="button" [disabled]="saving() || !dirty() || !validation().valid" (click)="save()">
+      {{ saving() ? 'Saving…' : 'Save route line' }}
+    </button>
+  }
+</app-page-header>
+
+@switch (state()) {
+  @case ('loading') { <app-page-state kind="loading" title="Loading route line…" /> }
+  @case ('denied') { <app-page-state kind="denied" [problem]="problem()" /> }
+  @case ('error') { <app-page-state kind="error" title="The route line could not be loaded" [problem]="problem()" (retry)="load()" /> }
+  @case ('not-found') { <app-page-state kind="not-found" message="No direction with this identifier exists." /> }
+  @default {
+    @if (route(); as r) {
+      <div class="editor-layout">
+        <section class="panel map-panel" aria-labelledby="map-title">
+          <div class="section-heading map-heading">
+            <div>
+              <h2 id="map-title">{{ r.routeCode }} · {{ direction()!.originName }} → {{ direction()!.destinationName }}</h2>
+              <p>Gray is the currently saved line. {{ dirty() ? 'The colored draft has unsaved changes.' : 'The draft matches the saved line.' }}</p>
+            </div>
+            <div class="history-actions">
+              <button mat-icon-button type="button" aria-label="Undo geometry change" [disabled]="undoStack().length === 0" (click)="undo()"><mat-icon>undo</mat-icon></button>
+              <button mat-icon-button type="button" aria-label="Redo geometry change" [disabled]="redoStack().length === 0" (click)="redo()"><mat-icon>redo</mat-icon></button>
+              <button mat-button type="button" [disabled]="!dirty()" (click)="reset()">Reset</button>
+            </div>
+          </div>
+          <div #mapHost class="map" role="application" aria-label="Interactive route geometry map. Click to append a vertex; drag a vertex to move it."></div>
+          <p class="map-note">No external basemap is loaded until an approved tile style and attribution policy are configured.</p>
+          @if (mapProblem()) { <p class="inline-alert" role="alert">{{ mapProblem() }}</p> }
+        </section>
+
+        <aside class="panel controls" aria-labelledby="controls-title">
+          <h2 id="controls-title">Vertices</h2>
+          <p class="vertex-count">{{ positions().length | number }} / {{ maxPositions | number }}</p>
+
+          <div class="toolbar">
+            <button mat-stroked-button type="button" [disabled]="selectedIndex() === null || selectedIndex() === 0" (click)="selectPrevious()"><mat-icon>chevron_left</mat-icon> Previous</button>
+            <button mat-stroked-button type="button" [disabled]="selectedIndex() === null || selectedIndex() === positions().length - 1" (click)="selectNext()">Next <mat-icon>chevron_right</mat-icon></button>
+          </div>
+
+          @if (selectedPosition(); as position) {
+            <fieldset>
+              <legend>Vertex {{ selectedIndex()! + 1 }} {{ selectedIndex() === 0 ? '· Origin' : selectedIndex() === positions().length - 1 ? '· Destination' : '' }}</legend>
+              <label>Longitude <input #longitude type="number" step="0.000001" [value]="position[0]" /></label>
+              <label>Latitude <input #latitude type="number" step="0.000001" [value]="position[1]" /></label>
+              <button mat-stroked-button type="button" (click)="updateSelected(longitude.value, latitude.value)">Apply coordinates</button>
+              <div class="nudge" role="group" aria-label="Move selected vertex in small steps">
+                <button mat-icon-button type="button" aria-label="Move vertex north" (click)="nudgeSelected(0, 0.0001)"><mat-icon>north</mat-icon></button>
+                <button mat-icon-button type="button" aria-label="Move vertex west" (click)="nudgeSelected(-0.0001, 0)"><mat-icon>west</mat-icon></button>
+                <button mat-icon-button type="button" aria-label="Move vertex east" (click)="nudgeSelected(0.0001, 0)"><mat-icon>east</mat-icon></button>
+                <button mat-icon-button type="button" aria-label="Move vertex south" (click)="nudgeSelected(0, -0.0001)"><mat-icon>south</mat-icon></button>
+              </div>
+              <button mat-button type="button" class="remove" (click)="removeSelected()"><mat-icon>delete</mat-icon> Remove selected vertex</button>
+            </fieldset>
+          } @else {
+            <p class="unavailable">Click the map to add the first vertex or import a LineString.</p>
+          }
+
+          <label class="file-button">
+            <span>Import GeoJSON LineString</span>
+            <input type="file" accept=".geojson,.json,application/geo+json,application/json" (change)="importFile($event)" />
+          </label>
+          <p class="field-help">One LineString only, at most 1 MiB. FeatureCollections and polygons are rejected.</p>
+          @if (importProblem()) { <p class="field-error" role="alert">{{ importProblem() }}</p> }
+
+          @if (!validation().valid) {
+            <div class="validation" role="alert">
+              <strong>Fix the route line before saving:</strong>
+              <ul>@for (error of validation().errors; track error) { <li>{{ error }}</li> }</ul>
+            </div>
+          }
+          @if (saveProblem(); as error) {
+            <div class="inline-alert" role="alert">
+              The route line was not saved. {{ error.message }}
+              @if (error.requestId) { (Request ID: <code>{{ error.requestId }}</code>) }
+            </div>
+          }
+          <p class="preview-note"><mat-icon aria-hidden="true">info</mat-icon> Undo and redo apply only to this unsaved draft. Corridor width, assignment impact, stops, and geofences are not changed here.</p>
+        </aside>
+      </div>
+    }
+  }
+}

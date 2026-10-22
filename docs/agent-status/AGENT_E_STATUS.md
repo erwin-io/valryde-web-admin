@@ -2,18 +2,18 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-22 10:46 +08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-22 14:00 +08:00
 - Agent / module: E — Administrative Web Development / Valryde Admin
 - Repository: `valryde-web-admin`
-- Branch / HEAD SHA: `feat/56-59-admin-integration` (PR #7), normally merged with `origin/main` @ `341ebc77f18d1c5ef923f556b2f1d87947cba9cc`; reconciliation merge `c3365ee230b381f87373dd8ac7e45b8c82d2fdfc`
+- Branch / HEAD SHA: `feat/62-67-independent-ui-closure` at merged `origin/main` `498abf4f2f5976296d8cb6e621c125c6fef8f1d8`; implementation changes not yet committed
 - Checklist IDs: 56–67
-- GitHub issues / PRs: PRs #1–#6 merged (PR #6 at `341ebc77`). Open: [PR #7](https://github.com/erwin-io/valryde-web-admin/pull/7) batch inventory, takeover findings, status and handover. No issue assigned.
-- Implementation progress: IN_PROGRESS
-- Tech Lead review decision (if actually issued): PR #6 merged at `341ebc77`. PR #7 reconciliation is awaiting review. Production acceptance of the Admin foundation remains OPERATOR-GATED.
-- Current objective: AGENT_E_PR7_POST_MERGE_RECONCILED — submit the normally merged documentation branch for Tech Lead review without self-merging.
-- Last confirmed result: Latest `origin/main` merged into PR #7 with no conflicts; Admin route and applications/GPS functionality, acceptance evidence, findings, geometry proposal and handover history are present; links and diff hygiene pass.
-- Next concrete action: Tech Lead reviews PR #7. After Agent A fixture PR #15 merges, run the approved seed → 26-case isolated real-API procedure → cleanup flow; implement ID 62 only after bounded-editor approval.
-- Blocked by / decision owner: Real authenticated API runs are BACKEND_FIXTURE_BLOCKED on Agent A PR #15. ID 62 requires Tech Lead decisions recorded in the geometry review. ID 67 is BACKEND_CONTRACT_BLOCKED. G1/G2/G3/G10/G11 and D3 belong to Agent A; live tracking belongs to Agent B. Hosting CSP and refresh-token storage remain owner/Tech Lead gates.
+- GitHub issues / PRs: PRs #1–#7 merged (PR #7 merge `498abf4f`). Closure PR not yet opened. No issue assigned.
+- Implementation progress: READY_FOR_REVIEW
+- Tech Lead review decision (if actually issued): PRs #1–#7 merged. Final independent closure is authorized but not yet reviewed. Production acceptance remains OPERATOR-GATED.
+- Current objective: `VALRYDE-CODEX-E-INDEPENDENT-CLOSURE-003` — close every remaining frontend-only action for IDs 56–64 and the contract-backed subset of ID 67.
+- Last confirmed result: Bounded geometry and current-transit reporting slices are implemented. Strict TypeScript, lint, production build, and 23 files / 146 tests pass; synthetic browser acceptance passes at 1440×900, 768×1024 and 375×812 with no post-fix console errors.
+- Next concrete action: Commit and push the verified closure head, open the Tech Lead PR, and report GitHub mergeability without self-merging.
+- Blocked by / decision owner: Real authenticated API evidence still requires an approved Admin fixture/credentials. G1/G2/G3/G10/G11 and D3 belong to Agent A; IDs 65–66 and tracking/health/history contracts belong to Agent B; hardware and physical verification remain Agent F/owner gates.
 - Execution agent: Codex temporary takeover from Claude under `VALRYDE-CODEX-E-TEMPORARY-TAKEOVER-001`; all earlier Claude/Codex history preserved.
 - Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
 
@@ -21,23 +21,29 @@
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
 |---:|---|---|---|---|
-| 56 | Admin Login & Dashboard | IN_PROGRESS | Shell/auth and dashboard pending-work counts merged through PR #6 | Real Admin login BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
+| 56 | Admin Login & Dashboard | READY_FOR_REVIEW | Shell/auth, safe return URLs, session/401/RBAC tests, dashboard pending-work counts and synthetic browser flow | Real Admin login BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
 | 57 | Operator Management | READY_FOR_REVIEW (merged `075b377`) | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | Fleet context gated on Agent A G1 |
 | 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | Assignment/membership gated on Agent A G1/G2 |
 | 59 | Commuter User Monitoring | READY_FOR_REVIEW (merged `fc55582`; production acceptance operator-gated) | User Accounts list (search, role/status filters, sort, pagination), detail, enable/disable with confirmation and self-disable guard; `src/app/features/identity`; unit tests + security review fixes S1–S3 | Tech Lead review; real-API check is an owner gate |
 | 60 | Jeepney & Fleet Group Monitoring | READY_FOR_REVIEW (merged `812bbab`) | Read-only `/fleet/jeepneys`, `/fleet/jeepneys/:id` (with effective route), `/fleet/groups`, `/fleet/groups/:id`; `src/app/features/fleet/{fleet.models,fleet.service,jeepney-*,group-*}`; unit tests | Membership/driver/operator names gated on Agent A G1–G3; create/edit is a later slice |
-| 61 | Official Transit Route & Direction Management | READY_FOR_REVIEW (merged `8018e88`) | PR #5: route list/detail/create/edit, direction metadata/status editor; 103 tests | Direction creation needs geometry (ID 62) |
-| 62 | Route Polyline / Corridor / Geofence Management | NOT_STARTED | Inventory/proposal plus bounded contract review; no editor code | Tech Lead approval and remaining map/accessibility inputs |
+| 61 | Official Transit Route & Direction Management | READY_FOR_REVIEW (merged `8018e88`; regression rerun) | Route list/detail/create/edit, direction metadata/status editor, geometry entry link; expanded 146-test suite | Agent A D3 duplicate direction-label conflict semantics |
+| 62 | Route Polyline / Corridor / Geofence Management | READY_FOR_REVIEW (bounded foundation) | MapLibre LineString editor, accessible vertex controls, undo/redo, bounded import/validation, exact geometry PATCH; deterministic and browser tests | Corridor/geofence persistence, G11 assignment impact, approved external basemap and Philippines bounds remain gated |
 | 63 | GPS Device Management & Mapping | READY_FOR_REVIEW (merged `341ebc77`) | PR #6 device mapping + verification; verified 130-test combined suite | Mapping read/update/unmap missing (G10); hardware gates |
 | 64 | GPS Setup Request Approval & Installation Status | READY_FOR_REVIEW (merged `341ebc77`) | PR #6 application review, transitions and queues; verified 130-test combined suite | Real API BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
-| 65 | Global Live Tracking Map | NOT_STARTED | Tracking integration gate recorded | Agent B REST/Pusher contract approval and implementation |
-| 66 | Route Deviation Monitoring | NOT_STARTED | Tracking integration gate recorded | Agent B compliance/event contract approval and implementation |
-| 67 | Basic Reports, Export & System Health | BLOCKED | Minimum data requirements documented; no reporting/export/audit/component-health endpoint on Agent A main `827738c` | Agent A/B approved contracts needed |
+| 65 | Global Live Tracking Map | BLOCKED | Tracking integration gate recorded; no fabricated UI | Agent B REST/Pusher contract approval and implementation |
+| 66 | Route Deviation Monitoring | BLOCKED | Tracking integration gate recorded; no fabricated UI | Agent B compliance/event contract approval and implementation |
+| 67 | Basic Reports, Export & System Health | READY_FOR_REVIEW (bounded subset) | Current transit snapshot, reusable summary, explicit-field CSV, formula protection, print/states, responsive browser evidence | Historical reports, audit, Traccar/component health and broad/private exports remain blocked |
 
 ## Latest verification
 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
+| Final clean release gate | Local Windows, Node v24.19.0, npm 11.6.2 | PASSED | 2026-10-22 14:00 +08:00 | Clean `npm ci` (615 packages); lint; app/spec TypeScript; 23 files / 146 tests; production build initial 392.86 kB, geometry lazy chunk 1.09 MB; `git diff --check`; 35-file relative Markdown link check; same-origin worker present in build. |
+| Dependency/runtime audits | npm registry audit | PRODUCTION PASSED / DEV-TOOL FINDINGS | 2026-10-22 13:55 +08:00 | `npm audit --omit=dev`: 0. Full audit: 1 low + 3 high through Angular CLI/build (`@modelcontextprotocol/sdk`, Vite); automated fix requires Angular 22 major. MapLibre 6.15.0 introduces no production finding. |
+| Geometry/report strict checks | Local Windows, Node v24.19.0, npm 11.6.2 | PASSED | 2026-10-22 13:36 +08:00 | Lint, app/spec TypeScript, production build; 23 files / 146 tests. First run failed because a real MapLibre worker loop was started in jsdom; explicit production-on/test-off seam fixed the isolation and the complete rerun passed. |
+| Responsive browser acceptance | In-app Chromium + Angular dev server + temporary synthetic API | PASSED | 2026-10-22 13:47 +08:00 | 1440×900, 768×1024, 375×812; geometry nudge/undo and report layout verified; same-origin worker fix confirmed; no new console errors; fixture stopped and removed. Evidence: `docs/testing/evidence/2026-10-22-independent-ui-closure/README.md`. |
+| Agent A fixture gate refresh | GitHub/API remote | BACKEND_FIXTURE_BLOCKED | 2026-10-22 13:48 +08:00 | API main remains `827738c`; PR #15 remains open, mergeable/CLEAN at `be8d6d0`. |
+| Merged-main recovery and baseline `npm test` | Local Windows, Node v24.19.0, repository npm 11.6.2 | PASSED | 2026-10-22 13:23 +08:00 | Branch created from PR #7 merge `498abf4f`; 19 files / 130 tests pass; MapLibre registry version verified as 6.15.0 |
 | PR #7 normal merge with latest `origin/main` | Local Git / GitHub baseline | PASSED | 2026-10-22 10:46 +08:00 | Merged `341ebc77` through `c3365ee`; no conflicts; no force push; route and applications/GPS files/evidence preserved |
 | Post-merge Markdown relative-link and `git diff --check` validation | PR #7 merged tree | PASSED | 2026-10-22 10:46 +08:00 | All repository Markdown links resolve; branch diff has no whitespace errors |
 | Temporary takeover recovery: fetch, branch/worktree/status/PR inspection | Local/GitHub | PASSED | 2026-10-22 09:50 +08:00 | `main` fast-forwarded to `8018e88`; no uncommitted Claude work; PR #6 `cc14c9c` and PR #7 `bb16127` open/mergeable with security checks passing |
@@ -84,10 +90,10 @@
 ## Shared contract / risk changes
 
 - API/DTO/schema/migration changes: None. No backend repository or application contract was modified.
-- Auth/RBAC/data-isolation impact: None implemented. Future client must rely on server-side `ADMIN` authorization and preserve ownership/data-isolation responses.
-- Realtime/Traccar/geospatial impact: None implemented. Agent B tracking/latest-state/realtime dependencies remain gated; server-owned route precedence and WGS84 LineString rules are documented without reimplementation.
-- Secrets/security/privacy impact: No secrets or local environment values added. Raw Traccar credentials and private data remain prohibited from the client and documentation.
-- Required Tech Lead or owner decision: Accept/freeze downstream Agent A contracts, approve Agent B tracking contracts, and provide the full Agent E development directive before implementation.
+- Auth/RBAC/data-isolation impact: No policy change. Existing `ADMIN` guard/interceptor remains; no role mutation or identity join was added. Transit CSV uses an explicit non-private field allow-list from the already-loaded authorized response.
+- Realtime/Traccar/geospatial impact: Existing direction geometry can be patched as a validated WGS84 LineString. No corridor, geofence, route precedence, Traccar, compliance or Agent B behavior is implemented or changed.
+- Secrets/security/privacy impact: No secrets or local environment values added. The MapLibre worker is same-origin and no external tile provider is configured; raw Traccar credentials/private data remain prohibited. Token storage policy is unchanged.
+- Required Tech Lead or owner decision: Review the bounded closure PR; merge Agent A fixture PR #15/provide a controlled Admin environment for real acceptance; approve any external map style/privacy/CSP/attribution; resolve G1–G3/G10/G11/D3 and Agent B tracking/report/health contracts.
 
 ## Operator / hardware / external gates
 
@@ -96,6 +102,36 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-22 14:00 +08:00 — Final independent closure gate passed
+- Action / reason: Reinstalled the exact lockfile and ran the complete release/security/documentation gate on the frozen source tree.
+- Checklist/issue: IDs 56–67; checkpoint `AGENT_E_UI_INDEPENDENT_SCOPE_COMPLETE`.
+- Files/config/services affected: No new feature scope; verification and status records only.
+- Observed result (success/failure/rollback): Clean install, lint, strict TypeScript, all 146 tests, production build, diff hygiene, 35-file relative-link validation, production audit and worker-asset verification pass. Full audit retains four Angular dev-tool findings (1 low, 3 high) whose available fix is Angular 22.
+- Validation and evidence: Initial production bundle 392.86 kB; MapLibre stays lazy (1.09 MB raw / 245.25 kB estimated transfer); production vulnerabilities 0.
+- Contracts / risks / dependencies: No scope or backend change. Angular 22 is an owner/toolchain migration, not a safe dependency-only patch in this closure PR.
+- Commit/PR link or SHA (if available): Pending immediate commit/push/PR creation.
+- Next action / owner gate: Open the Tech Lead PR without merging; real API, tracking and hardware gates remain external.
+
+### 2026-10-22 13:48 +08:00 — Bounded geometry/reporting implementation and browser acceptance
+- Action / reason: Implemented every newly authorized independent frontend action for IDs 62 and 67, reran E1/E2/E4 regressions, documented all IDs 56–67, and completed three-viewport browser acceptance.
+- Checklist/issue: IDs 56–67; directive `VALRYDE-CODEX-E-INDEPENDENT-CLOSURE-003`.
+- Files/config/services affected: MapLibre geometry feature, current transit snapshot/report utilities, routes/navigation/styles, unit tests, architecture/integration/testing docs, package manifest/lock.
+- Observed result (success/failure/rollback): Geometry edits use only the approved direction PATCH; reports use only already-loaded transit rows. An initial full run exposed a jsdom MapLibre worker loop and browser testing exposed a missing dev worker asset; both were fixed with a test seam and same-origin worker asset. Final suite and responsive browser flows pass.
+- Validation and evidence: Lint and strict TypeScript passed; production build passed; 23 files / 146 tests passed; browser 1440×900, 768×1024 and 375×812 passed without post-fix console errors.
+- Contracts / risks / dependencies: No external basemap, corridor/geofence persistence, assignment-impact analysis, tracking/compliance, history/audit, Traccar/component health, private export, backend change, or token-policy change.
+- Commit/PR link or SHA (if available): Base `498abf4f`; closure commit/PR pending final gates.
+- Next action / owner gate: Clean install and final full verification, then open the PR without merging. Real authenticated API remains blocked on Agent A PR #15/credentials; hardware remains owner/Agent F gated.
+
+### 2026-10-22 13:23 +08:00 — Final independent UI closure started
+- Action / reason: Recovered merged main after PR #7, created the authorized closure branch, audited existing E1/E2/E4 coverage, and established the exact independent geometry/reporting boundary.
+- Checklist/issue: IDs 56–64 and 67; directive `VALRYDE-CODEX-E-INDEPENDENT-CLOSURE-003`.
+- Files/config/services affected: Status only; no application source changed yet.
+- Observed result (success/failure/rollback): Clean baseline at `498abf4f`; all 130 baseline tests pass; MapLibre 6.15.0 confirmed.
+- Validation and evidence: `npm test` (19 files / 130 tests); registry metadata lookup; source/contract review.
+- Contracts / risks / dependencies: Geometry save is limited to approved `PATCH /api/admin/route-directions/{id}`. Reporting is limited to authorized route data already loaded for the current snapshot. No tracking, history, audit or component-health claims.
+- Commit/PR link or SHA (if available): Base `498abf4f2f5976296d8cb6e621c125c6fef8f1d8`; closure PR pending.
+- Next action / owner gate: Implement geometry transforms/editor and current transit snapshot, then verify responsive/browser/security evidence.
 
 ### 2026-10-22 10:46 +08:00 — PR #7 reconciled after PR #6 merge
 

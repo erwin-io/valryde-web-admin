@@ -53,12 +53,14 @@ export type UpdateRouteInput = Partial<{
   status: RecordStatus;
 }>;
 
-/** PATCH /admin/route-directions/{id} metadata subset; geometry and corridor belong to ID 62. */
+/** PATCH /admin/route-directions/{id}; geometry is edited only by the bounded ID 62 editor. */
 export type UpdateDirectionInput = Partial<{
   directionLabel: string;
   originName: string;
   destinationName: string;
   status: RecordStatus;
+  geometry: LineStringGeometry;
+  corridorM: number;
 }>;
 
 export const RECORD_STATUS: Record<RecordStatus, { label: string; icon: string; tone: StatusTone }> = {

@@ -12,7 +12,7 @@
 | ROUTE-02 | Route details | Inspect metadata and directions | loading, not found, ready | composed from Admin route list — implemented |
 | ROUTE-03 | Create/edit route | Manage approved metadata/status/color | pristine, dirty, invalid, saving, conflict | POST/PATCH Admin transit routes — implemented; duplicate code 409 mapped to field |
 | ROUTE-04 | Direction editor | Manage label, endpoints, status | pristine, dirty, invalid, saving | PATCH route direction — implemented (metadata/status only); create requires geometry (ID 62); duplicate label blocked client-side (Agent A D3) |
-| ROUTE-05 | Geometry editor | Display/edit/import one LineString | loading, editing, invalid, dirty, saving, recovery | direction PATCH; no stop contract |
+| ROUTE-05 | Geometry editor | Display/edit/import one existing direction LineString | loading, editing, invalid, dirty, saving, recovery | implemented bounded foundation using direction PATCH; corridor, stops, geofences and assignment impact excluded |
 | VEH-01 | Vehicle registry | Search/filter permitted jeepneys | loading, empty, failed, ready | `GET /api/jeepneys` — implemented read-only |
 | VEH-02 | Vehicle details | Inspect vehicle, route, and workflow context | partial, loading, failed, ready | jeepney list + `GET /api/jeepneys/{id}/effective-route` — implemented read-only; application/GPS context deferred to IDs 63–64; driver assignment gated (no read endpoint) |
 | GROUP-01 | Fleet groups | Review and manage groups | loading, empty, failed, ready | `GET /api/fleet-groups` — implemented read-only; create/edit deferred to a later reviewed slice |
@@ -27,5 +27,6 @@
 | TRACK-02 | Position history | Inspect approved retained history | blocked | Agent B gate |
 | TRACK-03 | Route compliance | Inspect deviation/re-entry | blocked | Agent B gate |
 | HEALTH-01 | Integration status | Distinguish service health | base API only, partial, failed | `GET /api/health`; component contracts missing |
+| REPORT-01 | Transit snapshot | Filter/print/export the current authorized route response | loading, empty, filtered-empty, denied, failed, ready | implemented bounded ID 67 subset; no historical/report API claim |
 
 Every list and detail screen includes explicit loading, error/retry, empty/not-found, and permission-denied handling. Create/edit screens use dedicated routes except concise status confirmations.
