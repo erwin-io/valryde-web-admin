@@ -24,7 +24,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
-import { filter, of, switchMap } from 'rxjs';
+import { filter, finalize, of, switchMap } from 'rxjs';
 
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
 import { HasUnsavedChanges } from '../../shared/forms/unsaved-changes.guard';
@@ -46,8 +46,8 @@ const NOT_BLANK = /\S/;
 type LoadState = 'loading' | 'ready' | 'not-found' | 'error' | 'denied';
 
 /**
- * ROUTE-04: direction label, endpoint names, and lifecycle status. Geometry and corridor are ID 62.
- * Label uniqueness is checked here because Agent A's PATCH maps a duplicate label to 500 (defect D3).
+ * Direction metadata and corridor. Fresh G11 impact is required before corridor changes.
+ * D3 is fixed upstream; local duplicate validation supplements server conflict handling.
  */
 @Component({
   selector: 'app-direction-form-page',
@@ -90,6 +90,7 @@ export class DirectionFormPage implements OnInit, HasUnsavedChanges {
     originName: ['', [Validators.required, Validators.maxLength(160), Validators.pattern(NOT_BLANK)]],
     destinationName: ['', [Validators.required, Validators.maxLength(160), Validators.pattern(NOT_BLANK)]],
     status: ['DRAFT' as RecordStatus],
+    corridorM: [100, [Validators.required, Validators.min(1), Validators.max(5000), Validators.pattern(/^\d+$/)]],
   });
 
   protected readonly breadcrumbs = computed(() => {
@@ -128,6 +129,7 @@ export class DirectionFormPage implements OnInit, HasUnsavedChanges {
               originName: direction.originName,
               destinationName: direction.destinationName,
               status: direction.status,
+              corridorM: direction.corridorM,
             });
           }
           this.state.set(direction ? 'ready' : 'not-found');
@@ -149,10 +151,12 @@ export class DirectionFormPage implements OnInit, HasUnsavedChanges {
     if (v.originName.trim() !== d.originName) patch.originName = v.originName.trim();
     if (v.destinationName.trim() !== d.destinationName) patch.destinationName = v.destinationName.trim();
     if (v.status !== d.status) patch.status = v.status;
+    if (v.corridorM !== d.corridorM) patch.corridorM = v.corridorM;
     return patch;
   }
 
   protected submit(): void {
+    if (this.saving()) return;
     this.saveProblem.set(null);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -166,18 +170,30 @@ export class DirectionFormPage implements OnInit, HasUnsavedChanges {
     const confirmation: ConfirmDialogData | null = patch.status
       ? statusChangeConfirmation('direction', d.directionLabel, d.status, patch.status)
       : null;
-    const confirmed$ = confirmation
-      ? this.dialog
-          .open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, { data: confirmation })
-          .afterClosed()
-          .pipe(filter((ok) => ok === true))
-      : of(true);
+    this.saving.set(true);
+    this.form.disable();
+    const confirmed$ = patch.corridorM !== undefined
+      ? this.service.assignmentImpact(d.id).pipe(
+          switchMap(({ impact }) => this.dialog
+            .open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, { data: {
+              title: 'Change route corridor?',
+              message: `Change ${d.corridorM} m to ${patch.corridorM} m. Server preview: ${impact.affectedJeepneyCount} affected jeepneys; ${impact.activeDirectAssignmentCount} active direct assignments; ${impact.activeGroupAssignmentCount} active group assignments. The preview is a current snapshot; assignments can change before saving.${confirmation ? ' ' + confirmation.message : ''}`,
+              confirmLabel: 'Save changes',
+            } }).afterClosed()),
+        )
+      : confirmation
+        ? this.dialog.open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, { data: confirmation }).afterClosed()
+        : of(true);
 
     confirmed$
       .pipe(
+        filter((ok) => ok === true),
         switchMap(() => {
-          this.saving.set(true);
           return this.service.updateDirection(d.id, patch);
+        }),
+        finalize(() => {
+          this.saving.set(false);
+          if (this.form.disabled) this.form.enable();
         }),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -190,7 +206,13 @@ export class DirectionFormPage implements OnInit, HasUnsavedChanges {
         },
         error: (err: unknown) => {
           this.saving.set(false);
-          this.saveProblem.set(toApiProblem(err));
+          this.form.enable();
+          const problem = toApiProblem(err);
+          this.saveProblem.set(problem);
+          if (problem.status === 409 && problem.code === 'CONFLICT' && patch.directionLabel) {
+            this.form.controls.directionLabel.setErrors({ duplicate: true });
+            this.form.controls.directionLabel.markAsTouched();
+          }
         },
       });
   }

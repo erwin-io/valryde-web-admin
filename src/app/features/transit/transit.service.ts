@@ -5,6 +5,7 @@ import { Observable, map } from 'rxjs';
 import { API_BASE_URL } from '../../core/api/api-config';
 import {
   AdminTransitRoute,
+  AssignmentImpactResponse,
   CreateRouteInput,
   RouteDirection,
   TransitRoute,
@@ -43,5 +44,12 @@ export class TransitService {
         input,
       )
       .pipe(map((b) => b.direction));
+  }
+
+  assignmentImpact(directionId: string): Observable<AssignmentImpactResponse> {
+    return this.http.get<AssignmentImpactResponse>(
+      `${this.api}/admin/route-directions/${encodeURIComponent(directionId)}/assignment-impact`,
+      { params: { page: 1, pageSize: 20 } },
+    );
   }
 }

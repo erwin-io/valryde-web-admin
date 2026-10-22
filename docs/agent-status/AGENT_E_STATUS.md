@@ -2,21 +2,20 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23 09:30 +08:00
-- Agent / module: E — Administrative Web Development / Valryde Admin
-- Repository: `valryde-web-admin`
-- Branch / implementation SHA: `feat/62-67-independent-ui-closure` (PR #8) from `2c6a4f2`; E8-01/E8-02 correction commit follows this record
-- Checklist IDs: 56–67
-- GitHub issues / PRs: PRs #1–#7 merged. [PR #8](https://github.com/erwin-io/valryde-web-admin/pull/8) is open for final independent UI closure. No issue assigned.
-- Implementation progress: READY_FOR_REVIEW
-- Tech Lead review decision (if actually issued): PRs #1–#7 merged. PR #8: CHANGES REQUIRED by Agent G (E8-01 save concurrency, E8-02 canvas clarity) — corrected, awaiting re-review. Production acceptance remains OPERATOR-GATED.
-- Current objective: `AGENT_E_PR8_GEOMETRY_CORRECTED_READY_FOR_REVIEW`.
-- Last confirmed result: E8-01/E8-02 corrected. Clean `npm ci` (npm 11.6.2, Node v24.15.0); lint, strict app/spec typecheck, 23 files / 154 tests, production build, prod audit 0, diff check and Markdown links pass; browser acceptance at 1440×900, 768×1024, 375×812 against a synthetic stub.
-- Next concrete action: Agent G re-review of PR #8; owner/upstream agents resolve backend, tracking, basemap-provider and hardware gates.
-- Blocked by / decision owner: Real authenticated API evidence still requires an approved Admin fixture/credentials. G1/G2/G3/G10/G11 and D3 belong to Agent A; IDs 65–66 and tracking/health/history contracts belong to Agent B; hardware and physical verification remain Agent F/owner gates.
-- Execution agent: Claude (takeover round 2, `VALRYDE-CLAUDE-E-TAKEOVER-ROUND2-001`, sole active Agent E owner); Codex paused. Codex takeover history preserved.
-- Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
-
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T03:01:00+08:00
+- Agent / module: E — Admin Web; Codex, VALRYDE-E-RAPID-DELIVERY-003.
+- Repository: erwin-io/valryde-web-admin.
+- Branch / HEAD SHA: codex/admin-corridor-impact; base 1eb94279f5670ad71078b2ec27ba117905a75898, working changes.
+- Checklist IDs: 61/62 transit slice; primary batch 57/58/59/61/62/64 and secondary 56/60/63/65/66/67 tracked below.
+- GitHub issues / PRs: #1–#8 merged. Directory PR #9 open at e33baf46950a3e2b1011ca4cad2b9b3f6efad497.
+- Implementation progress: READY_FOR_REVIEW (transit slice); overall rapid-delivery batch in progress.
+- Tech Lead review decision: no decision on new rapid-delivery slices; no new acceptance claimed.
+- Current objective: corridor persistence, G11 impact-before-confirmation for geometry/corridor and D3 duplicate-label conflict handling.
+- Last confirmed result: transit lint, strict app/spec typecheck, full 166 tests (23 files), production build (392.86 kB initial) and diff check passed. Command npm test -- --include emitted npm 10 include warnings and ran the full suite; no focused-only claim.
+- Next concrete action: finish transit verification/PR, GPS mapping re-read and tracking preparation; authenticated acceptance when fixture credentials are available.
+- Blocked by / decision owner: no authenticated fixture credentials provided; geofence API absent; tracking REST/Pusher DTOs are proposed/unreleased; physical GPS and deployment are owner gates. Full standalone Version 1.0 document/checklist unavailable; exact API Agent E handoff reviewed.
+- Execution ownership: current user confirms E. Original checkout unchanged; no admin-referencing Claude command line/concurrent edit observed; process-level inactivity cannot be conclusively proven.
+- Dependencies / affected agents: A contracts pinned read-only at API origin/main 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479 (local main stale), B gateway, F hardware, G review/merge.
 ## Checklist coverage
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
@@ -104,6 +103,20 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 03:04 +08:00 — Transit release gates passed
+- `npm run lint`, `npm run typecheck`, `npm test -- --include=...` (npm 10 consumed include flags; full suite ran), 23 files / 166 tests PASSED; `npm run build` PASSED (392.86 kB initial); `git diff --check` PASSED.
+- Submitting bounded IDs 61/62 changes for review. No authenticated API/browser persistence or real compliance-engine validation performed; no full completion-ready/acceptance claim. Mapping/geofence/tracking/provider/device gates remain separate.
+- Directory PR #9 remains independent from this main-based branch; canonical status snapshot/history will need ordinary reconciliation when Agent G merges either branch. No shared policy/history deleted.
+
+
+### 2026-10-23 03:01 +08:00 — Transit rapid-delivery implementation
+- Preserved original clean Claude checkout at 8138c9739756b9d922f824c64bc7383146775a0e; zero stashes/unpushed commits at audit. Recovered unfinished directory work in admin-takeover worktree, corrected Angular template type error and submitted PR #9 after lint, strict typecheck, 156 tests and build passed.
+- Separate worktree transit-corridor, branch codex/admin-corridor-impact from origin/main 1eb9427. Reuses installed dependency tree through an ignored junction; no other repository modified. Initial relative junction creation failed harmlessly, absolute target succeeded.
+- Implemented integer corridor 1–5000m persistence through existing direction PATCH. Fresh G11 impact GET required before confirmation for geometry/corridor, showing authoritative aggregate counts, snapshot limitation, no client precedence calculation. Impact 403/409/error blocks PATCH and preserves draft. Edit/duplicate-save locks preserved. D3 server 409 maps to the direction name field alongside request ID.
+- Tests added for validation/bounds, exact PATCH, cancelled confirmation, duplicate submit, impact denial/conflict/failure, destroy cancellation and concurrent D3 conflict. Strict typecheck/focused tests running, no acceptance result claimed yet.
+- Real API and browser tests pending credentials/setup; no operational tracking, physical GPS, merge or deployment claim.
+
 
 ### 2026-10-23 09:30 +08:00 — Claude takeover round 2: PR #8 corrections E8-01 and E8-02
 
