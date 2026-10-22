@@ -2,21 +2,20 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23 09:30 +08:00
-- Agent / module: E — Administrative Web Development / Valryde Admin
-- Repository: `valryde-web-admin`
-- Branch / implementation SHA: `feat/62-67-independent-ui-closure` (PR #8) from `2c6a4f2`; E8-01/E8-02 correction commit follows this record
-- Checklist IDs: 56–67
-- GitHub issues / PRs: PRs #1–#7 merged. [PR #8](https://github.com/erwin-io/valryde-web-admin/pull/8) is open for final independent UI closure. No issue assigned.
-- Implementation progress: READY_FOR_REVIEW
-- Tech Lead review decision (if actually issued): PRs #1–#7 merged. PR #8: CHANGES REQUIRED by Agent G (E8-01 save concurrency, E8-02 canvas clarity) — corrected, awaiting re-review. Production acceptance remains OPERATOR-GATED.
-- Current objective: `AGENT_E_PR8_GEOMETRY_CORRECTED_READY_FOR_REVIEW`.
-- Last confirmed result: E8-01/E8-02 corrected. Clean `npm ci` (npm 11.6.2, Node v24.15.0); lint, strict app/spec typecheck, 23 files / 154 tests, production build, prod audit 0, diff check and Markdown links pass; browser acceptance at 1440×900, 768×1024, 375×812 against a synthetic stub.
-- Next concrete action: Agent G re-review of PR #8; owner/upstream agents resolve backend, tracking, basemap-provider and hardware gates.
-- Blocked by / decision owner: Real authenticated API evidence still requires an approved Admin fixture/credentials. G1/G2/G3/G10/G11 and D3 belong to Agent A; IDs 65–66 and tracking/health/history contracts belong to Agent B; hardware and physical verification remain Agent F/owner gates.
-- Execution agent: Claude (takeover round 2, `VALRYDE-CLAUDE-E-TAKEOVER-ROUND2-001`, sole active Agent E owner); Codex paused. Codex takeover history preserved.
-- Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
-
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T03:03:00+08:00
+- Agent / module: E — Admin Web; Codex, VALRYDE-E-RAPID-DELIVERY-003.
+- Repository: erwin-io/valryde-web-admin.
+- Branch / HEAD SHA: codex/admin-gps-mapping-read; base 1eb94279f5670ad71078b2ec27ba117905a75898, working changes.
+- Checklist IDs: 63/64 GPS mapping reconciliation and workflow safety; remaining batch tracked below.
+- GitHub issues / PRs: #1–#8 merged; directory PR #9 open (e33baf46950a3e2b1011ca4cad2b9b3f6efad497).
+- Implementation progress: READY_FOR_REVIEW (GPS slice); no new acceptance issued.
+- Tech Lead review decision: new slices awaiting review.
+- Current objective: consume G10 mapping reads, preserve lifecycle/error states, prevent duplicate writes and invalid transitions.
+- Last confirmed result: GPS lint, strict typecheck, full 158 tests (23 files, rerun with 2 workers), production build (392.86 kB initial), diff check passed; initial run had one unrelated baseline directory timeout, retained below.
+- Next concrete action: complete GPS quality gates and PR; finish tracking adapter preparation and reproducible acceptance.
+- Blocked by / decision owner: authenticated API acceptance has no session fixture credentials (environment variable presence checked without values) and localhost:3000 unreachable. Mapping update/unmap and standalone geofence API absent. Real tracking gateway/Pusher, physical GPS and deployment remain A/B/F/G/owner gates.
+- Execution ownership/recovery: original Claude checkout unchanged at 8138c97; recovered Codex unfinished directory code; zero stashes/unpushed commits at initial audit; isolated admin-takeover/transit-corridor/gps-read worktrees. No admin-referencing Claude process command line or concurrent file edits observed; process-level inactivity unprovable. No other repo modified.
+- Dependencies / affected agents: read-only API origin/main 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; B proposed gateway design only; F physical checks; G acceptance and merge.
 ## Checklist coverage
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
@@ -104,6 +103,21 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 03:16 +08:00 — GPS quality gates passed after constrained rerun
+- `npm run typecheck` PASSED. Initial `npm test`: 157 passed / 1 failed due unchanged baseline directory test timing out at 5000ms under parallel load; all GPS tests passed. No source change or timeout increase was used to hide the failure.
+- Full rerun `node node_modules/@angular/cli/bin/ng.js test --watch=false --runner-config=.angular/rapid-vitest.config.mjs --reporters=dot`, ignored local config `{test:{maxWorkers:2}}`: 23 files / 158 tests PASSED. `npm run lint`, `npm run build` (392.86 kB initial) and diff check PASSED.
+- Contract matrix and acceptance row updated for merged G10. Mapping read failure is distinct from no mapping; unauthorized operations remain server-controlled. Submit for G review; real API credentials, service availability and physical evidence remain absent.
+- PR #9 directories and PR #10 transit are separate main-based slices; no autonomous merge/deploy.
+
+
+### 2026-10-23 03:03 +08:00 — GPS mapping re-read and workflow safety
+- Implemented G10 GET mapping after permitted request/fleet lists; confirmed null means unmapped, read failure hides all actions, successful mapping/conflict reconciles authoritative mapping on reload. Stored mapping survives a fresh visit; stale no-read-contract copy removed.
+- Added action/state guards, locks across confirmation and write, cancellation unlock, transition allowlist checks and invalid scheduling-date validation. Server still owns authorization/state transitions/activation; installer checkboxes never claim physical evidence.
+- Added component tests for fresh visit, exact mapping GET/read-after-write, read denial/failure and retry, duplicate writes, cancellation and 403. Existing approval/rejection/schedule/install/mapping/verification tests retained.
+- Typecheck passed; GPS full tests running. API probe failed to connect; no credential variables available. No real API/browser/hardware acceptance claimed.
+- Separate worktree/branch created from remote main; dependencies reused via ignored junction. No other repository writes or destructive Git commands.
+
 
 ### 2026-10-23 09:30 +08:00 — Claude takeover round 2: PR #8 corrections E8-01 and E8-02
 

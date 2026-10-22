@@ -146,7 +146,7 @@
             <dt>Mapped</dt>
             <dd>{{ m.mappedAt | date: 'medium' }}</dd>
           </dl>
-          <p class="section-note">Shown for this visit only: the API has no endpoint to read mappings back.</p>
+          <p class="section-note">Saved mapping from the application API. Device connectivity is verified separately.</p>
         </section>
       } @else if (canMap()) {
         <section class="panel details" aria-labelledby="mapping-title">
@@ -233,8 +233,7 @@
         <div>
           <h2 id="gate-title">Not shown here</h2>
           <p>
-            An existing device mapping cannot be displayed after this visit because the API has no read endpoint for
-            mappings. Live device connectivity, last position, and online status depend on tracking contracts that are
+            Live device connectivity, last position, and online status depend on tracking contracts that are
             not yet approved. Power, SIM, server, and GPS-fix results are entered by the installer, not measured here.
           </p>
         </div>
