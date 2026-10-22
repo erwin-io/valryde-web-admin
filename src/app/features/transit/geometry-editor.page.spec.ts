@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 
 import { apiError, direction, transitRoute } from '../../../testing/fixtures';
 import { Position } from './geometry-editor.utils';
@@ -16,9 +16,11 @@ describe('GeometryEditorPage', () => {
   let fixture: ComponentFixture<GeometryEditorPage>;
   let http: HttpTestingController;
   let confirm: boolean;
+  let dialogResult: () => Observable<boolean>;
 
   beforeEach(async () => {
     confirm = true;
+    dialogResult = () => of(confirm);
     TestBed.configureTestingModule({
       imports: [GeometryEditorPage],
       providers: [
@@ -26,7 +28,7 @@ describe('GeometryEditorPage', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: GEOMETRY_MAP_ENABLED, useValue: false },
-        { provide: MatDialog, useValue: { open: () => ({ afterClosed: () => of(confirm) }) } },
+        { provide: MatDialog, useValue: { open: () => ({ afterClosed: () => dialogResult() }) } },
       ],
     });
     http = TestBed.inject(HttpTestingController);
@@ -50,7 +52,29 @@ describe('GeometryEditorPage', () => {
     redo(): void;
     save(): void;
     saveProblem: () => { message: string } | null;
+    saving: () => boolean;
+    reset(): void;
+    updateSelected(longitude: string, latitude: string): void;
+    importFile(event: Event): Promise<void>;
+    importProblem: () => string | null;
+    direction: () => { geometry: { coordinates: Position[] } } | null;
   };
+  const positionsSignal = () =>
+    (fixture.componentInstance as unknown as { positions: { set(v: Position[]): void } }).positions;
+  const fileEvent = (text: string) =>
+    ({ target: { files: [new File([text], 'line.geojson', { type: 'application/geo+json' })], value: 'x' } }) as unknown as Event;
+  const lineGeoJson = JSON.stringify({ type: 'LineString', coordinates: [[123.8, 10.2], [123.81, 10.21]] });
+
+  /** Every user-reachable edit path: nudge, coordinates, remove, undo, redo, reset. */
+  function attemptAllEdits() {
+    page().selectedIndex.set(0);
+    page().nudgeSelected(0.01, 0.01);
+    page().updateSelected('120', '14');
+    page().removeSelected();
+    page().undo();
+    page().redo();
+    page().reset();
+  }
 
   it('tracks deterministic draft edits with undo and redo', () => {
     const original = page().positions();
@@ -97,5 +121,112 @@ describe('GeometryEditorPage', () => {
     await fixture.whenStable();
     expect(page().dirty()).toBe(true);
     expect(page().saveProblem()?.message).toBe('Canonical geometry changed');
+  });
+
+  describe('E8-01 save concurrency', () => {
+    function editAndCapture() {
+      page().selectedIndex.set(1);
+      page().nudgeSelected(0.001, 0);
+      return page().positions();
+    }
+
+    it('rejects a duplicate Save while one is in flight', () => {
+      editAndCapture();
+      page().save();
+      page().save();
+      page().save();
+      const request = http.expectOne(PATCH);
+      expect(page().saving()).toBe(true);
+      request.flush({ direction: direction({ geometry: request.request.body.geometry }) });
+      expect(page().saving()).toBe(false);
+    });
+
+    it('locks every edit path while the save is pending and submits the captured geometry', async () => {
+      const submitted = editAndCapture();
+      page().save();
+      const request = http.expectOne(PATCH);
+      expect(request.request.body.geometry.coordinates).toEqual(submitted);
+
+      attemptAllEdits();
+      await page().importFile(fileEvent(lineGeoJson));
+      expect(page().positions()).toEqual(submitted);
+
+      request.flush({ direction: direction({ geometry: request.request.body.geometry }) });
+      await fixture.whenStable();
+      expect(page().positions()).toEqual(submitted);
+      expect(page().dirty()).toBe(false);
+    });
+
+    it('locks edits while the confirmation dialog is open, and unlocks if it is cancelled', () => {
+      const closed = new Subject<boolean>();
+      dialogResult = () => closed;
+      const submitted = editAndCapture();
+      page().save();
+      expect(page().saving()).toBe(true);
+      attemptAllEdits();
+      page().save();
+      expect(page().positions()).toEqual(submitted);
+      closed.next(false);
+      closed.complete();
+      http.expectNone(PATCH);
+      expect(page().saving()).toBe(false);
+      page().nudgeSelected(0.001, 0);
+      expect(page().positions()).not.toEqual(submitted);
+    });
+
+    it('keeps the draft and re-enables editing after a failed save', async () => {
+      const submitted = editAndCapture();
+      page().save();
+      http.expectOne(PATCH).flush(apiError('INTERNAL_ERROR', 'Boom', 'req-x'), { status: 500, statusText: 'Error' });
+      await fixture.whenStable();
+      expect(page().saving()).toBe(false);
+      expect(page().positions()).toEqual(submitted);
+      expect(page().dirty()).toBe(true);
+      expect((fixture.componentInstance as unknown as { hasUnsavedChanges(): boolean }).hasUnsavedChanges()).toBe(true);
+      page().nudgeSelected(0.001, 0);
+      expect(page().positions()).not.toEqual(submitted);
+    });
+
+    it('never discards newer edits when a late success arrives for a superseded draft', async () => {
+      const submitted = editAndCapture();
+      page().save();
+      const request = http.expectOne(PATCH);
+      // Simulate a newer draft that bypassed the UI lock (defence in depth).
+      const newer: Position[] = submitted.map(([lng, lat]) => [lng + 0.01, lat]);
+      positionsSignal().set(newer);
+      request.flush({ direction: direction({ geometry: { type: 'LineString', coordinates: submitted } }) });
+      await fixture.whenStable();
+      expect(page().positions()).toEqual(newer);
+      expect(page().direction()?.geometry.coordinates).toEqual(submitted);
+      expect(page().dirty()).toBe(true);
+    });
+
+    it('does not apply an import that finishes reading after a save started', async () => {
+      editAndCapture();
+      const importing = page().importFile(fileEvent(lineGeoJson));
+      page().save();
+      await importing;
+      expect(page().importProblem()).toContain('a save started');
+      http.expectOne(PATCH).flush({ direction: direction() });
+    });
+
+    it('cancels the request and applies nothing when destroyed during a save', () => {
+      editAndCapture();
+      page().save();
+      const request = http.expectOne(PATCH);
+      fixture.destroy();
+      expect(request.cancelled).toBe(true);
+    });
+  });
+
+  describe('E8-02 canvas clarity', () => {
+    it('labels the surface as a geometry canvas without road or geographic context', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelector('.canvas-notice')?.textContent).toContain('Geometry canvas only');
+      expect(el.querySelector('.canvas-notice')?.textContent).toContain('cannot be aligned to streets visually');
+      expect(el.querySelector('.map')?.getAttribute('aria-label')).toContain('without road or geographic context');
+      expect(el.querySelector('input[type="file"]')).not.toBeNull();
+      expect(el.querySelectorAll('input[type="number"]').length).toBe(2);
+    });
   });
 });

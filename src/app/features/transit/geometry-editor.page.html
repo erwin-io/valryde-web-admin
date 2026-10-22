@@ -1,6 +1,6 @@
 <app-page-header
   [title]="direction() ? direction()!.directionLabel + ' route line' : 'Route line editor'"
-  description="Edit the canonical GeoJSON LineString for one direction. Coordinates use longitude first, then latitude."
+  description="Edit the canonical GeoJSON LineString for one direction on a blank geometry canvas. Coordinates use longitude first, then latitude."
   [breadcrumbs]="breadcrumbs()"
 >
   @if (state() === 'ready') {
@@ -26,13 +26,34 @@
               <p>Gray is the currently saved line. {{ dirty() ? 'The colored draft has unsaved changes.' : 'The draft matches the saved line.' }}</p>
             </div>
             <div class="history-actions">
-              <button mat-icon-button type="button" aria-label="Undo geometry change" [disabled]="undoStack().length === 0" (click)="undo()"><mat-icon>undo</mat-icon></button>
-              <button mat-icon-button type="button" aria-label="Redo geometry change" [disabled]="redoStack().length === 0" (click)="redo()"><mat-icon>redo</mat-icon></button>
-              <button mat-button type="button" [disabled]="!dirty()" (click)="reset()">Reset</button>
+              <button mat-icon-button type="button" aria-label="Undo geometry change" [disabled]="saving() || undoStack().length === 0" (click)="undo()"><mat-icon>undo</mat-icon></button>
+              <button mat-icon-button type="button" aria-label="Redo geometry change" [disabled]="saving() || redoStack().length === 0" (click)="redo()"><mat-icon>redo</mat-icon></button>
+              <button mat-button type="button" [disabled]="saving() || !dirty()" (click)="reset()">Reset</button>
             </div>
           </div>
-          <div #mapHost class="map" role="application" aria-label="Interactive route geometry map. Click to append a vertex; drag a vertex to move it."></div>
-          <p class="map-note">No external basemap is loaded until an approved tile style and attribution policy are configured.</p>
+          <aside class="contract-gate canvas-notice" aria-labelledby="canvas-notice-title">
+            <mat-icon aria-hidden="true">grid_off</mat-icon>
+            <div>
+              <h3 id="canvas-notice-title">Geometry canvas only — no map background</h3>
+              <p>
+                This surface shows only the saved line, your draft and its vertices on a blank background. It has no
+                roads, labels, buildings or terrain, so vertices cannot be aligned to streets visually here. Use
+                surveyed coordinates (the coordinate fields or a GeoJSON import) for accurate placement. A basemap will
+                only be added after an approved tile provider, privacy, CSP and attribution policy.
+              </p>
+            </div>
+          </aside>
+          <div
+            #mapHost
+            class="map"
+            [class.locked]="saving()"
+            role="application"
+            aria-describedby="canvas-notice-title"
+            aria-label="Geometry editing canvas without road or geographic context. Click to append a vertex; drag a vertex to move it."
+          ></div>
+          @if (saving()) {
+            <p class="map-note" role="status">Saving… editing is paused until the save finishes.</p>
+          }
           @if (mapProblem()) { <p class="inline-alert" role="alert">{{ mapProblem() }}</p> }
         </section>
 
@@ -48,16 +69,16 @@
           @if (selectedPosition(); as position) {
             <fieldset>
               <legend>Vertex {{ selectedIndex()! + 1 }} {{ selectedIndex() === 0 ? '· Origin' : selectedIndex() === positions().length - 1 ? '· Destination' : '' }}</legend>
-              <label>Longitude <input #longitude type="number" step="0.000001" [value]="position[0]" /></label>
-              <label>Latitude <input #latitude type="number" step="0.000001" [value]="position[1]" /></label>
-              <button mat-stroked-button type="button" (click)="updateSelected(longitude.value, latitude.value)">Apply coordinates</button>
+              <label>Longitude <input #longitude type="number" step="0.000001" [value]="position[0]" [disabled]="saving()" /></label>
+              <label>Latitude <input #latitude type="number" step="0.000001" [value]="position[1]" [disabled]="saving()" /></label>
+              <button mat-stroked-button type="button" [disabled]="saving()" (click)="updateSelected(longitude.value, latitude.value)">Apply coordinates</button>
               <div class="nudge" role="group" aria-label="Move selected vertex in small steps">
-                <button mat-icon-button type="button" aria-label="Move vertex north" (click)="nudgeSelected(0, 0.0001)"><mat-icon>north</mat-icon></button>
-                <button mat-icon-button type="button" aria-label="Move vertex west" (click)="nudgeSelected(-0.0001, 0)"><mat-icon>west</mat-icon></button>
-                <button mat-icon-button type="button" aria-label="Move vertex east" (click)="nudgeSelected(0.0001, 0)"><mat-icon>east</mat-icon></button>
-                <button mat-icon-button type="button" aria-label="Move vertex south" (click)="nudgeSelected(0, -0.0001)"><mat-icon>south</mat-icon></button>
+                <button mat-icon-button type="button" [disabled]="saving()" aria-label="Move vertex north" (click)="nudgeSelected(0, 0.0001)"><mat-icon>north</mat-icon></button>
+                <button mat-icon-button type="button" [disabled]="saving()" aria-label="Move vertex west" (click)="nudgeSelected(-0.0001, 0)"><mat-icon>west</mat-icon></button>
+                <button mat-icon-button type="button" [disabled]="saving()" aria-label="Move vertex east" (click)="nudgeSelected(0.0001, 0)"><mat-icon>east</mat-icon></button>
+                <button mat-icon-button type="button" [disabled]="saving()" aria-label="Move vertex south" (click)="nudgeSelected(0, -0.0001)"><mat-icon>south</mat-icon></button>
               </div>
-              <button mat-button type="button" class="remove" (click)="removeSelected()"><mat-icon>delete</mat-icon> Remove selected vertex</button>
+              <button mat-button type="button" class="remove" [disabled]="saving()" (click)="removeSelected()"><mat-icon>delete</mat-icon> Remove selected vertex</button>
             </fieldset>
           } @else {
             <p class="unavailable">Click the map to add the first vertex or import a LineString.</p>
@@ -65,7 +86,7 @@
 
           <label class="file-button">
             <span>Import GeoJSON LineString</span>
-            <input type="file" accept=".geojson,.json,application/geo+json,application/json" (change)="importFile($event)" />
+            <input type="file" accept=".geojson,.json,application/geo+json,application/json" [disabled]="saving()" (change)="importFile($event)" />
           </label>
           <p class="field-help">One LineString only, at most 1 MiB. FeatureCollections and polygons are rejected.</p>
           @if (importProblem()) { <p class="field-error" role="alert">{{ importProblem() }}</p> }

@@ -53,8 +53,10 @@ Agent B consumes canonical route direction/corridor data for tracking compliance
 
 - MapLibre 6.15.0 is lazy-loaded with the geometry page; its worker is served as a same-origin build asset.
 - The initial style is an empty local style, so no coordinate or usage data is transmitted to a tile provider before a style/attribution policy is approved.
+- **E8-02 (2026-10-23):** because that style has no geographic content, the surface is labelled a *geometry canvas without road or geographic context*. Vertices cannot be road-aligned visually; accurate placement relies on surveyed coordinates entered manually or imported as GeoJSON.
 - Mouse users can click and drag vertices. The keyboard-accessible alternative provides previous/next selection, exact longitude/latitude inputs, four-direction nudge buttons, and removal.
 - Save is enabled only for a valid, dirty draft of an existing direction and uses `PATCH /api/admin/route-directions/{directionId}` with a `geometry`-only body.
+- **E8-01 (2026-10-23):** one Save at a time. The draft is locked from the moment Save starts (including the confirmation dialog) until the request settles; every edit path (map click, vertex drag, nudge, coordinate apply, remove, undo, redo, reset, GeoJSON import) is refused while locked. The submitted geometry is captured once; a response replaces the draft only if the draft still equals that snapshot, otherwise newer edits are kept and only the saved baseline updates. Failures keep the draft; destroying the page cancels the request.
 - An Active route/direction receives a generic visibility warning. The warning explicitly says assignment-specific impact is unavailable.
 
 ## Remaining approval inputs

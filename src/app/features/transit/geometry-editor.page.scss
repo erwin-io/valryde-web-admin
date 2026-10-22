@@ -38,3 +38,7 @@ input[type='number'] { box-sizing: border-box; width: 100%; padding: 10px; color
   .controls { padding: 16px; }
   .toolbar button { min-width: 0; }
 }
+
+.canvas-notice { margin: 0 16px 12px; }
+.canvas-notice h3 { margin: 0 0 4px; font: var(--mat-sys-title-small); }
+.map.locked { opacity: 0.7; pointer-events: none; }

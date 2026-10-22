@@ -27,7 +27,8 @@ This audit distinguishes independently executable Admin UI work from backend, tr
 
 - No role mutation or business-identity join was added.
 - The refresh token remains in `sessionStorage` and the access token remains in memory, matching the retained policy; no cookie authentication was invented.
-- The geometry map uses a same-origin MapLibre worker and an empty local style. It sends no coordinate or user data to a third-party tile service.
+- The geometry map uses a same-origin MapLibre worker and an empty local style. It sends no coordinate or user data to a third-party tile service. It is labelled as a blank geometry canvas (no roads or geography; E8-02).
+- Agent G findings E8-01 (save concurrency) and E8-02 (canvas clarity) were corrected on 2026-10-23; see `docs/testing/evidence/2026-10-23-pr8-geometry-corrections/`.
 - CSV export contains only an explicit route/direction field allow-list from the response already loaded by the current page. It never loads user, device, tracking, or broad fleet datasets for export.
 - Spreadsheet formula prefixes are neutralized. No Traccar password, API key, raw credential, private GPS history, or private user field is displayed or exported.
 

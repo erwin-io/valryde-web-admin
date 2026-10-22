@@ -2,19 +2,19 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-22 14:03 +08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23 09:30 +08:00
 - Agent / module: E — Administrative Web Development / Valryde Admin
 - Repository: `valryde-web-admin`
-- Branch / implementation SHA: `feat/62-67-independent-ui-closure` / `d291d2f` from merged `origin/main` `498abf4f2f5976296d8cb6e621c125c6fef8f1d8`; final status-sync commit follows this record
+- Branch / implementation SHA: `feat/62-67-independent-ui-closure` (PR #8) from `2c6a4f2`; E8-01/E8-02 correction commit follows this record
 - Checklist IDs: 56–67
 - GitHub issues / PRs: PRs #1–#7 merged. [PR #8](https://github.com/erwin-io/valryde-web-admin/pull/8) is open for final independent UI closure. No issue assigned.
 - Implementation progress: READY_FOR_REVIEW
-- Tech Lead review decision (if actually issued): PRs #1–#7 merged. Final independent closure is authorized but not yet reviewed. Production acceptance remains OPERATOR-GATED.
-- Current objective: `AGENT_E_UI_INDEPENDENT_SCOPE_COMPLETE` — Tech Lead review of PR #8; do not self-merge.
-- Last confirmed result: Bounded geometry and current-transit reporting slices are implemented. Strict TypeScript, lint, production build, and 23 files / 146 tests pass; synthetic browser acceptance passes at 1440×900, 768×1024 and 375×812 with no post-fix console errors.
-- Next concrete action: Tech Lead reviews PR #8; owner/upstream agents resolve the recorded backend, tracking, basemap and hardware gates.
+- Tech Lead review decision (if actually issued): PRs #1–#7 merged. PR #8: CHANGES REQUIRED by Agent G (E8-01 save concurrency, E8-02 canvas clarity) — corrected, awaiting re-review. Production acceptance remains OPERATOR-GATED.
+- Current objective: `AGENT_E_PR8_GEOMETRY_CORRECTED_READY_FOR_REVIEW`.
+- Last confirmed result: E8-01/E8-02 corrected. Clean `npm ci` (npm 11.6.2, Node v24.15.0); lint, strict app/spec typecheck, 23 files / 154 tests, production build, prod audit 0, diff check and Markdown links pass; browser acceptance at 1440×900, 768×1024, 375×812 against a synthetic stub.
+- Next concrete action: Agent G re-review of PR #8; owner/upstream agents resolve backend, tracking, basemap-provider and hardware gates.
 - Blocked by / decision owner: Real authenticated API evidence still requires an approved Admin fixture/credentials. G1/G2/G3/G10/G11 and D3 belong to Agent A; IDs 65–66 and tracking/health/history contracts belong to Agent B; hardware and physical verification remain Agent F/owner gates.
-- Execution agent: Codex temporary takeover from Claude under `VALRYDE-CODEX-E-TEMPORARY-TAKEOVER-001`; all earlier Claude/Codex history preserved.
+- Execution agent: Claude (takeover round 2, `VALRYDE-CLAUDE-E-TAKEOVER-ROUND2-001`, sole active Agent E owner); Codex paused. Codex takeover history preserved.
 - Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
 
 ## Checklist coverage
@@ -38,6 +38,8 @@
 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
+| PR #8 E8-01/E8-02 correction: clean `npm ci` (npm 11.6.2), lint, typecheck (app + spec), `npm test`, build, audits, diff check, Markdown links | Local Windows, Node v24.15.0 | PASSED | 2026-10-23 09:20 +08:00 | 23 files / 154 tests (+8); 7 of the new tests fail on the pre-fix code; initial 392.86 kB; prod audit 0; full audit 4 dev-only (MCP SDK via @angular/cli, vite via @angular/build); 35 Markdown files, no broken links |
+| PR #8 browser acceptance (save lock, canvas notice, responsive) | `ng serve` + synthetic stub (3 s delayed PATCH) | PASSED | 2026-10-23 09:25 +08:00 | `docs/testing/evidence/2026-10-23-pr8-geometry-corrections/` |
 | Final clean release gate | Local Windows, Node v24.19.0, npm 11.6.2 | PASSED | 2026-10-22 14:00 +08:00 | Clean `npm ci` (615 packages); lint; app/spec TypeScript; 23 files / 146 tests; production build initial 392.86 kB, geometry lazy chunk 1.09 MB; `git diff --check`; 35-file relative Markdown link check; same-origin worker present in build. |
 | Dependency/runtime audits | npm registry audit | PRODUCTION PASSED / DEV-TOOL FINDINGS | 2026-10-22 13:55 +08:00 | `npm audit --omit=dev`: 0. Full audit: 1 low + 3 high through Angular CLI/build (`@modelcontextprotocol/sdk`, Vite); automated fix requires Angular 22 major. MapLibre 6.15.0 introduces no production finding. |
 | Geometry/report strict checks | Local Windows, Node v24.19.0, npm 11.6.2 | PASSED | 2026-10-22 13:36 +08:00 | Lint, app/spec TypeScript, production build; 23 files / 146 tests. First run failed because a real MapLibre worker loop was started in jsdom; explicit production-on/test-off seam fixed the isolation and the complete rerun passed. |
@@ -102,6 +104,17 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 09:30 +08:00 — Claude takeover round 2: PR #8 corrections E8-01 and E8-02
+
+- Action / reason: Tech Lead directive `VALRYDE-CLAUDE-E-TAKEOVER-ROUND2-001` — Codex reached its usage limit; Claude resumes as sole Agent E owner to correct Agent G findings on PR #8. Codex's completed MapLibre editor and CSV reporting were verified intact and continued, not recreated.
+- Checklist/issue: IDs 62, 67 (PR #8).
+- Files/config/services affected: `src/app/features/transit/geometry-editor.page.{ts,html,scss,spec.ts}`; `docs/integration/GEOMETRY_EDITOR_CONTRACT_REVIEW.md`; `docs/testing/AGENT_E_UI_INDEPENDENT_CLOSURE_AUDIT.md`; new evidence folder; this file. Removed Claude's leftover scratchpad git worktree from the previous session (junction removed first; `node_modules` intact).
+- Observed result (success/failure/rollback): Recovery: local branch equals PR #8 HEAD `2c6a4f2`, clean tree, PR mergeable/CLEAN. E8-01 fixed with a save lock (set before the confirmation dialog, cleared via `finalize` on success, failure, cancel and destroy), a guard in the single `mutate()` path plus undo/redo/import, a submitted-geometry snapshot, and a late-response check that never overwrites a newer draft. Markers become non-draggable during Save and a drag is snapped back. E8-02: explicit "Geometry canvas only — no map background" notice and canvas aria label; manual coordinates, GeoJSON import, validation and the active-route warning unchanged; no tile provider configured; geometry-only PATCH unchanged.
+- Validation and evidence: see Latest verification rows dated 2026-10-23. Security review: CSV allowlist and formula neutralization intact; import limited to 1 MiB / 10,000 vertices / WGS84; same-origin worker; map removed on destroy; Admin guard and unsaved-changes guard on the route.
+- Contracts / risks / dependencies: No backend, token-storage or Traccar change.
+- Commit/PR link or SHA (if available): PR #8; correction commit on `feat/62-67-independent-ui-closure`.
+- Next action / owner gate: Agent G re-review; do not self-merge.
 
 ### 2026-10-22 14:03 +08:00 — Closure PR opened
 - Action / reason: Committed and pushed the verified independent UI closure and opened the required Tech Lead review PR.

@@ -9,7 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import * as maplibregl from 'maplibre-gl';
 import { GeoJSONSource, LngLatBounds, Map, MapMouseEvent, Marker, StyleSpecification } from 'maplibre-gl';
-import { filter, of, switchMap } from 'rxjs';
+import { filter, finalize, of, switchMap } from 'rxjs';
 
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
 import { HasUnsavedChanges } from '../../shared/forms/unsaved-changes.guard';
@@ -187,7 +187,7 @@ export class GeometryEditorPage implements OnInit, OnDestroy, HasUnsavedChanges 
 
   protected undo(): void {
     const previous = this.undoStack().at(-1);
-    if (!previous) return;
+    if (!previous || this.saving()) return;
     this.redoStack.update((stack) => [...stack, clonePositions(this.positions())]);
     this.undoStack.update((stack) => stack.slice(0, -1));
     this.positions.set(clonePositions(previous));
@@ -197,7 +197,7 @@ export class GeometryEditorPage implements OnInit, OnDestroy, HasUnsavedChanges 
 
   protected redo(): void {
     const next = this.redoStack().at(-1);
-    if (!next) return;
+    if (!next || this.saving()) return;
     this.undoStack.update((stack) => [...stack, clonePositions(this.positions())]);
     this.redoStack.update((stack) => stack.slice(0, -1));
     this.positions.set(clonePositions(next));
@@ -218,13 +218,18 @@ export class GeometryEditorPage implements OnInit, OnDestroy, HasUnsavedChanges 
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
-    if (!file) return;
+    if (!file || this.saving()) return;
     if (file.size > MAX_GEOJSON_BYTES) {
       this.importProblem.set('The GeoJSON file exceeds the 1 MiB import limit.');
       return;
     }
     try {
       const parsed = parseLineStringGeoJson(JSON.parse(await file.text()) as unknown);
+      // A Save may have started while the file was being read; mutate() refuses edits during Save.
+      if (this.saving()) {
+        this.importProblem.set('The import was not applied because a save started. Import again after it finishes.');
+        return;
+      }
       this.mutate(parsed);
       this.selectedIndex.set(0);
       this.renderMap(true);
@@ -233,11 +238,17 @@ export class GeometryEditorPage implements OnInit, OnDestroy, HasUnsavedChanges 
     }
   }
 
+  /**
+   * E8-01: the draft is locked from the moment Save starts (including the confirmation dialog) until
+   * the request settles, so a late response cannot overwrite newer edits. The submitted geometry is
+   * captured once; a response only replaces the draft if the draft still equals that snapshot.
+   */
   protected save(): void {
     const direction = this.direction();
     const route = this.route();
-    if (!direction || !route || !this.dirty() || !this.validation().valid) return;
+    if (this.saving() || !direction || !route || !this.dirty() || !this.validation().valid) return;
 
+    const submitted = clonePositions(this.positions());
     const confirmation: ConfirmDialogData | null = direction.status === 'ACTIVE' || route.status === 'ACTIVE'
       ? {
           title: 'Save commuter-visible route line?',
@@ -254,28 +265,29 @@ export class GeometryEditorPage implements OnInit, OnDestroy, HasUnsavedChanges 
       : of(true);
 
     this.saveProblem.set(null);
+    this.setSaving(true);
     confirmed$
       .pipe(
-        switchMap(() => {
-          this.saving.set(true);
-          return this.service.updateDirection(direction.id, { geometry: asLineString(this.positions()) });
-        }),
+        switchMap(() => this.service.updateDirection(direction.id, { geometry: asLineString(submitted) })),
+        // Runs on success, failure, cancelled confirmation, and destroy (takeUntilDestroyed unsubscribes).
+        finalize(() => this.setSaving(false)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (saved) => {
-          this.saving.set(false);
           this.direction.set(saved);
-          this.positions.set(clonePositions(saved.geometry.coordinates));
-          this.undoStack.set([]);
-          this.redoStack.set([]);
+          if (samePositions(this.positions(), submitted)) {
+            this.positions.set(clonePositions(saved.geometry.coordinates));
+            this.undoStack.set([]);
+            this.redoStack.set([]);
+            this.snackBar.open('Canonical route line saved.', 'Dismiss', { duration: 5000 });
+          } else {
+            // Defensive: never discard a newer draft; the saved line becomes the new baseline only.
+            this.snackBar.open('Route line saved. Newer unsaved edits were kept.', 'Dismiss', { duration: 5000 });
+          }
           this.renderMap(true);
-          this.snackBar.open('Canonical route line saved.', 'Dismiss', { duration: 5000 });
         },
-        error: (error: unknown) => {
-          this.saving.set(false);
-          this.saveProblem.set(toApiProblem(error));
-        },
+        error: (error: unknown) => this.saveProblem.set(toApiProblem(error)),
       });
   }
 
@@ -284,7 +296,17 @@ export class GeometryEditorPage implements OnInit, OnDestroy, HasUnsavedChanges 
     void this.router.navigate(route ? ['/transit/routes', route.id] : ['/transit/routes']);
   }
 
+  private setSaving(saving: boolean): void {
+    this.saving.set(saving);
+    this.markers.forEach((marker) => marker.setDraggable(!saving));
+  }
+
+  /** Single entry point for draft edits (map click, drag, nudge, coordinates, remove, reset, import). */
   private mutate(next: Position[]): void {
+    if (this.saving()) {
+      this.renderMarkers(); // snap a marker dragged during Save back to the locked draft
+      return;
+    }
     if (samePositions(next, this.positions())) return;
     this.undoStack.update((stack) => [...stack.slice(-99), clonePositions(this.positions())]);
     this.redoStack.set([]);
@@ -366,7 +388,7 @@ export class GeometryEditorPage implements OnInit, OnDestroy, HasUnsavedChanges 
         event.stopPropagation();
         this.select(index);
       });
-      const marker = new maplibregl.Marker({ element: button, draggable: true }).setLngLat(position).addTo(this.map!);
+      const marker = new maplibregl.Marker({ element: button, draggable: !this.saving() }).setLngLat(position).addTo(this.map!);
       marker.on('dragend', () => {
         const point = marker.getLngLat();
         this.selectedIndex.set(index);
