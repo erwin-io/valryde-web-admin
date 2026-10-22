@@ -2,21 +2,20 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23 09:30 +08:00
-- Agent / module: E — Administrative Web Development / Valryde Admin
-- Repository: `valryde-web-admin`
-- Branch / implementation SHA: `feat/62-67-independent-ui-closure` (PR #8) from `2c6a4f2`; E8-01/E8-02 correction commit follows this record
-- Checklist IDs: 56–67
-- GitHub issues / PRs: PRs #1–#7 merged. [PR #8](https://github.com/erwin-io/valryde-web-admin/pull/8) is open for final independent UI closure. No issue assigned.
-- Implementation progress: READY_FOR_REVIEW
-- Tech Lead review decision (if actually issued): PRs #1–#7 merged. PR #8: CHANGES REQUIRED by Agent G (E8-01 save concurrency, E8-02 canvas clarity) — corrected, awaiting re-review. Production acceptance remains OPERATOR-GATED.
-- Current objective: `AGENT_E_PR8_GEOMETRY_CORRECTED_READY_FOR_REVIEW`.
-- Last confirmed result: E8-01/E8-02 corrected. Clean `npm ci` (npm 11.6.2, Node v24.15.0); lint, strict app/spec typecheck, 23 files / 154 tests, production build, prod audit 0, diff check and Markdown links pass; browser acceptance at 1440×900, 768×1024, 375×812 against a synthetic stub.
-- Next concrete action: Agent G re-review of PR #8; owner/upstream agents resolve backend, tracking, basemap-provider and hardware gates.
-- Blocked by / decision owner: Real authenticated API evidence still requires an approved Admin fixture/credentials. G1/G2/G3/G10/G11 and D3 belong to Agent A; IDs 65–66 and tracking/health/history contracts belong to Agent B; hardware and physical verification remain Agent F/owner gates.
-- Execution agent: Claude (takeover round 2, `VALRYDE-CLAUDE-E-TAKEOVER-ROUND2-001`, sole active Agent E owner); Codex paused. Codex takeover history preserved.
-- Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
-
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T03:18:00+08:00
+- Agent / module: E — Admin Web, Codex; VALRYDE-E-RAPID-DELIVERY-003.
+- Repository: erwin-io/valryde-web-admin.
+- Branch / HEAD SHA: codex/admin-tracking-readiness, base 1eb94279f5670ad71078b2ec27ba117905a75898; working changes.
+- Checklist IDs: 65/66 adapter-driven preparation. Primary batch 57/58/59/61/62/64 requires authenticated acceptance and G review before completion-ready.
+- GitHub issues / PRs: directory #9 e33baf46950a3e2b1011ca4cad2b9b3f6efad497; transit #10 6b4c5bd5b69242e5da4355bb22331ff8d1b8c268; GPS #11 cba601b7912558b3504afbe4620552c79818d66f open.
+- Implementation progress: READY_FOR_REVIEW (tracking preparation); no operational tracking or checklist acceptance claimed.
+- Tech Lead decision: no decision on these new slices.
+- Current objective: implement proposal-driven map/deviation screens with an injected projection adapter, explicit unconfigured production default and no guessed HTTP/Pusher integration.
+- Last confirmed result: lint, strict typecheck, full 24-file / 167-test suite, production build (393.30 kB initial), and diff check passed. Prior directory/transit/GPS release gates passed, with one GPS baseline timeout followed by successful full constrained rerun.
+- Next concrete action: full tracking gates/PR; operational report/health and G2 membership work; reproducible authenticated/browser acceptance where feasible.
+- Blocked by / decision owner: Agent B D09–D11 gateway/projection/path/auth/history contracts remain proposed, not implemented/released. API unreachable on localhost:3000; fixture credentials absent. Geofence CRUD/profile-update operations absent. Physical GPS/provider/deployment remain external gates.
+- Recovery/ownership: original clean Claude checkout at 8138c97 preserved; unfinished directory slice recovered; initial zero stashes/unpushed commits. Isolated agent worktrees retained; no admin-referencing Claude process command line/concurrent edit observed, process-level inactivity unprovable. No other repository modified.
+- Dependencies: read-only API origin/main 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; B proposal 149cefc82d0ccea3c1efe06aebaf157a607c1d8e; F physical evidence; G review/merge. Full standalone baseline DOCX/checklist unavailable; canonical Agent E handoff reviewed.
 ## Checklist coverage
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
@@ -104,6 +103,20 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 03:22 +08:00 — Tracking preparation release gates passed
+- `npm run lint`, `npm run typecheck`, full Angular/Vitest run with ignored local maxWorkers:2 runner config (24 files / 167 tests), `npm run build` (393.30 kB initial), and diff check PASSED.
+- Default provider remains null and production navigation unchanged. Admin-only direct preparation routes are implemented; synthetic records exist only in tests. Real B gateway/Pusher authorization, coalescing/poll adapter, historical events and actual map/provider/hardware acceptance remain future integration work.
+- Submit source for review without claiming IDs 65/66 operational or complete. PRs #9/#10/#11 remain separate review slices; no autonomous merge/deployment.
+
+
+### 2026-10-23 03:18 +08:00 — Proposal-driven Admin tracking screens
+- Read B gateway design pinned at 149cefc: complete bounded snapshots, per-vehicle decimal revisions, authoritative removals even with equal revision, invalidation-only events and scoped reauthorization. No released endpoint/DTO/auth signer exists; did not invent an API or connect to Traccar.
+- Added internal projection gateway token, default null, guarded `/tracking/live` and `/tracking/deviations` routes. Production navigation unchanged until integration. Null provider explicitly displays unavailable, never synthetic vehicles.
+- Map/deviation screens accept injected projections only; Philippines bounds from G6; current vs last-known/UNKNOWN labels, server-reported compliance, selection/fleet links, fresh complete replacements, superseded-request cancellation, reconnect refresh, expiry, scope-cap/duplicate/revision validation, 401/403 clears data and stops automatic retry, component timer/map cleanup.
+- Synthetic telemetry exists only in component tests. No Pusher key/signature, raw provider ID, private device credential, route-compliance calculation, event history or operational live-tracking claim.
+- Strict typecheck and 13 focused component tests PASSED. Full release gates running. Missing real gateway, API runtime and credentials remain exact blockers; physical GPS remains F/owner gate.
+
 
 ### 2026-10-23 09:30 +08:00 — Claude takeover round 2: PR #8 corrections E8-01 and E8-02
 

@@ -1,0 +1,5 @@
+:host { display: block; }
+.panel { margin-block: 16px; padding: 20px; border: 1px solid var(--mat-sys-outline-variant); border-radius: 8px; }
+.tracking-map { height: min(55vh, 520px); min-height: 260px; border: 1px solid var(--mat-sys-outline-variant); }
+article { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-block: 12px; border-bottom: 1px solid var(--mat-sys-outline-variant); }
+article span { overflow-wrap: anywhere; }

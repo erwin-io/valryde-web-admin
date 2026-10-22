@@ -86,6 +86,18 @@ export const routes: Routes = [
           import('./features/identity/user-detail.page').then((m) => m.UserDetailPage),
       },
       {
+        path: 'tracking/live',
+        title: 'Tracking readiness · Valryde Admin',
+        data: { mode: 'map' },
+        loadComponent: () => import('./features/tracking/tracking-operations.page').then(m => m.TrackingOperationsPage),
+      },
+      {
+        path: 'tracking/deviations',
+        title: 'Deviation readiness · Valryde Admin',
+        data: { mode: 'deviations' },
+        loadComponent: () => import('./features/tracking/tracking-operations.page').then(m => m.TrackingOperationsPage),
+      },
+      {
         path: 'system/reports/transit',
         title: 'Transit snapshot · Valryde Admin',
         loadComponent: () =>

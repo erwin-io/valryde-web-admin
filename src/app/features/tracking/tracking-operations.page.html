@@ -1,0 +1,45 @@
+<app-page-header [title]="mode() === 'map' ? 'Global tracking map' : 'Route deviations'"
+  description="Admin tracking preparation. Operational tracking requires the released Agent B gateway." />
+@if (!configured) {
+  <section class="panel" role="status">
+    <h2>Tracking gateway is not configured</h2>
+    <p>Live locations and route deviations are unavailable until the authorized snapshot gateway is integrated. No vehicle data is simulated here.</p>
+    <a mat-button routerLink="/fleet/jeepneys">View fleet records</a>
+  </section>
+} @else {
+  <p role="status">{{ connected() ? 'Notification transport connected' : 'Disconnected — current tracking is unknown' }}.
+    @if (snapshotAt()) { Snapshot: {{ snapshotAt() | date:'medium' }}. }
+  </p>
+  <button mat-stroked-button (click)="reload()" [disabled]="state() === 'loading'">Refresh snapshot</button>
+  @if (state() === 'loading') { <app-page-state kind="loading" title="Reconciling tracking snapshot…" /> }
+  @if (state() === 'denied') { <app-page-state kind="denied" [problem]="problem()" /> }
+  @if (state() === 'error') {
+    <app-page-state kind="error" title="Tracking snapshot unavailable" [problem]="problem()" (retry)="reload()" />
+  }
+  @if (mode() === 'map') {
+    <p>Coordinate canvas only — no map background configured. Camera is constrained to the Philippines.</p>
+    <div #mapHost class="tracking-map" role="region" aria-label="Philippines tracking coordinate canvas"></div>
+    @if (mapProblem()) { <p role="alert">Map unavailable. Use the vehicle list below.</p> }
+  }
+  @if (state() !== 'denied') {
+    <section class="panel" aria-label="Tracking vehicles">
+      @if (shown().length === 0 && state() === 'ready') {
+        <p>{{ mode() === 'deviations' ? 'No current server-reported deviations. Stale compliance is unknown.' : 'No vehicles in this authorized snapshot.' }}</p>
+      }
+      @for (row of shown(); track row.jeepneyId) {
+        <article>
+          <button mat-button (click)="select(row)">{{ row.plateNo }}</button>
+          <span>{{ locationLabel(row) }} · Route compliance: {{ complianceLabel(row) }}</span>
+          @if (row.position) { <span>Fix: {{ row.position.fixTime | date:'medium' }}</span> }
+          @if (row.reason) { <span>{{ row.reason }}</span> }
+          <a [routerLink]="['/fleet/jeepneys', row.jeepneyId]">Fleet record</a>
+        </article>
+      }
+    </section>
+    @if (selected(); as row) {
+      <section class="panel" aria-label="Selected vehicle">
+        <h2>{{ row.plateNo }}</h2><p>{{ locationLabel(row) }} · {{ complianceLabel(row) }}</p>
+      </section>
+    }
+  }
+}
