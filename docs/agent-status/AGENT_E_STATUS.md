@@ -2,42 +2,55 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-21 18:45 +08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-22 10:46 +08:00
 - Agent / module: E — Administrative Web Development / Valryde Admin
 - Repository: `valryde-web-admin`
-- Branch / HEAD SHA: `feat/60-jeepney-fleet-monitoring` from `main` @ `075b377` (PR #3 merge)
+- Branch / HEAD SHA: `feat/56-59-admin-integration` (PR #7), normally merged with `origin/main` @ `341ebc77f18d1c5ef923f556b2f1d87947cba9cc`; reconciliation merge `c3365ee230b381f87373dd8ac7e45b8c82d2fdfc`
 - Checklist IDs: 56–67
-- GitHub issues / PRs: PR #1 merged (`b1c381f`); PR #2 merged (`fc55582`); PR #3 merged (`075b377`); [PR #4](https://github.com/erwin-io/valryde-web-admin/pull/4) checklist 60 → `main`, under review. No issue assigned.
+- GitHub issues / PRs: PRs #1–#6 merged (PR #6 at `341ebc77`). Open: [PR #7](https://github.com/erwin-io/valryde-web-admin/pull/7) batch inventory, takeover findings, status and handover. No issue assigned.
 - Implementation progress: IN_PROGRESS
-- Tech Lead review decision (if actually issued): PRs #2 and #3 merged; Admin foundation accepted for development with production acceptance OPERATOR-GATED. Checklist 60 PR: Not reviewed.
-- Current objective: AGENT_E_CHECKLIST60_READY_FOR_REVIEW — read-only Jeepney and Fleet Group monitoring.
-- Last confirmed result: 13 test files / 82 tests, lint, typecheck, production build, diff check pass; synthetic-fixture screenshots captured.
-- Next concrete action: Tech Lead review of the checklist 60 PR. Separate future PRs: transit routes (61–62), applications/GPS (63–64), Angular 22 (owner Node decision), cookie-auth proposal (Agent A contract), G1/G2 wiring once Agent A implements them.
-- Blocked by / decision owner: Operator names, driver assignment and group membership — Agent A G1/G2/G3 implementation (G1 proposal merged via API PR #8, endpoints not implemented). Production gates (real Admin login/status tests, hosting CSP, refresh-token storage) — owner/Tech Lead.
-- Execution agent: Claude (took over from Codex 2026-10-21 03:35 +08:00 after Codex usage limit; no approved work rejected).
+- Tech Lead review decision (if actually issued): PR #6 merged at `341ebc77`. PR #7 reconciliation is awaiting review. Production acceptance of the Admin foundation remains OPERATOR-GATED.
+- Current objective: AGENT_E_PR7_POST_MERGE_RECONCILED — submit the normally merged documentation branch for Tech Lead review without self-merging.
+- Last confirmed result: Latest `origin/main` merged into PR #7 with no conflicts; Admin route and applications/GPS functionality, acceptance evidence, findings, geometry proposal and handover history are present; links and diff hygiene pass.
+- Next concrete action: Tech Lead reviews PR #7. After Agent A fixture PR #15 merges, run the approved seed → 26-case isolated real-API procedure → cleanup flow; implement ID 62 only after bounded-editor approval.
+- Blocked by / decision owner: Real authenticated API runs are BACKEND_FIXTURE_BLOCKED on Agent A PR #15. ID 62 requires Tech Lead decisions recorded in the geometry review. ID 67 is BACKEND_CONTRACT_BLOCKED. G1/G2/G3/G10/G11 and D3 belong to Agent A; live tracking belongs to Agent B. Hosting CSP and refresh-token storage remain owner/Tech Lead gates.
+- Execution agent: Codex temporary takeover from Claude under `VALRYDE-CODEX-E-TEMPORARY-TAKEOVER-001`; all earlier Claude/Codex history preserved.
 - Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
 
 ## Checklist coverage
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
 |---:|---|---|---|---|
-| 56 | Admin Login & Dashboard | IN_PROGRESS | Sign-in, session restore/refresh, Admin guard, interceptor, shell, access-denied, dashboard shortcuts; `src/app/core`, `src/app/shell`, `src/app/features/auth`, `src/app/features/dashboard`; unit tests | Tech Lead review; dashboard metrics gated on aggregation contracts |
+| 56 | Admin Login & Dashboard | IN_PROGRESS | Shell/auth and dashboard pending-work counts merged through PR #6 | Real Admin login BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
 | 57 | Operator Management | READY_FOR_REVIEW (merged `075b377`) | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | Fleet context gated on Agent A G1 |
 | 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | Assignment/membership gated on Agent A G1/G2 |
 | 59 | Commuter User Monitoring | READY_FOR_REVIEW (merged `fc55582`; production acceptance operator-gated) | User Accounts list (search, role/status filters, sort, pagination), detail, enable/disable with confirmation and self-disable guard; `src/app/features/identity`; unit tests + security review fixes S1–S3 | Tech Lead review; real-API check is an owner gate |
-| 60 | Jeepney & Fleet Group Monitoring | READY_FOR_REVIEW | Read-only `/fleet/jeepneys`, `/fleet/jeepneys/:id` (with effective route), `/fleet/groups`, `/fleet/groups/:id`; `src/app/features/fleet/{fleet.models,fleet.service,jeepney-*,group-*}`; unit tests | Membership/driver/operator names gated on Agent A G1–G3; create/edit is a later slice |
-| 61 | Official Transit Route & Direction Management | NOT_STARTED | Scope and server-owned route rules recorded | Full directive; verify accepted API contract |
-| 62 | Route Polyline / Corridor / Geofence Management | NOT_STARTED | Map/geometry documentation area prepared | Full directive; approved geometry/geofence contracts |
-| 63 | GPS Device Management & Mapping | NOT_STARTED | Dependency/gate recorded | Approved Agent A/B contracts and full directive |
-| 64 | GPS Setup Request Approval & Installation Status | NOT_STARTED | Workflow states recorded | Full directive; operator/hardware evidence later |
+| 60 | Jeepney & Fleet Group Monitoring | READY_FOR_REVIEW (merged `812bbab`) | Read-only `/fleet/jeepneys`, `/fleet/jeepneys/:id` (with effective route), `/fleet/groups`, `/fleet/groups/:id`; `src/app/features/fleet/{fleet.models,fleet.service,jeepney-*,group-*}`; unit tests | Membership/driver/operator names gated on Agent A G1–G3; create/edit is a later slice |
+| 61 | Official Transit Route & Direction Management | READY_FOR_REVIEW (merged `8018e88`) | PR #5: route list/detail/create/edit, direction metadata/status editor; 103 tests | Direction creation needs geometry (ID 62) |
+| 62 | Route Polyline / Corridor / Geofence Management | NOT_STARTED | Inventory/proposal plus bounded contract review; no editor code | Tech Lead approval and remaining map/accessibility inputs |
+| 63 | GPS Device Management & Mapping | READY_FOR_REVIEW (merged `341ebc77`) | PR #6 device mapping + verification; verified 130-test combined suite | Mapping read/update/unmap missing (G10); hardware gates |
+| 64 | GPS Setup Request Approval & Installation Status | READY_FOR_REVIEW (merged `341ebc77`) | PR #6 application review, transitions and queues; verified 130-test combined suite | Real API BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
 | 65 | Global Live Tracking Map | NOT_STARTED | Tracking integration gate recorded | Agent B REST/Pusher contract approval and implementation |
 | 66 | Route Deviation Monitoring | NOT_STARTED | Tracking integration gate recorded | Agent B compliance/event contract approval and implementation |
-| 67 | Basic Reports, Export & System Health | NOT_STARTED | Integration gate recorded | Approved reporting/export/history/component-health APIs |
+| 67 | Basic Reports, Export & System Health | BLOCKED | Minimum data requirements documented; no reporting/export/audit/component-health endpoint on Agent A main `827738c` | Agent A/B approved contracts needed |
 
 ## Latest verification
 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
+| PR #7 normal merge with latest `origin/main` | Local Git / GitHub baseline | PASSED | 2026-10-22 10:46 +08:00 | Merged `341ebc77` through `c3365ee`; no conflicts; no force push; route and applications/GPS files/evidence preserved |
+| Post-merge Markdown relative-link and `git diff --check` validation | PR #7 merged tree | PASSED | 2026-10-22 10:46 +08:00 | All repository Markdown links resolve; branch diff has no whitespace errors |
+| Temporary takeover recovery: fetch, branch/worktree/status/PR inspection | Local/GitHub | PASSED | 2026-10-22 09:50 +08:00 | `main` fast-forwarded to `8018e88`; no uncommitted Claude work; PR #6 `cc14c9c` and PR #7 `bb16127` open/mergeable with security checks passing |
+| PR #6 fresh lint, typecheck, test, production build, diff check, production audit | Local Windows, Node v24.19.0, repository npm 11.6.2 | PASSED | 2026-10-22 09:59 +08:00 | 19 files / 130 tests; initial 316.57 kB; 0 production vulnerabilities; full audit still 4 dev-tool findings (1 low, 3 high) requiring breaking Angular 22 upgrades |
+| Clean dependency install | Local Windows | PASSED with tooling note | 2026-10-22 09:56 +08:00 | Global npm 10.9.1 rejected optional lock entries; repository-declared `npx npm@11.6.2 ci` installed 592 packages successfully without lockfile change |
+| PR #7 relative links, real-API cases, proposal/reference/diff checks | Local/GitHub | PASSED | 2026-10-22 10:01 +08:00 | All changed-document links resolve; exactly 26 cases; ID 62 remains proposal; PR/base/head references current; diff check clean |
+| Agent A fixture availability | GitHub/API remote | BACKEND_FIXTURE_BLOCKED | 2026-10-22 10:01 +08:00 | API main `827738c`; fixture PR #15 open/mergeable at `be8d6d0` with CI/security success, not merged |
+| PR #6 after merging `main` `8018e88`: lint, typecheck, `npm test`, build, diff check, prod audit | Local Windows, Node v24.15.0 | PASSED | 2026-10-22 18:15 +08:00 | 19 files / 130 tests (PR #5 + #6 suites); initial 316.57 kB; GitHub mergeable/CLEAN; full audit 4 dev-only findings (MCP SDK, vite) unchanged |
+| PR #5 (ID 61): lint, typecheck, `npm test`, build, diff check, prod audit | Local Windows, Node v24.15.0 (active nvm version; not changed by Agent E) | PASSED | 2026-10-22 | 16 files / 103 tests; initial 316.38 kB |
+| PR #6 (IDs 63–64): lint, typecheck, `npm test`, build, diff check, prod audit | Local Windows, Node v24.15.0 | PASSED | 2026-10-22 | 16 files / 109 tests; initial 315.80 kB; one real UX bug (409 transition error hidden after re-read) found and fixed |
+| Stub browser flows (routes; applications/GPS) | `ng serve` + synthetic stub; proxy verified not to reach real API | PASSED | 2026-10-22 | Evidence READMEs under `docs/testing/evidence/2026-10-22-*`; screenshots partly unavailable (app window hidden) |
+| Live local `valryde-api` unauthenticated probes | API observed on 127.0.0.1:3000 from Agent A checkout `711f4c4` (not started by Agent E) | PASSED | 2026-10-22 | health 200; user list/status, transit list, device-mapping → 401 `AUTH_REQUIRED`; no credentials, no writes |
+| Real authenticated Admin API run | — | OWNER_VERIFICATION_PENDING | — | No owner test credentials/backend provided |
 | Checklist 60: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`, `git diff --check` | Local Windows, Node 22.17.1 | PASSED | 2026-10-21 18:40 +08:00 | 13 files / 82 tests (+23); no build warnings; initial 315.63 kB raw / 85.25 kB transfer |
 | `npm audit --omit=dev` / `npm audit` | Local Windows | PASSED / FAILED | 2026-10-21 18:40 +08:00 | 0 production; same 2 dev-only packages (MCP SDK via @angular/cli, vite via @angular/build), now reported as 4 high; unchanged by this PR |
 | Checklist 60 screenshots | `ng serve` + synthetic fixtures (not committed) | PASSED | 2026-10-21 18:35 +08:00 | `docs/testing/evidence/2026-10-21-jeepney-fleet-monitoring/`; no console errors; not real-backend evidence |
@@ -83,6 +96,50 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-22 10:46 +08:00 — PR #7 reconciled after PR #6 merge
+
+- Action / reason: Agent G directed PR #7 to absorb merged PR #6 from latest `origin/main` using a normal merge without force-pushing.
+- Checklist/issue: PR #7; IDs 56–67; checkpoint `AGENT_E_PR7_POST_MERGE_RECONCILED`.
+- Files/config/services affected: Normal merge `c3365ee` brought the complete applications/GPS module, dashboard counts, acceptance updates and evidence into the PR #7 tree. Current-state references in README, contract inventory, status and Codex-to-Claude handover were refreshed. Historical activity entries remain unchanged.
+- Observed result (success/failure/rollback): Merge completed with no conflicts. Route management, applications/GPS functionality, acceptance evidence, G10/G11/D3 findings, ID 62 proposal/review, ID 67 requirements and takeover history are preserved.
+- Validation and evidence: Latest `origin/main` is `341ebc77`; relative Markdown links and `git diff --check` pass. No application behavior was changed by the documentation refresh.
+- Contracts / risks / dependencies: No API, schema, RBAC, auth, tracking or infrastructure contract changed. Existing Agent A/B and fixture gates remain.
+- Commit/PR link or SHA (if available): PR #6 merged `341ebc77`; PR #7 reconciliation merge `c3365ee`; final pushed PR #7 head to be reported in chat.
+- Next action / owner gate: Push PR #7 normally and return it for Tech Lead review; do not self-merge.
+
+### 2026-10-22 10:01 +08:00 — Codex temporary takeover and PR #6/#7 verification
+
+- Action / reason: Executed `VALRYDE-CODEX-E-TEMPORARY-TAKEOVER-001` after Claude interruption: recovered repository/PR state, preserved all history, reverified open PRs, corrected the real-integration gate, and prepared independent contract findings without recreating route/GPS modules.
+- Checklist/issue: IDs 56–67; PR #6, PR #7; Agent A fixture PR #15; findings G10, G11, D3.
+- Files/config/services affected: Agent E status; integration README; geometry contract review; reporting/export/health requirements; Agent A findings; real-API procedure/inventory gate wording; Codex-to-Claude resumption handoff. No application code or backend repository changed.
+- Observed result (success/failure/rollback): AGENT_E_CODEX_TAKEOVER_READY. PR #6 and #7 heads match the directive and remain open/mergeable. PR #6 code passes the full suite. PR #7 documentation checks pass. Real business integration is BACKEND_FIXTURE_BLOCKED because PR #15 is open, not merged.
+- Validation and evidence: Fresh lint/typecheck/130 tests/build/diff/prod-audit on PR #6; PR #7 link/case-count/proposal/reference/diff checks; GitHub PR/remote SHA verification. Global npm 10 clean-install failure was resolved by using repository-declared npm 11.6.2 without changing tracked files.
+- Contracts / risks / dependencies: No API, schema, RBAC, auth-storage, CSP, realtime, or infrastructure change. ID 62 remains unimplemented. ID 67 remains contract-blocked. Four dev-tool audit findings remain; production dependency audit is clean.
+- Commit/PR link or SHA (if available): PR #6 verified at `cc14c9c`; PR #7 takeover work based on `bb16127`; final PR #7 head to be reported after commit/push. Pre-existing 18:30 status timestamp is preserved even though it is later than the current system clock.
+- Next action / owner gate: Push this documentation/status update to PR #7 for Tech Lead review; wait for Agent A PR #15 before authenticated integration; do not self-merge.
+
+### 2026-10-22 18:30 +08:00 — PR #6 and PR #7 reconciled with main after PR #5 merge
+
+- Action / reason: Agent G CHANGES REQUIRED — reconcile PRs #6 and #7 with `main` after PR #5 merged at `8018e88`.
+- Checklist/issue: PR #6 (IDs 63, 64, 56 dashboard); PR #7 (batch docs).
+- Files/config/services affected: PR #6 — merge commit `7ea76c4` (git auto-merged `src/app/app.routes.ts`, `src/app/shell/navigation.ts`, `src/app/shell/navigation.spec.ts`, `docs/ui-ux/NAVIGATION_STRUCTURE.md`, `docs/ui-ux/SCREEN_INVENTORY.md`; no manual conflicts) and `cc14c9c` (acceptance rows W-07/W-08). PR #7 — merge of `main` (no conflicts; status history kept: all prior entries plus the batch entry), then reference updates in the contract inventory, integration procedure, README and this file.
+- Observed result (success/failure/rollback): Both Transit Network and Applications & Approvals are reachable from the drawer on the merged code. PR #6 is mergeable/CLEAN on GitHub. Real-login gating changed per Tech Lead: test accounts come from Agent A's approved development fixtures (none on `main` `827738c`), not owner-created accounts.
+- Validation and evidence: PR #6 merged tree passes lint, typecheck, 130/130 tests, production build, diff check and production audit (Node v24.15.0).
+- Contracts / risks / dependencies: No code or contract change beyond the merge; no force push.
+- Commit/PR link or SHA (if available): PR #6 `cc14c9c`; PR #7 this branch.
+- Next action / owner gate: Agent G re-review of PRs #6 and #7; Agent A development fixtures for the real-API procedure.
+
+### 2026-10-22 16:30 +08:00 — Independent Admin UI batch (IDs 56, 59, 61, 62, 63, 64, 67)
+
+- Action / reason: Tech Lead approved building the remaining non-tracking Admin workflows supported by Agent A main, after PR #4 merged (`812bbab`).
+- Checklist/issue: 56, 59 (E1), 61 (E2), 63–64 (E3), 62 and 67 (conditional); no issue assigned.
+- Files/config/services affected: PR #5 `feat/61-official-route-management` (`src/app/features/transit/*`, `src/app/shared/forms/unsaved-changes.guard*`); PR #6 `feat/63-64-gps-admin-workflows` (`src/app/features/applications/*`, dashboard); PR #7 `feat/56-59-admin-integration` (`docs/integration/ADMIN_BATCH_CONTRACT_INVENTORY.md`, integration procedure, README, this file).
+- Observed result (success/failure/rollback): Verified Agent A routes/services/migrations first. E2 implemented except direction creation (requires geometry → ID 62). E3 implemented for all Admin operations; mapping cannot be re-read (G10). E1 OPERATOR-GATED: no owner credentials; a local `valryde-api` was found running (not started by Agent E) and only unauthenticated read-only probes were made. E4: no reporting/export contract → nothing implemented. ID 62: inventory + UI proposal only. New Agent A findings: D3 (direction label rename → 500), G10 (no mapping read/unmap), G11 (no route-assignment read), transit lifecycle unconstrained. Moved transit and applications routes into lazy child configs to keep the form guard and dialogs out of the initial bundle (initial grew to 492 kB before the change, back to ~316 kB after). Corrected PR #5's description: checks ran on the active Node v24.15.0, not 22.17.1 (the active nvm version was switched outside this session).
+- Validation and evidence: see Latest verification rows dated 2026-10-22. Synthetic stub ran on port 3100 after port 3000 was found occupied by the real API; proxy target confirmed before any sign-in.
+- Contracts / risks / dependencies: No API/DB/RBAC/shared contract change; no auth storage, cookie, CSP or Angular-major change. PRs #5 and #6 are independent; acceptance rows W-07/W-08 deferred to avoid an adjacent-line conflict.
+- Commit/PR link or SHA (if available): PR #5 `e8bc3d1`; PR #6 `6014645`; PR #7 this branch.
+- Next action / owner gate: Tech Lead review; owner test backend/credentials for the real-API procedure (cases 1–26).
 
 ### 2026-10-21 18:45 +08:00 — Checklist 60 read-only Jeepney and Fleet Group monitoring
 

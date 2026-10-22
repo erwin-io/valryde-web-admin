@@ -1,7 +1,7 @@
-# Real API Integration Procedure — Admin sign-in and User Accounts
+# Real API Integration Procedure — Admin web
 
-**Purpose:** repeatable verification of PR #2 (IDs 56, 59) against a real local `valryde-api`, replacing the synthetic stub used so far.
-**State:** `OPERATOR-GATED` — not yet run. Requires an owner-approved local test backend and test Admin account.
+**Purpose:** repeatable verification of the Admin web (IDs 56, 59 from PR #2; 60; 61 from PR #5; 63–64 from PR #6) against a real local `valryde-api`, replacing the synthetic stubs used so far.
+**State:** `BACKEND_FIXTURE_BLOCKED` — not yet run. Per Tech Lead direction (2026-10-22), test identities must come from **Agent A's approved development fixtures**, not owner-created accounts. Fixture PR #15 is open/mergeable at `be8d6d0` but is not on `valryde-api` `main` `827738c`. After it merges, its seed and cleanup instructions supersede the manual reference below.
 **Never** run this against production, a shared database, or real user records.
 
 ## 1. Preconditions (owner/operator)
@@ -11,7 +11,7 @@
 | API source | `valryde-api` `main` at or after `4a9a152`, in its own checkout. Agent E does not modify it. |
 | Runtime | Node.js ≥ 22.12, PostgreSQL 16 with `postgis`, `citext`, `pgcrypto`; Mailpit (`compose.mailpit.yaml`). |
 | Database | A **local, disposable** application database. Not the Traccar database, not shared. |
-| Accounts | One test Admin (A1), one second test Admin (A2), one test Commuter or Driver (U1). All test-only addresses (for example `*@example.test`). |
+| Accounts | From Agent A's approved development fixtures: one test Admin (A1), optionally a second (A2), one test Commuter/Driver/Operator (U1). Test-only addresses (for example `*@example.test`). |
 | Secrets | `.env` values and passwords stay on the operator's machine. Do not paste them into chat, commits, PRs, screenshots, or the status file. |
 
 ## 2. Start the API (operator, in `valryde-api`)
@@ -32,7 +32,9 @@ npm run dev
 
 Check `http://127.0.0.1:3000/api/health` returns `{"status":"ok","database":"ok"}`.
 
-## 3. Create test accounts (operator, local database only)
+## 3. Test accounts (local database only)
+
+Use Agent A's development fixtures once approved; the steps below are the current manual reference from Agent A's handoff and are superseded by the fixtures.
 
 - **A1 (first Admin):** `npm run admin:bootstrap` with `ADMIN_BOOTSTRAP_EMAIL`, `ADMIN_BOOTSTRAP_DISPLAY_NAME`, `ADMIN_BOOTSTRAP_PASSWORD`, `ADMIN_BOOTSTRAP_CONFIRM=CREATE_FIRST_ADMIN` set as temporary shell variables (never in `.env`). Works only on an empty Admin set.
 - **U1:** `POST /api/auth/register` with role `COMMUTER`, then verify through Mailpit (`http://127.0.0.1:8025`) and `POST /api/auth/verify-email`.
@@ -67,6 +69,19 @@ Record pass/fail, time, and request IDs only. Use browser DevTools → Network t
 | 13 | Revocation | After 12, replay the old refresh token with `POST /api/auth/refresh` (DevTools) | `401 SESSION_REVOKED` |
 | 14 | Rate limit | 11 wrong sign-ins within a minute | Server `500` + `retry-after` (Agent A D1); UI shows "Too many sign-in attempts" |
 | 15 | W-11 | Stop the API, click Try again on the user list | Network error state with retry; no crash |
+| 16 | ID 60 | Open Fleet Management → Jeepneys, then a jeepney | List and detail load; effective route shows direct/group/none or the 409 conflict notice |
+| 17 | ID 61 | Create route `ZZ-TEST-1` (test-only code), then open it | `POST /api/admin/transit-routes` 201; detail shows Draft; list re-read includes it |
+| 18 | ID 61 | Create `ZZ-TEST-1` again | `409 CONFLICT` shown on the route-code field; values kept |
+| 19 | ID 61 | Edit the test route name and status → Inactive | Only changed fields in the PATCH body; confirmation shown; detail re-read shows the change |
+| 20 | ID 61 | On a route with ≥ 2 directions, rename one to the other's label | Blocked client-side; no PATCH sent (Agent A D3 would return 500) |
+| 21 | ID 64 | As U1 (Operator), submit a vehicle application for a test jeepney; as A1 approve it | Review PATCH 200; status re-read Approved; jeepney status updated by server |
+| 22 | ID 64 | Approve the same application again from a second stale tab | `409 CONFLICT`; page re-reads and shows the existing decision |
+| 23 | ID 63–64 | As U1 request GPS setup; as A1 approve, schedule (date), mark installed | Each transition confirmed and re-read; invalid transition attempts return 409 |
+| 24 | ID 63 | Map a test device (test IMEI/serial/Traccar ID only) | 201; mapping shown once; repeating with the same IMEI → `409 DEVICE_MAPPING_CONFLICT` |
+| 25 | ID 63 | Verify with one check failing, then with all four passing | First → Failed; second → Verified and jeepney Active. Physical device reporting is **not** proven by this; that is a hardware gate |
+| 26 | RBAC | Repeat any Admin write with U1's token (DevTools) | `403 FORBIDDEN`; nothing changes |
+
+Test data for cases 17–25 must use obviously synthetic values (route codes starting `ZZ-TEST`, IMEIs from a test range agreed with the operator, Traccar IDs that do not exist in a production Traccar). There is no delete for routes, applications, requests or mappings: use a disposable database.
 
 ## 6. Evidence and reporting
 
