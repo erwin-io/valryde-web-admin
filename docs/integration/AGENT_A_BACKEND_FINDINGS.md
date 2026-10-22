@@ -68,4 +68,3 @@ The database unique constraint on `(route_id, direction_label)` is raised during
 ### Client containment
 
 The current Admin direction form blocks a label already present in the loaded route before sending. This reduces ordinary exposure but is not authoritative and cannot prevent concurrent updates; the backend still needs explicit conflict handling and a regression test.
-

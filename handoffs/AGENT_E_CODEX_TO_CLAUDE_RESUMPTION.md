@@ -45,4 +45,3 @@
 3. Submit sanitized evidence and update acceptance/status.
 4. Implement only the bounded checklist 62 editor operations the Tech Lead approves.
 5. Keep checklist 67 and Agent B tracking views gated until contracts exist.
-

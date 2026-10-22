@@ -30,4 +30,3 @@
 - Acceptance fixtures for totals and export contents.
 
 Until these are approved, System Administration must not show fabricated metrics, placeholder history, synthetic compliance events, or combined “all healthy” status.
-

@@ -56,4 +56,3 @@ Agent B consumes canonical route direction/corridor data for tracking compliance
 - MapLibre version at least 6.15 and dependency review.
 - Accessible keyboard alternative for vertex operations.
 - Tech Lead decision on whether generic active-route warning is sufficient while G11 remains open.
-
