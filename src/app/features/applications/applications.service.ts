@@ -14,7 +14,7 @@ import {
 
 /**
  * Agent A vehicle-application and GPS-setup operations available to ADMIN. Lists are unpaginated;
- * there are no detail GETs and no device-mapping read endpoint.
+ * request details are composed from lists. G10 adds the Admin-only mapping read.
  */
 @Injectable({ providedIn: 'root' })
 export class ApplicationsService {
@@ -64,6 +64,14 @@ export class ApplicationsService {
       .post<{ mapping: DeviceMapping }>(
         `${this.api}/admin/gps-setup-requests/${encodeURIComponent(id)}/device-mapping`,
         input,
+      )
+      .pipe(map((b) => b.mapping));
+  }
+
+  getDeviceMapping(id: string): Observable<DeviceMapping | null> {
+    return this.http
+      .get<{ mapping: DeviceMapping | null }>(
+        `${this.api}/admin/gps-setup-requests/${encodeURIComponent(id)}/device-mapping`,
       )
       .pipe(map((b) => b.mapping));
   }

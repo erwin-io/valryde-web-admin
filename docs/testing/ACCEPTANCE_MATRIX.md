@@ -9,7 +9,7 @@
 | W-05 Route details | nested direction rendering and failure states | hierarchy clarity | Implemented (ID 61); unit tests passing; synthetic-stub screenshots |
 | W-06 Geometry edit | LineString validation, dirty guard, save/error recovery | MapLibre pointer/keyboard checks | Proposal only (ID 62); dirty guard implemented for ID 61 forms |
 | W-07 Application review | allowed decisions, confirmation, 409 preservation | review layout | Implemented (ID 64); unit tests passing; stub browser flow |
-| W-08 GPS installation | transition/mapping/verification validation | multi-step clarity | Implemented (IDs 63–64); unit tests passing; stub browser flow; hardware gates remain |
+| W-08 GPS installation | transition/mapping/verification validation | multi-step clarity | Implemented (IDs 63–64), with G10 mapping re-read, denied/error/read-after-write and action-lock regressions; authenticated API/browser acceptance pending; hardware gates remain |
 | W-09 Live tracking | ordering, freshness, disconnect, reconcile | map bounds and stale state | BLOCKED by Agent B |
 | W-10 Unauthorized | route guard, 401 redirect, 403 state | direct URL behavior | Implemented for shell and User Accounts; unit tests passing |
 | W-11 Errors | structured API error/request ID and form retention | actionable copy | Implemented for sign-in and User Accounts; unit tests passing |

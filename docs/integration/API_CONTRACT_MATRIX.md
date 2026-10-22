@@ -52,6 +52,7 @@ Geometry is `{type:'LineString', coordinates:[[longitude,latitude], ...]}` with 
 | `PATCH /admin/vehicle-applications/{id}/review` | ADMIN | decision only `APPROVED|REJECTED`; optional notes |
 | `GET /gps-setup-requests` | DRIVER, OPERATOR, ADMIN | Admin receives all permitted records |
 | `PATCH /admin/gps-setup-requests/{id}/status` | ADMIN | `APPROVED|SCHEDULED|INSTALLED|REJECTED`; conditional schedule/reason |
+| `GET /admin/gps-setup-requests/{id}/device-mapping` | ADMIN | Merged G10 at API main 810c8a1; `{mapping}` or confirmed null, used on every detail load and after writes |
 | `POST /admin/gps-setup-requests/{id}/device-mapping` | ADMIN | IMEI 14–17 digits, serial, non-secret Traccar unique ID |
 | `POST /admin/gps-setup-requests/{id}/verification` | ADMIN | power/SIM/server/GPS booleans, optional notes |
 

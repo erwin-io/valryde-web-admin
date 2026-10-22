@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 
 import { gpsRequest } from '../../../testing/application-fixtures';
 import { apiError, jeepney } from '../../../testing/fixtures';
-import { GpsSetupRequest } from './applications.models';
+import { DeviceMapping, GpsSetupRequest } from './applications.models';
 import { GpsRequestDetailPage } from './gps-request-detail.page';
 
 const GPS = '/api/gps-setup-requests';
@@ -15,6 +15,9 @@ const JEEPS = '/api/jeepneys';
 const ID = 'g1';
 const BASE = `/api/admin/gps-setup-requests/${ID}`;
 const unit = jeepney({ id: 'j1', plateNo: 'ABC 1234' });
+const savedMapping: DeviceMapping = { id: 'm1', gpsSetupRequestId: ID, gpsDeviceId: 'd1', jeepneyId: 'j1',
+  imei: '860000000000001', serialNumber: 'VAL-TEST-0001', traccarUniqueId: 'valryde-test-device-0001',
+  mappedAt: '2026-11-02T10:00:00.000Z' };
 
 describe('GpsRequestDetailPage', () => {
   let fixture: ComponentFixture<GpsRequestDetailPage>;
@@ -22,7 +25,7 @@ describe('GpsRequestDetailPage', () => {
   let confirm: boolean;
   let dialogOpen: ReturnType<typeof vi.fn>;
 
-  async function open(request: Partial<GpsSetupRequest>) {
+  async function open(request: Partial<GpsSetupRequest>, mapping: DeviceMapping | null = null) {
     confirm = true;
     dialogOpen = vi.fn(() => ({ afterClosed: () => of(confirm) }));
     TestBed.configureTestingModule({
@@ -38,13 +41,14 @@ describe('GpsRequestDetailPage', () => {
     fixture = TestBed.createComponent(GpsRequestDetailPage);
     fixture.componentRef.setInput('requestId', ID);
     await fixture.whenStable();
-    flushLoad(request);
+    flushLoad(request, mapping);
     await fixture.whenStable();
   }
 
-  function flushLoad(request: Partial<GpsSetupRequest>) {
+  function flushLoad(request: Partial<GpsSetupRequest>, mapping: DeviceMapping | null = null) {
     http.expectOne(GPS).flush({ requests: [gpsRequest({ id: ID, jeepneyId: 'j1', ...request })] });
     http.expectOne(JEEPS).flush({ jeepneys: [unit] });
+    http.expectOne(`${BASE}/device-mapping`).flush({ mapping });
   }
 
   afterEach(() => http.verify());
@@ -144,7 +148,7 @@ describe('GpsRequestDetailPage', () => {
       expect(dialogOpen).not.toHaveBeenCalled();
     });
 
-    it('maps after confirmation, shows the returned mapping once, and re-reads', async () => {
+    it('maps after confirmation and reconciles the saved mapping through G10', async () => {
       await open({ status: 'SCHEDULED' });
       page().mappingForm.setValue({ imei: '860000000000001', serialNumber: ' VAL-TEST-0001 ', traccarUniqueId: ' valryde-test-device-0001 ' });
       await submitForm('mapping-title');
@@ -155,10 +159,10 @@ describe('GpsRequestDetailPage', () => {
         mapping: { id: 'm1', gpsSetupRequestId: ID, gpsDeviceId: 'd1', jeepneyId: 'j1', imei: '860000000000001', serialNumber: 'VAL-TEST-0001', traccarUniqueId: 'valryde-test-device-0001', mappedAt: '2026-11-02T10:00:00.000Z' },
       }, { status: 201, statusText: 'Created' });
       await fixture.whenStable();
-      flushLoad({ status: 'SCHEDULED' });
+      flushLoad({ status: 'SCHEDULED' }, savedMapping);
       await fixture.whenStable();
       expect(text()).toContain('Device mapped');
-      expect(text()).toContain('Shown for this visit only');
+      expect(text()).toContain('Saved mapping from the application API');
       expect(el().querySelector('section[aria-labelledby="mapping-title"]')).toBeNull();
     });
 
@@ -168,8 +172,10 @@ describe('GpsRequestDetailPage', () => {
       await submitForm('mapping-title');
       http.expectOne(`${BASE}/device-mapping`).flush(apiError('DEVICE_MAPPING_CONFLICT', 'Device or Traccar identity is already mapped', 'req-m'), { status: 409, statusText: 'Conflict' });
       await fixture.whenStable();
-      expect(text()).toContain('is already mapped, or this jeepney or request already has a device');
-      expect(text()).toContain('req-m');
+      flushLoad({ status: 'INSTALLED', verificationStatus: 'PENDING' }, savedMapping);
+      await fixture.whenStable();
+      expect(text()).toContain('Device mapped');
+      expect(el().querySelector('section[aria-labelledby="mapping-title"]')).toBeNull();
     });
   });
 
@@ -211,9 +217,45 @@ describe('GpsRequestDetailPage', () => {
     await open({ status: 'REJECTED', rejectedReason: 'Duplicate request' });
     expect(text()).toContain('Duplicate request');
     expect(el().querySelectorAll('form')).toHaveLength(0);
-    expect(el().querySelector('.contract-gate')?.textContent).toContain('no read endpoint for');
+    expect(el().querySelector('.contract-gate')?.textContent).toContain('Live device connectivity');
     const terms = Array.from(el().querySelectorAll('dt')).map((d) => d.textContent ?? '').join(' ');
     expect(terms).not.toMatch(/online|last position|speed|battery/i);
+  });
+
+  it('reads an existing mapping on a fresh visit and never offers duplicate mapping', async () => {
+    await open({ status: 'INSTALLED', verificationStatus: 'VERIFIED' }, savedMapping);
+    expect(text()).toContain(savedMapping.serialNumber);
+    expect(text()).toContain('Saved mapping from the application API');
+    expect(el().querySelector('section[aria-labelledby="mapping-title"]')).toBeNull();
+  });
+
+  it('does not send duplicate writes and restores actions after cancellation', async () => {
+    await open({ status: 'PENDING' });
+    await click('Approve installation');
+    (fixture.componentInstance as unknown as { transition(s: string): void }).transition('APPROVED');
+    const req = http.expectOne(`${BASE}/status`);
+    req.flush(apiError('FORBIDDEN', 'Denied', 'req-permission'), { status: 403, statusText: 'Forbidden' });
+    await fixture.whenStable();
+    expect(text()).toContain('req-permission');
+    confirm = false;
+    await click('Approve installation');
+    http.expectNone(`${BASE}/status`);
+    expect(Array.from(el().querySelectorAll('button')).find(b => b.textContent?.trim() === 'Approve installation')!.disabled).toBe(false);
+  });
+
+  it.each([403, 500])('fails closed when the mapping read returns %s and can retry', async status => {
+    await open({ status: 'SCHEDULED' });
+    (fixture.componentInstance as unknown as { load(): void }).load();
+    http.expectOne(GPS).flush({ requests: [gpsRequest({ id: ID, jeepneyId: 'j1', status: 'SCHEDULED' })] });
+    http.expectOne(JEEPS).flush({ jeepneys: [unit] });
+    http.expectOne(`${BASE}/device-mapping`).flush(apiError('FORBIDDEN', 'Mapping read failed', 'req-read'), { status, statusText: 'Failure' });
+    await fixture.whenStable();
+    expect(el().querySelectorAll('form')).toHaveLength(0);
+    expect(text()).toContain(status === 403 ? 'You do not have permission' : 'could not be loaded');
+    (fixture.componentInstance as unknown as { load(): void }).load();
+    flushLoad({ status: 'SCHEDULED' }, savedMapping);
+    await fixture.whenStable();
+    expect(text()).toContain('Device mapped');
   });
 
   it('shows not-found and permission states', async () => {

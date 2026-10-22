@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
-import { Observable, filter, forkJoin, switchMap } from 'rxjs';
+import { Observable, filter, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
 import { ConfirmDialog, ConfirmDialogData } from '../../shared/ui/confirm-dialog';
@@ -83,7 +83,7 @@ export class GpsRequestDetailPage implements OnInit {
   protected readonly saving = signal<Action | null>(null);
   protected readonly request = signal<GpsSetupRequest | null>(null);
   protected readonly jeepney = signal<Jeepney | null>(null);
-  /** The API returns a mapping only in the create response; it cannot be re-read later. */
+  /** Always reconciled through the G10 read; null means a confirmed unmapped request. */
   protected readonly mapping = signal<DeviceMapping | null>(null);
 
   protected readonly status = computed(() => {
@@ -148,13 +148,23 @@ export class GpsRequestDetailPage implements OnInit {
   protected load(): void {
     this.state.set('loading');
     this.problem.set(null);
+    this.mapping.set(null);
     forkJoin([this.applications.listGpsRequests(), this.fleet.listJeepneys()])
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: ([requests, jeepneys]) => {
+      .pipe(
+        switchMap(([requests, jeepneys]) => {
           const request = requests.find((r) => r.id === this.requestId()) ?? null;
+          const base = { request, jeepney: jeepneys.find((j) => j.id === request?.jeepneyId) ?? null };
+          return request
+            ? this.applications.getDeviceMapping(request.id).pipe(map((mapping) => ({ ...base, mapping })))
+            : of({ ...base, mapping: null });
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: ({ request, jeepney, mapping }) => {
           this.request.set(request);
-          this.jeepney.set(jeepneys.find((j) => j.id === request?.jeepneyId) ?? null);
+          this.jeepney.set(jeepney);
+          this.mapping.set(mapping);
           this.state.set(request ? 'ready' : 'not-found');
         },
         error: (err: unknown) => {
@@ -167,7 +177,7 @@ export class GpsRequestDetailPage implements OnInit {
 
   protected transition(next: SetupTransition): void {
     const r = this.request();
-    if (!r) return;
+    if (!r || this.state() !== 'ready' || this.saving() || !this.transitions().includes(next)) return;
     const { scheduledAt, rejectedReason } = this.transitionForm.getRawValue();
     const c = this.transitionForm.controls;
     if (next === 'SCHEDULED' && !scheduledAt) {
@@ -182,6 +192,11 @@ export class GpsRequestDetailPage implements OnInit {
     }
     if (c.rejectedReason.invalid) return;
     const when = scheduledAt ? new Date(scheduledAt) : null;
+    if (next === 'SCHEDULED' && (!when || !Number.isFinite(when.getTime()))) {
+      c.scheduledAt.setErrors({ invalid: true });
+      c.scheduledAt.markAsTouched();
+      return;
+    }
     const copy: Record<SetupTransition, ConfirmDialogData> = {
       APPROVED: {
         title: 'Approve GPS installation?',
@@ -216,7 +231,7 @@ export class GpsRequestDetailPage implements OnInit {
 
   protected submitMapping(): void {
     const r = this.request();
-    if (!r) return;
+    if (!r || this.state() !== 'ready' || !this.canMap() || this.saving()) return;
     if (this.mappingForm.invalid) {
       this.mappingForm.markAllAsTouched();
       return;
@@ -241,7 +256,7 @@ export class GpsRequestDetailPage implements OnInit {
 
   protected submitVerification(): void {
     const r = this.request();
-    if (!r || this.verificationForm.invalid) return;
+    if (!r || this.state() !== 'ready' || !this.canVerify() || this.saving() || this.verificationForm.invalid) return;
     const v = this.verificationForm.getRawValue();
     const allPass = v.powerOk && v.simOk && v.serverOk && v.gpsFixOk;
     const notes = v.notes.trim();
@@ -279,16 +294,16 @@ export class GpsRequestDetailPage implements OnInit {
     success: string,
     after?: (result: T) => void,
   ): void {
+    if (this.saving()) return;
     this.actionProblem.set(null);
+    this.saving.set(action);
     this.dialog
       .open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, { data: confirm })
       .afterClosed()
       .pipe(
         filter((ok) => ok === true),
-        switchMap(() => {
-          this.saving.set(action);
-          return write();
-        }),
+        switchMap(() => write()),
+        finalize(() => this.saving.set(null)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
@@ -303,7 +318,7 @@ export class GpsRequestDetailPage implements OnInit {
           this.saving.set(null);
           const problem = toApiProblem(err);
           this.actionProblem.set({ action, problem });
-          if (problem.code === 'CONFLICT') this.load();
+          if (problem.code === 'CONFLICT' || problem.code === 'DEVICE_MAPPING_CONFLICT') this.load();
         },
       });
   }
