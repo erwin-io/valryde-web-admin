@@ -1,0 +1,244 @@
+<app-page-header
+  [title]="'GPS installation · ' + (jeepney()?.plateNo ?? '')"
+  description="Move the installation through approval, scheduling, and installation, then map the device and record verification."
+  [breadcrumbs]="breadcrumbs()"
+/>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-page-state kind="loading" title="Loading installation…" />
+  }
+  @case ('denied') {
+    <app-page-state kind="denied" [problem]="problem()" />
+  }
+  @case ('error') {
+    <app-page-state kind="error" title="This installation could not be loaded" [problem]="problem()" (retry)="load()" />
+  }
+  @case ('not-found') {
+    <app-page-state kind="not-found" message="No GPS installation request with this identifier exists." />
+  }
+  @default {
+    @if (request(); as r) {
+      <section class="panel details" aria-labelledby="request-title">
+        <h2 id="request-title">Installation</h2>
+        <dl>
+          <dt>Installation status</dt>
+          <dd>
+            @if (status(); as s) {
+              <app-status-badge [label]="s.label" [icon]="s.icon" [tone]="s.tone" />
+            }
+          </dd>
+          <dt>Verification</dt>
+          <dd>
+            @if (verification(); as v) {
+              <app-status-badge [label]="v.label" [icon]="v.icon" [tone]="v.tone" />
+            }
+          </dd>
+          <dt>Jeepney</dt>
+          <dd>
+            @if (jeepney(); as j) {
+              <a [routerLink]="['/fleet/jeepneys', j.id]">{{ j.plateNo }}</a>
+            } @else {
+              <span class="unavailable">Jeepney not visible</span>
+            }
+          </dd>
+          <dt>Vehicle application</dt>
+          <dd><a [routerLink]="['/applications/vehicles', r.vehicleApplicationId]">Open application</a></dd>
+          <dt>Requested</dt>
+          <dd>{{ r.createdAt | date: 'medium' }}</dd>
+          <dt>Scheduled for</dt>
+          <dd>
+            @if (r.scheduledAt) {
+              {{ r.scheduledAt | date: 'medium' }}
+            } @else {
+              <span class="unavailable">Not scheduled</span>
+            }
+          </dd>
+          <dt>Installed</dt>
+          <dd>
+            @if (r.installedAt) {
+              {{ r.installedAt | date: 'medium' }}
+            } @else {
+              <span class="unavailable">Not installed</span>
+            }
+          </dd>
+          @if (r.rejectedReason) {
+            <dt>Rejection reason</dt>
+            <dd>{{ r.rejectedReason }}</dd>
+          }
+          @if (r.verifiedAt) {
+            <dt>Last verification</dt>
+            <dd>
+              {{ r.verifiedAt | date: 'medium' }}
+              <ul class="check-list">
+                @for (c of recordedChecks(); track c.label) {
+                  <li>{{ c.ok ? 'Pass' : 'Fail' }} — {{ c.label }}</li>
+                }
+              </ul>
+              @if (recordedNotes(); as notes) {
+                <span>Notes: {{ notes }}</span>
+              }
+            </dd>
+          }
+        </dl>
+      </section>
+
+      <!-- Outside the step section: after a 409 re-read the section may no longer exist. -->
+      @if (problemFor('transition'); as p) {
+        <div class="inline-alert action-alert" role="alert">
+          <mat-icon aria-hidden="true">error</mat-icon>
+          <span>The status was not changed. {{ p.message }} @if (p.requestId) { (Request ID: <code>{{ p.requestId }}</code>) }</span>
+        </div>
+      }
+
+      @if (transitions().length) {
+        <section class="panel details" aria-labelledby="transition-title">
+          <h2 id="transition-title">Next step</h2>
+          <form [formGroup]="transitionForm" novalidate (ngSubmit)="$event.preventDefault()">
+            <div class="form-row">
+              @if (transitions().includes('SCHEDULED')) {
+                <mat-form-field appearance="outline">
+                  <mat-label>Installation date and time</mat-label>
+                  <input matInput type="datetime-local" formControlName="scheduledAt" />
+                  @if (transitionForm.controls.scheduledAt.invalid) {
+                    <mat-error>Choose when the installation will happen.</mat-error>
+                  }
+                </mat-form-field>
+              }
+              @if (transitions().includes('REJECTED')) {
+                <mat-form-field appearance="outline">
+                  <mat-label>Rejection reason (required to reject)</mat-label>
+                  <input matInput formControlName="rejectedReason" maxlength="2000" />
+                  @if (transitionForm.controls.rejectedReason.invalid) {
+                    <mat-error>Enter a reason of up to 2,000 characters.</mat-error>
+                  }
+                </mat-form-field>
+              }
+            </div>
+            <div class="form-actions">
+              @if (transitions().includes('REJECTED')) {
+                <button mat-stroked-button type="button" [disabled]="saving()" (click)="transition('REJECTED')">Reject request</button>
+              }
+              @if (transitions().includes('APPROVED')) {
+                <button mat-flat-button type="button" [disabled]="saving()" (click)="transition('APPROVED')">Approve installation</button>
+              }
+              @if (transitions().includes('SCHEDULED')) {
+                <button mat-flat-button type="button" [disabled]="saving()" (click)="transition('SCHEDULED')">Schedule installation</button>
+              }
+              @if (transitions().includes('INSTALLED')) {
+                <button mat-flat-button type="button" [disabled]="saving()" (click)="transition('INSTALLED')">Mark installed</button>
+              }
+            </div>
+          </form>
+        </section>
+      }
+
+      @if (mapping(); as m) {
+        <section class="panel details mapping-result" aria-labelledby="mapped-title" role="status">
+          <h2 id="mapped-title">Device mapped</h2>
+          <dl>
+            <dt>IMEI</dt>
+            <dd><code>{{ m.imei }}</code></dd>
+            <dt>Serial number</dt>
+            <dd><code>{{ m.serialNumber }}</code></dd>
+            <dt>Traccar unique ID</dt>
+            <dd><code>{{ m.traccarUniqueId }}</code></dd>
+            <dt>Mapped</dt>
+            <dd>{{ m.mappedAt | date: 'medium' }}</dd>
+          </dl>
+          <p class="section-note">Shown for this visit only: the API has no endpoint to read mappings back.</p>
+        </section>
+      } @else if (canMap()) {
+        <section class="panel details" aria-labelledby="mapping-title">
+          <h2 id="mapping-title">Device mapping</h2>
+          <p class="section-note">
+            Link the installed GPS unit to this jeepney. Enter the device's non-secret identifiers only; never enter
+            server passwords or API keys. If a device was already mapped, the API rejects a second mapping.
+          </p>
+          @if (problemFor('mapping'); as p) {
+            <div class="inline-alert" role="alert">
+              <mat-icon aria-hidden="true">error</mat-icon>
+              <span>
+                @if (mappingConflict()) {
+                  This IMEI, serial number, or Traccar ID is already mapped, or this jeepney or request already has a device.
+                } @else {
+                  The device was not mapped. {{ p.message }}
+                }
+                @if (p.requestId) { (Request ID: <code>{{ p.requestId }}</code>) }
+              </span>
+            </div>
+          }
+          <form [formGroup]="mappingForm" (ngSubmit)="submitMapping()" novalidate>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>IMEI</mat-label>
+                <input matInput formControlName="imei" inputmode="numeric" maxlength="17" autocomplete="off" />
+                <mat-hint>14 to 17 digits.</mat-hint>
+                @if (mappingForm.controls.imei.invalid) {
+                  <mat-error>Enter 14 to 17 digits.</mat-error>
+                }
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Serial number</mat-label>
+                <input matInput formControlName="serialNumber" maxlength="128" autocomplete="off" />
+                @if (mappingForm.controls.serialNumber.invalid) {
+                  <mat-error>Enter a serial number of up to 128 characters.</mat-error>
+                }
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Traccar unique ID</mat-label>
+                <input matInput formControlName="traccarUniqueId" maxlength="128" autocomplete="off" />
+                <mat-hint>The device identifier configured in Traccar.</mat-hint>
+                @if (mappingForm.controls.traccarUniqueId.invalid) {
+                  <mat-error>Enter an identifier of up to 128 characters.</mat-error>
+                }
+              </mat-form-field>
+            </div>
+            <div class="form-actions">
+              <button mat-flat-button type="submit" [disabled]="saving()">Map device</button>
+            </div>
+          </form>
+        </section>
+      }
+
+      @if (canVerify()) {
+        <section class="panel details" aria-labelledby="verify-title">
+          <h2 id="verify-title">Verification</h2>
+          <p class="section-note">Record the on-site checks. The jeepney is activated only when all four pass.</p>
+          @if (problemFor('verification'); as p) {
+            <div class="inline-alert" role="alert">
+              <mat-icon aria-hidden="true">error</mat-icon>
+              <span>Verification was not recorded. {{ p.message }} @if (p.requestId) { (Request ID: <code>{{ p.requestId }}</code>) }</span>
+            </div>
+          }
+          <form [formGroup]="verificationForm" (ngSubmit)="submitVerification()" novalidate>
+            <div class="checks" role="group" aria-label="Installation checks">
+              @for (c of checks; track c.key) {
+                <mat-checkbox [formControlName]="c.key">{{ c.label }}</mat-checkbox>
+              }
+            </div>
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Notes (optional)</mat-label>
+              <textarea matInput formControlName="notes" rows="2" maxlength="2000"></textarea>
+            </mat-form-field>
+            <div class="form-actions">
+              <button mat-flat-button type="submit" [disabled]="saving()">Record verification</button>
+            </div>
+          </form>
+        </section>
+      }
+
+      <aside class="contract-gate" aria-labelledby="gate-title">
+        <mat-icon aria-hidden="true">lock_clock</mat-icon>
+        <div>
+          <h2 id="gate-title">Not shown here</h2>
+          <p>
+            An existing device mapping cannot be displayed after this visit because the API has no read endpoint for
+            mappings. Live device connectivity, last position, and online status depend on tracking contracts that are
+            not yet approved. Power, SIM, server, and GPS-fix results are entered by the installer, not measured here.
+          </p>
+        </div>
+      </aside>
+    }
+  }
+}

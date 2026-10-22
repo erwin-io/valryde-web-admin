@@ -1,0 +1,78 @@
+<app-page-header
+  title="Vehicle applications"
+  description="Applications submitted by operators and drivers. Review pending applications before GPS installation can be requested."
+  [breadcrumbs]="[{ label: 'Applications & Approvals' }, { label: 'Vehicle applications' }]"
+/>
+
+<section class="panel" aria-label="Vehicle applications">
+  <div class="filters" role="search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
+      <mat-label>Search plate</mat-label>
+      <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+      <input matInput type="search" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Status</mat-label>
+      <mat-select [ngModel]="status()" (ngModelChange)="status.set($event)">
+        <mat-option value="">All statuses</mat-option>
+        @for (entry of statuses; track entry[0]) {
+          <mat-option [value]="entry[0]">{{ entry[1].label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    @if (hasFilters()) {
+      <button mat-button type="button" (click)="clearFilters()">Clear filters</button>
+    }
+  </div>
+
+  @switch (state()) {
+    @case ('loading') {
+      <app-page-state kind="loading" title="Loading applications…" />
+    }
+    @case ('denied') {
+      <app-page-state kind="denied" [problem]="problem()" />
+    }
+    @case ('error') {
+      <app-page-state kind="error" title="Applications could not be loaded" [problem]="problem()" (retry)="load()" />
+    }
+    @default {
+      @if (rows().length === 0) {
+        <app-page-state kind="empty" title="No vehicle applications yet" />
+      } @else if (filtered().length === 0) {
+        <app-page-state kind="filtered-empty">
+          <button mat-stroked-button type="button" (click)="clearFilters()">Clear filters</button>
+        </app-page-state>
+      }
+      <div class="table-wrap" [hidden]="filtered().length === 0">
+        <table mat-table [dataSource]="dataSource" matSort aria-label="Vehicle applications">
+          <ng-container matColumnDef="plateNo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Jeepney</th>
+            <td mat-cell *matCellDef="let row">
+              <a class="primary-cell" [routerLink]="['/applications/vehicles', row.id]">{{ row.plateNo }}</a>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+            <td mat-cell *matCellDef="let row">
+              @let badge = statusOf(row);
+              <app-status-badge [label]="badge.label" [icon]="badge.icon" [tone]="badge.tone" />
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="optional">Submitted</th>
+            <td mat-cell *matCellDef="let row" class="optional">{{ row.createdAt | date: 'mediumDate' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="reviewedAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="optional">Reviewed</th>
+            <td mat-cell *matCellDef="let row" class="optional">
+              {{ row.reviewedAt ? (row.reviewedAt | date: 'mediumDate') : '—' }}
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="25" aria-label="Select page of applications" />
+      </div>
+    }
+  }
+</section>

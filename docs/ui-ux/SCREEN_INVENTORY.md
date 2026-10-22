@@ -4,7 +4,7 @@
 |---|---|---|---|---|
 | AUTH-01 | Sign in | Establish an Admin session | idle, validating, invalid, unverified, disabled, server error | `POST /api/auth/login`, then role check |
 | AUTH-02 | Access denied | Explain insufficient role/session | denied, session expired | local guard; backend 401/403 |
-| DASH-01 | Dashboard | Route administrators to attention items | loading, no supported metrics, partial, failed | aggregation APIs missing |
+| DASH-01 | Dashboard | Route administrators to attention items | loading, no supported metrics, partial, failed | pending-work counts from application/GPS lists (implemented); fleet/tracking aggregates missing |
 | USER-01 | User accounts | Search/filter all accounts and change supported status | loading, empty, filtered-empty, failed, ready | `GET /api/admin/users/` |
 | USER-02 | User details | Show identity, roles, verification, and lifecycle | loading, not found, ready | composed from Admin user list; no detail endpoint |
 | USER-03 | Account status confirmation | Enable/disable a non-self account | confirm, saving, conflict/error, success | `PATCH /api/admin/users/{id}/status` |
@@ -19,10 +19,10 @@
 | GROUP-02 | Fleet group details | Inspect one group | loading, not found, failed, ready | composed from group list; membership gated (Agent A G2) |
 | OP-01 | Operators | Monitor Operator accounts | loading, empty, failed, ready | filtered Admin users (implemented); `operators.id` not linkable to accounts until G1 — contract-gate notice shown |
 | DRV-01 | Drivers | Monitor Driver accounts | loading, empty, failed, ready | filtered Admin users (implemented); `drivers.id` not linkable to accounts until G1 — contract-gate notice shown |
-| APP-01 | Vehicle applications | Review application queue | loading, empty, failed, ready | vehicle-application GET |
-| APP-02 | Vehicle review | Approve/reject a pending application | loading, reviewable, completed, saving, conflict | Admin review PATCH |
-| GPS-01 | GPS setup queue | Filter setup and verification states | loading, empty, failed, ready | GPS request GET |
-| GPS-02 | GPS setup details | Transition, map device, verify checks | loading, gated action, saving, conflict, complete | Admin status/mapping/verification operations |
+| APP-01 | Vehicle applications | Review application queue | loading, empty, failed, ready | `GET /api/vehicle-applications` + jeepney list — implemented |
+| APP-02 | Vehicle review | Approve/reject a pending application | loading, reviewable, completed, saving, conflict | `PATCH /api/admin/vehicle-applications/{id}/review` — implemented; 409 re-reads |
+| GPS-01 | GPS setup queue | Filter setup and verification states | loading, empty, failed, ready | `GET /api/gps-setup-requests` + jeepney list — implemented |
+| GPS-02 | GPS setup details | Transition, map device, verify checks | loading, gated action, saving, conflict, complete | status PATCH, device-mapping POST, verification POST — implemented; existing mapping not readable (no GET) |
 | TRACK-01 | Live fleet map | Inspect approved latest state | blocked, later loading/stale/disconnected | Agent B gate |
 | TRACK-02 | Position history | Inspect approved retained history | blocked | Agent B gate |
 | TRACK-03 | Route compliance | Inspect deviation/re-entry | blocked | Agent B gate |

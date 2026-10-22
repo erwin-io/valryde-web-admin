@@ -1,0 +1,131 @@
+<app-page-header
+  [title]="'Vehicle application · ' + (jeepney()?.plateNo ?? '')"
+  description="Review the application and decide whether the vehicle is approved for GPS installation."
+  [breadcrumbs]="breadcrumbs()"
+/>
+
+@if (saveProblem(); as problem) {
+  <div class="inline-alert" role="alert">
+    <mat-icon aria-hidden="true">error</mat-icon>
+    <span>
+      The review was not saved. {{ problem.message }}
+      @if (problem.requestId) {
+        (Request ID: <code>{{ problem.requestId }}</code>)
+      }
+    </span>
+  </div>
+}
+
+@switch (state()) {
+  @case ('loading') {
+    <app-page-state kind="loading" title="Loading application…" />
+  }
+  @case ('denied') {
+    <app-page-state kind="denied" [problem]="problem()" />
+  }
+  @case ('error') {
+    <app-page-state kind="error" title="This application could not be loaded" [problem]="problem()" (retry)="load()" />
+  }
+  @case ('not-found') {
+    <app-page-state kind="not-found" message="No vehicle application with this identifier exists." />
+  }
+  @default {
+    @if (application(); as a) {
+      <section class="panel details" aria-labelledby="app-title">
+        <h2 id="app-title">Application</h2>
+        <dl>
+          <dt>Status</dt>
+          <dd>
+            @if (badge(); as b) {
+              <app-status-badge [label]="b.label" [icon]="b.icon" [tone]="b.tone" />
+            }
+          </dd>
+          <dt>Jeepney</dt>
+          <dd>
+            @if (jeepney(); as j) {
+              <a [routerLink]="['/fleet/jeepneys', j.id]">{{ j.plateNo }}</a>
+            } @else {
+              <span class="unavailable">Jeepney not visible</span>
+            }
+          </dd>
+          <dt>Submitted by</dt>
+          <dd>
+            @if (applicant(); as u) {
+              <a [routerLink]="['/identity/users', u.id]">{{ u.displayName }}</a> · {{ u.email }}
+            } @else {
+              <span class="unavailable">Account not found</span>
+            }
+          </dd>
+          <dt>Submitted</dt>
+          <dd>{{ a.createdAt | date: 'medium' }}</dd>
+          <dt>Applicant notes</dt>
+          <dd>
+            @if (a.applicantNotes) {
+              {{ a.applicantNotes }}
+            } @else {
+              <span class="unavailable">None</span>
+            }
+          </dd>
+          @if (a.reviewedAt) {
+            <dt>Reviewed</dt>
+            <dd>
+              {{ a.reviewedAt | date: 'medium' }}
+              @if (reviewer(); as r) {
+                by {{ r.displayName }}
+              }
+            </dd>
+            <dt>Review notes</dt>
+            <dd>
+              @if (a.reviewNotes) {
+                {{ a.reviewNotes }}
+              } @else {
+                <span class="unavailable">None</span>
+              }
+            </dd>
+          }
+          <dt>GPS installation</dt>
+          <dd>
+            @if (gpsRequest(); as g) {
+              @if (gpsBadge(); as gb) {
+                <app-status-badge [label]="gb.label" [icon]="gb.icon" [tone]="gb.tone" />
+              }
+              <a class="inline-link" [routerLink]="['/applications/gps', g.id]">Open installation</a>
+            } @else if (a.status === 'APPROVED') {
+              <span class="unavailable">Not requested yet. The operator or driver requests installation.</span>
+            } @else {
+              <span class="unavailable">Available after approval</span>
+            }
+          </dd>
+        </dl>
+      </section>
+
+      @if (a.status === 'PENDING') {
+        <section class="panel details" aria-labelledby="review-title">
+          <h2 id="review-title">Decision</h2>
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <mat-radio-group formControlName="decision" aria-labelledby="review-title" class="decision">
+              <mat-radio-button value="APPROVED">Approve</mat-radio-button>
+              <mat-radio-button value="REJECTED">Reject</mat-radio-button>
+            </mat-radio-group>
+            @if (form.controls.decision.touched && form.controls.decision.invalid) {
+              <p class="field-error" role="alert">Choose Approve or Reject.</p>
+            }
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Review notes (optional)</mat-label>
+              <textarea matInput formControlName="reviewNotes" rows="3" maxlength="2000"></textarea>
+              <mat-hint>Visible with the decision record.</mat-hint>
+              @if (form.controls.reviewNotes.invalid) {
+                <mat-error>Review notes are limited to 2,000 characters.</mat-error>
+              }
+            </mat-form-field>
+            <div class="form-actions">
+              <button mat-flat-button type="submit" [disabled]="saving()">
+                {{ saving() ? 'Saving…' : 'Submit decision' }}
+              </button>
+            </div>
+          </form>
+        </section>
+      }
+    }
+  }
+}
