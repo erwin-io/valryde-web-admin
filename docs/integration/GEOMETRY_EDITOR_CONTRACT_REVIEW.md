@@ -75,3 +75,5 @@ The current directive VALRYDE-E-RAPID-DELIVERY-003 authorizes corridor persisten
 - A denied, conflicting or failed preview prevents saving and retains the draft. Confirmation cancellation and component destruction release edit locks; duplicate submits are rejected.
 - D3 concurrent rename conflicts return `409 CONFLICT` and are shown at the name field with request ID; local uniqueness validation remains a convenience.
 - No standalone geofence read/write contract exists. Map style/bounds remain unchanged; no provider, tracking threshold, geometry authority or backend change.
+
+Direction creation is now implemented through the existing POST contract from route detail. The creation form accepts one validated LineString/Feature with metadata/corridor, creates Draft directions and preserves input after 403/409. Route colors offer an optional unused palette candidate from the current list; the Admin explicitly chooses it. No uniqueness lock or geofence API is implied.

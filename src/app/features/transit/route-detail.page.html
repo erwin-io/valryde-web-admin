@@ -55,9 +55,10 @@
       <section class="panel details-table" aria-labelledby="directions-title">
         <div class="section-heading">
           <h2 id="directions-title">Directions ({{ r.directions.length }})</h2>
+          <a mat-stroked-button [routerLink]="['/transit/routes', r.id, 'directions', 'new']">New direction</a>
         </div>
         @if (r.directions.length === 0) {
-          <app-page-state kind="empty" title="No directions yet" message="Directions are created with their route line in the geometry editor." />
+          <app-page-state kind="empty" title="No directions yet" message="Create a direction from a valid GeoJSON LineString, then edit its route line on the canvas." />
         } @else {
           <div class="table-wrap">
             <table mat-table [dataSource]="r.directions" aria-label="Route directions">
@@ -111,9 +112,9 @@
         <div>
           <h2 id="gate-title">Geometry scope is intentionally bounded</h2>
           <p>
-            Existing direction route lines can be edited with the approved geometry editor. Direction creation,
-            corridor changes, stops, geofences, and assignment-impact analysis remain unavailable until their exact
-            contracts and operational rules are approved.
+            Existing direction route lines can be edited on the geometry canvas. Create directions from validated GeoJSON,
+            edit corridor tolerance in direction details, and review server assignment-impact counts before geometry or corridor saves.
+            Stops, standalone geofences, and tracking operations require their own approved contracts.
           </p>
         </div>
       </aside>

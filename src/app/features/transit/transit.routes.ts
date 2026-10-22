@@ -16,6 +16,12 @@ export const TRANSIT_ROUTES: Routes = [
     loadComponent: () => import('./route-form.page').then((m) => m.RouteFormPage),
   },
   {
+    path: 'routes/:routeId/directions/new',
+    title: 'New direction · Valryde Admin',
+    canDeactivate: [unsavedChangesGuard],
+    loadComponent: () => import('./direction-create.page').then(m => m.DirectionCreatePage),
+  },
+  {
     path: 'routes/:routeId',
     title: 'Route · Valryde Admin',
     loadComponent: () => import('./route-detail.page').then((m) => m.RouteDetailPage),

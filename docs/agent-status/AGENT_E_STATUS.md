@@ -10,8 +10,8 @@
 - GitHub issues / PRs: #1–#8 merged. Directory PR #9 open at e33baf46950a3e2b1011ca4cad2b9b3f6efad497.
 - Implementation progress: READY_FOR_REVIEW (transit slice); overall rapid-delivery batch in progress.
 - Tech Lead review decision: no decision on new rapid-delivery slices; no new acceptance claimed.
-- Current objective: corridor persistence, G11 impact-before-confirmation for geometry/corridor and D3 duplicate-label conflict handling.
-- Last confirmed result: transit lint, strict app/spec typecheck, full 166 tests (23 files), production build (392.86 kB initial) and diff check passed. Command npm test -- --include emitted npm 10 include warnings and ran the full suite; no focused-only claim.
+- Current objective: finish direction creation, explicit unused-color suggestion, corridor persistence, G11 confirmation and D3 conflict handling. PR #10 open; current follow-up changes under verification.
+- Last confirmed result: final expanded transit lint, strict app/spec typecheck, full 176 tests (24 files), production build (392.86 kB initial) and diff check passed, including direction creation and unused color suggestion. Earlier startup/stale-assertion failures preserved in activity history.
 - Next concrete action: finish transit verification/PR, GPS mapping re-read and tracking preparation; authenticated acceptance when fixture credentials are available.
 - Blocked by / decision owner: no authenticated fixture credentials provided; geofence API absent; tracking REST/Pusher DTOs are proposed/unreleased; physical GPS and deployment are owner gates. Full standalone Version 1.0 document/checklist unavailable; exact API Agent E handoff reviewed.
 - Execution ownership: current user confirms E. Original checkout unchanged; no admin-referencing Claude command line/concurrent edit observed; process-level inactivity cannot be conclusively proven.
@@ -103,6 +103,19 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 03:45 +08:00 — Expanded transit release gates passed
+- Final lint, strict app/spec typecheck, full Angular/Vitest maxWorkers:2 run: 24 files / 176 tests PASSED; production build 392.86 kB initial PASSED; diff check PASSED.
+- New direction form and explicit unused color suggestion now close independent route-management gaps. Retained missing-runner-config startup failure and stale old assertion failure as historical evidence; neither is counted as a passing run.
+- Push follow-up to existing PR #10, refresh browser evidence at committed source HEAD and rewrite PR description around final scope. No real authenticated API/persistence, geofence or hardware acceptance claim.
+
+
+### 2026-10-23 03:44 +08:00 — Direction creation and explicit color suggestion
+- Added guarded new-direction page from route detail: required metadata, default Draft, integer corridor, one LineString or Feature converted to geometry-only body, WGS84/finite/2–10000-vertex/1MiB bounds, draft guard, local/server duplicate-label handling and rejection retention. Uses only existing Admin POST /transit-routes/{id}/directions; no new API/shared contract.
+- Added optional unused palette color suggestion from current canonical route list. Never silently overwrites Admin input; Admin explicitly chooses suggested color. Route create/edit now locks across confirmation/write and rejects duplicate submission; immutable route code remains disabled after edit retry/cancellation.
+- Focused direction creation: 8 tests passed. Lint/typecheck/build passed. First full runner startup failed because the ignored local runner config had not been created in this worktree; created it and reran. Next full run had 175 pass / 1 stale baseline assertion rejecting the newly supported New direction link. Updated that assertion and outdated scope copy; full release gate rerunning. No final 176-test pass claimed yet.
+- Current PR #10 remains open; follow-up source uncommitted until gates pass. Other rapid-delivery PRs #9/#11/#12/#13 remain independent. Source/browser evidence will be refreshed at the final source head; no real API/hardware/completion claim.
+
 
 ### 2026-10-23 03:04 +08:00 — Transit release gates passed
 - `npm run lint`, `npm run typecheck`, `npm test -- --include=...` (npm 10 consumed include flags; full suite ran), 23 files / 166 tests PASSED; `npm run build` PASSED (392.86 kB initial); `git diff --check` PASSED.

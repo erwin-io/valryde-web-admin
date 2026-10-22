@@ -58,6 +58,24 @@ describe('transit forms', () => {
       return f;
     }
 
+    it('suggests an unused color without silently changing the Admin choice', async () => {
+      const f = await newForm();
+      const page = f.componentInstance as unknown as { suggestColor(): void; setColor(color: string): void };
+      setValue(f, 'routeColorHex', '#123456'); page.suggestColor();
+      http.expectOne(LIST).flush({ routes: [transitRoute({ routeColorHex: '#006b67' })] });
+      await f.whenStable(); expect(text(f)).toContain('#1E88E5');
+      const input = (f.nativeElement as HTMLElement).querySelector<HTMLInputElement>('[formcontrolname="routeColorHex"]')!;
+      expect(input.value).toBe('#123456'); page.setColor('#1E88E5'); await f.whenStable(); expect(input.value).toBe('#1E88E5');
+    });
+
+    it('guards duplicate route creation and preserves entered values after failure', async () => {
+      const f = await newForm(); setValue(f, 'routeCode', 'NEW'); setValue(f, 'publicName', 'New route');
+      await submit(f); await submit(f);
+      http.expectOne(LIST).flush(apiError('FORBIDDEN', 'Denied', 'req-route'), { status: 403, statusText: 'Forbidden' });
+      await f.whenStable(); expect(text(f)).toContain('req-route');
+      expect((f.nativeElement as HTMLElement).querySelector<HTMLInputElement>('[formcontrolname="publicName"]')!.value).toBe('New route');
+    });
+
     it('blocks invalid input without calling the API', async () => {
       const f = await newForm();
       setValue(f, 'routeColorHex', 'green');

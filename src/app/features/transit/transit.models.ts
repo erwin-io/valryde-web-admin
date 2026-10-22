@@ -63,6 +63,9 @@ export interface CreateRouteInput {
   routeColorHex: string;
 }
 
+export type CreateDirectionInput = Pick<RouteDirection,
+  'directionLabel' | 'originName' | 'destinationName' | 'geometry' | 'corridorM'>;
+
 /** PATCH /admin/transit-routes/{id}: at least one field. */
 export type UpdateRouteInput = Partial<{
   publicName: string;
