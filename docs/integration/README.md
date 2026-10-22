@@ -2,6 +2,13 @@
 
 This area will hold the approved API contract matrix and tracking integration gates.
 
+Current focused reviews:
+
+- [`ADMIN_BATCH_CONTRACT_INVENTORY.md`](ADMIN_BATCH_CONTRACT_INVENTORY.md)
+- [`GEOMETRY_EDITOR_CONTRACT_REVIEW.md`](GEOMETRY_EDITOR_CONTRACT_REVIEW.md)
+- [`REPORTING_EXPORT_HEALTH_REQUIREMENTS.md`](REPORTING_EXPORT_HEALTH_REQUIREMENTS.md)
+- [`AGENT_A_BACKEND_FINDINGS.md`](AGENT_A_BACKEND_FINDINGS.md)
+
 ## Current contract sources
 
 - Agent A API source and `docs/OPENAPI_ENDPOINT_TAGS.md` in the read-only `valryde-api` reference repository

@@ -1,6 +1,6 @@
 # Admin Independent UI Batch — Contract Inventory
 
-**Verified source:** `valryde-api` `main` `827738c` (2026-10-22). Route files: `src/routes/{admin-user,auth,fleet,transit,vehicle-workflow}-routes.ts`; services: `transit-service.ts`, `vehicle-workflow-service.ts`; migrations `002`, `005`. No open Agent A PRs; no reporting, export, audit-read, settings, directory (G1), membership (G2) or assignment-read endpoints exist.
+**Verified source:** `valryde-api` `main` `827738c` (2026-10-22). Route files: `src/routes/{admin-user,auth,fleet,transit,vehicle-workflow}-routes.ts`; services: `transit-service.ts`, `vehicle-workflow-service.ts`; migrations `002`, `005`. Agent A fixture PR #15 is open at `be8d6d0` but not merged. No reporting, export, audit-read, settings, directory (G1), membership (G2) or assignment-read endpoints exist on `main`.
 
 All operations below are protected by `fastify.requireRoles(...)`, which first authenticates (`401 AUTH_REQUIRED` / `401 SESSION_REVOKED`), then checks the role (`403 FORBIDDEN`). Errors use `{ error: { code, message, requestId, details? } }`.
 
@@ -43,15 +43,17 @@ Submission (`POST /vehicle-applications`, `POST /gps-setup-requests`) is DRIVER/
 
 | Package | Checklist | Result |
 |---|---|---|
-| E1 Admin auth and User Accounts acceptance | 56, 59 | **OPERATOR-GATED** on Agent A's approved development fixtures (Tech Lead direction 2026-10-22; none exist on `main` `827738c`), not owner-created accounts. A local `valryde-api` was observed running (not started by Agent E); unauthenticated read-only probes only: health `200`, protected Admin endpoints `401 AUTH_REQUIRED`. Procedure extended in `docs/testing/REAL_API_INTEGRATION_PROCEDURE.md`. Refresh-token storage, cookie contract, CSP and Angular major unchanged. |
+| E1 Admin auth and User Accounts acceptance | 56, 59 | **BACKEND_FIXTURE_BLOCKED** until Agent A fixture PR #15 merges. Fixtures are not on `main` `827738c`; owner-created accounts are not required. A local `valryde-api` was previously observed running (not started by Agent E); unauthenticated read-only probes only: health `200`, protected Admin endpoints `401 AUTH_REQUIRED`. Procedure: `docs/testing/REAL_API_INTEGRATION_PROCEDURE.md`. Refresh-token storage, cookie contract, CSP and Angular major unchanged. |
 | E2 Official routes and directions | 61 | PR #5 **merged** at `8018e88`. Direction *creation* deferred to ID 62 because it requires geometry. |
 | E3 Applications and GPS workflow | 63, 64 (+56 dashboard counts) | PR #6 open, reconciled with `main` `8018e88` at `cc14c9c`. Physical connectivity and GPS fix remain hardware/operator gates. |
-| E4 Reports / export | 67 | **Nothing implemented.** No reporting, export, audit-read or component-health endpoint exists; only `GET /api/health` (API + DB). Client-side CSV of list payloads was not built: no approved export scope, field set or privacy review. |
+| E4 Reports / export | 67 | **BACKEND_CONTRACT_BLOCKED.** No reporting, export, audit-read or component-health endpoint exists; only `GET /api/health` (API + DB). Client-side CSV of list payloads was not built: no approved export scope, field set or privacy review. See `REPORTING_EXPORT_HEALTH_REQUIREMENTS.md`. |
 | ID 62 Geometry | 62 | **Proposal only** (section 5). No geometry editor implemented. |
 
 ## 5. ID 62 — geometry contract inventory and UI proposal (for review, not implemented)
 
 **Available contract:** direction create (`geometry` required) and update (`geometry`, `corridorM` optional) as in section 1. Geometry is a GeoJSON `LineString` `[longitude, latitude]`, 2–10,000 positions, server-validated (finite, WGS84 bounds) and stored as PostGIS SRID 4326. `corridorM` 1–5000. **Not available:** stops, geofences beyond the per-direction corridor, assignment-impact data (G11), geometry history or undo.
+
+The bounded contract and safety review is maintained in `GEOMETRY_EDITOR_CONTRACT_REVIEW.md`.
 
 **Proposed UI (separate PR, after Tech Lead approval):**
 

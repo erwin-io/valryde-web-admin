@@ -1,7 +1,7 @@
 # Real API Integration Procedure — Admin web
 
 **Purpose:** repeatable verification of the Admin web (IDs 56, 59 from PR #2; 60; 61 from PR #5; 63–64 from PR #6) against a real local `valryde-api`, replacing the synthetic stubs used so far.
-**State:** `OPERATOR-GATED` — not yet run. Per Tech Lead direction (2026-10-22) the test Admin and test users must come from **Agent A's approved development fixtures** when they exist, not from owner-created accounts. None exist on `valryde-api` `main` `827738c`.
+**State:** `BACKEND_FIXTURE_BLOCKED` — not yet run. Per Tech Lead direction (2026-10-22), test identities must come from **Agent A's approved development fixtures**, not owner-created accounts. Fixture PR #15 is open/mergeable at `be8d6d0` but is not on `valryde-api` `main` `827738c`. After it merges, its seed and cleanup instructions supersede the manual reference below.
 **Never** run this against production, a shared database, or real user records.
 
 ## 1. Preconditions (owner/operator)
