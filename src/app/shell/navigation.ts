@@ -40,4 +40,8 @@ export const NAVIGATION: NavGroup[] = [
     label: 'Identity & Access',
     items: [{ label: 'User accounts', icon: 'manage_accounts', route: '/identity/users' }],
   },
+  {
+    label: 'System Administration',
+    items: [{ label: 'Transit snapshot', icon: 'table_view', route: '/system/reports/transit' }],
+  },
 ];

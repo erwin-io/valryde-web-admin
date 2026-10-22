@@ -17,5 +17,8 @@
 | `Breadcrumbs` | Hierarchical context | Uses configured route metadata |
 | `RelatedRecordLink` | Cross-domain navigation | Does not duplicate related CRUD |
 | `MapPanel` | Map lifecycle and non-secret style config | Feature editor owns geometry rules |
+| `GeometryEditorPage` | One-direction LineString draft, MapLibre preview, accessible vertex controls, import and exact PATCH | No external basemap, corridor, stops, geofence, assignment impact, or Agent B logic |
+| `ReportSummary` | Accessible definition-list summary for contract-backed report rows | Simple values only; no decorative chart |
+| `CsvExportService` | Explicit-column client CSV with spreadsheet-formula neutralization | Callers must pass only authorized, already-loaded rows |
 
 Utilities include typed API envelopes/errors, loading-state helpers, permission predicates, URL-safe return navigation, and table filter normalization. Reuse stops where it would obscure domain rules.

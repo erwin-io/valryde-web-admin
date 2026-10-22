@@ -83,6 +83,39 @@ code {
   }
 }
 
+// MapLibre markers are created outside Angular's component style boundary.
+.geometry-vertex {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: #fff;
+  border: 3px solid var(--vr-primary);
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.geometry-vertex.selected {
+  width: 26px;
+  height: 26px;
+  background: #ffca72;
+  border-color: #643c00;
+}
+
+.geometry-vertex.origin::after,
+.geometry-vertex.destination::after {
+  position: absolute;
+  top: 20px;
+  left: -12px;
+  padding: 2px 5px;
+  color: #fff;
+  background: var(--vr-text);
+  border-radius: 3px;
+  font: 10px sans-serif;
+}
+
+.geometry-vertex.origin::after { content: 'Origin'; }
+.geometry-vertex.destination::after { content: 'Destination'; }
+
 // Blocked-by-contract notice (docs/ui-ux/DESIGN_SYSTEM.md): distinct from error and empty states.
 .contract-gate {
   display: flex;

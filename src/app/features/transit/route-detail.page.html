@@ -85,6 +85,13 @@
                 <td mat-cell *matCellDef="let d" class="actions-cell">
                   <a
                     mat-icon-button
+                    [routerLink]="['/transit/directions', d.id, 'geometry']"
+                    [attr.aria-label]="'Edit route line for ' + d.directionLabel"
+                  >
+                    <mat-icon>polyline</mat-icon>
+                  </a>
+                  <a
+                    mat-icon-button
                     [routerLink]="['/transit/directions', d.id, 'edit']"
                     [attr.aria-label]="'Edit direction ' + d.directionLabel"
                   >
@@ -102,11 +109,11 @@
       <aside class="contract-gate" aria-labelledby="gate-title">
         <mat-icon aria-hidden="true">lock_clock</mat-icon>
         <div>
-          <h2 id="gate-title">Route lines are managed separately</h2>
+          <h2 id="gate-title">Geometry scope is intentionally bounded</h2>
           <p>
-            Adding a direction requires its route line, and editing route lines or corridor width belongs to the
-            geometry editor, which is planned as a separate reviewed change. Vehicle assignments to this route are
-            not listed because the API has no read endpoint for them.
+            Existing direction route lines can be edited with the approved geometry editor. Direction creation,
+            corridor changes, stops, geofences, and assignment-impact analysis remain unavailable until their exact
+            contracts and operational rules are approved.
           </p>
         </div>
       </aside>

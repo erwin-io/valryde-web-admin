@@ -1,0 +1,58 @@
+<app-page-header
+  title="Transit snapshot"
+  description="A current, client-side view of the authorized route response. This is not a historical or compliance report."
+  [breadcrumbs]="[{ label: 'System Administration' }, { label: 'Transit snapshot' }]"
+>
+  @if (state() === 'ready') {
+    <button mat-button type="button" (click)="print()"><mat-icon>print</mat-icon> Print</button>
+    <button mat-flat-button type="button" [disabled]="filtered().length === 0" (click)="exportCsv()"><mat-icon>download</mat-icon> Export filtered CSV</button>
+  }
+</app-page-header>
+
+@switch (state()) {
+  @case ('loading') { <app-page-state kind="loading" title="Loading transit snapshot…" /> }
+  @case ('denied') { <app-page-state kind="denied" [problem]="problem()" /> }
+  @case ('error') { <app-page-state kind="error" title="The transit snapshot could not be loaded" [problem]="problem()" (retry)="load()" /> }
+  @default {
+    <app-report-summary [metrics]="metrics()" />
+    <section class="panel report" aria-labelledby="report-title">
+      <h2 id="report-title" class="cdk-visually-hidden">Current transit routes and directions</h2>
+      <div class="filters" role="search">
+        <mat-form-field appearance="outline" class="search" subscriptSizing="dynamic">
+          <mat-label>Search current routes</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [ngModel]="search()" (ngModelChange)="updateSearch($event)" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Route or direction status</mat-label>
+          <mat-select [ngModel]="status()" (ngModelChange)="updateStatus($event)">
+            <mat-option value="">All statuses</mat-option>
+            @for (item of statuses; track item) { <mat-option [value]="item">{{ statusMeta[item].label }}</mat-option> }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      @if (rows().length === 0) {
+        <app-page-state kind="empty" title="No transit records" message="The authorized route response is currently empty." />
+      } @else if (filtered().length === 0) {
+        <app-page-state kind="empty" title="No matching records" message="Change or clear the report filters." />
+      } @else {
+        <div class="table-wrap">
+          <table mat-table [dataSource]="visibleRows()" aria-label="Current transit snapshot">
+            <ng-container matColumnDef="route"><th mat-header-cell *matHeaderCellDef>Route</th><td mat-cell *matCellDef="let row"><strong>{{ row.routeCode }}</strong><span>{{ row.publicName }}</span></td></ng-container>
+            <ng-container matColumnDef="direction"><th mat-header-cell *matHeaderCellDef>Direction</th><td mat-cell *matCellDef="let row">{{ row.directionLabel || 'No direction' }}</td></ng-container>
+            <ng-container matColumnDef="endpoints"><th mat-header-cell *matHeaderCellDef>From / to</th><td mat-cell *matCellDef="let row">{{ row.originName ? row.originName + ' → ' + row.destinationName : '—' }}</td></ng-container>
+            <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let row">{{ row.routeStatus }} / {{ row.directionStatus || '—' }}</td></ng-container>
+            <ng-container matColumnDef="geometry"><th mat-header-cell *matHeaderCellDef>Geometry</th><td mat-cell *matCellDef="let row">{{ row.points ? row.points + ' points · ' + row.corridorM + ' m' : '—' }}</td></ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns"></tr>
+          </table>
+        </div>
+        <mat-paginator [length]="filtered().length" [pageIndex]="pageIndex()" [pageSize]="pageSize()" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons (page)="changePage($event)" />
+      }
+    </section>
+    <aside class="contract-gate no-print" aria-label="Reporting limits">
+      <mat-icon aria-hidden="true">info</mat-icon><div><h2>Current snapshot only</h2><p>The CSV contains only the filtered route fields already loaded on this page. Historical activity, audit records, compliance events, Traccar health, and API/Bridge monitoring remain unavailable without approved backend contracts.</p></div>
+    </aside>
+  }
+}

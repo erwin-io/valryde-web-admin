@@ -10,7 +10,7 @@ Production navigation exposes only functional MVP routes. Disabled placeholders 
 | Transit Network | `/transit/routes/:routeId` | Route details | Implemented (ID 61), composed from Admin list payload |
 | Transit Network | `/transit/routes/:routeId/edit` | Route metadata editor | Implemented (ID 61); route code immutable |
 | Transit Network | `/transit/directions/:directionId/edit` | Direction metadata/status editor | Implemented (ID 61); geometry and corridor excluded |
-| Transit Network | `/transit/directions/:directionId/geometry` | Geometry editor | ID 62, separate reviewed PR; direction creation needs geometry; active-assignment warning data unavailable |
+| Transit Network | `/transit/directions/:directionId/geometry` | Geometry editor | Implemented bounded ID 62 foundation for an existing direction; exact geometry PATCH only; corridor and assignment impact gated |
 | Fleet Management | `/fleet/jeepneys` | Jeepney registry | Implemented read-only (ID 60); path renamed from planned `/fleet/vehicles` to match the domain term |
 | Fleet Management | `/fleet/jeepneys/:jeepneyId` | Jeepney details | Implemented read-only: list composition + effective route; driver/GPS/tracking gated |
 | Fleet Management | `/fleet/groups` | Fleet groups | Implemented read-only (ID 60) |
@@ -23,7 +23,8 @@ Production navigation exposes only functional MVP routes. Disabled placeholders 
 | Applications & Approvals | `/applications/gps/:requestId` | GPS installation review | Implemented (IDs 63–64): server-allowed transitions, device mapping, verification; mapping not re-readable (no GET) |
 | Identity & Access | `/identity/users` | User accounts | Agent A available; first implemented module |
 | Tracking Operations | — | Live map/history/compliance | Hidden until Agent B contracts are approved |
-| System Administration | `/system/health` | Integration status | Base API health only; component health blocked |
+| System Administration | `/system/reports/transit` | Current transit snapshot | Implemented bounded ID 67 subset; current authorized route response and client CSV only |
+| System Administration | `/system/health` | Integration status | Hidden; base API health is not whole-system health and component contracts are missing |
 
 Stops are relationship context only. No Stops navigation or production screen is created because no stop entity or API exists in the approved MVP backend.
 

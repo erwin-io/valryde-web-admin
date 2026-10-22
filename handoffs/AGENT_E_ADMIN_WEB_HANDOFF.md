@@ -6,7 +6,7 @@
 
 **Repository:** `valryde-web-admin`
 
-**Status:** Development authorized; shell, Admin access control and User Accounts (56, 59) implemented — see `docs/agent-status/AGENT_E_STATUS.md` for current state
+**Status:** Independent frontend scope implemented and awaiting Tech Lead review; backend/tracking/hardware gates remain — see `docs/agent-status/AGENT_E_STATUS.md`
 
 ## Mission
 
@@ -18,18 +18,18 @@ The canonical approved Agent E scope originates from the backend reference hando
 
 | ID | Feature | Priority | Bootstrap state |
 |---:|---|---|---|
-| 56 | Admin Login & Dashboard | High | NOT_STARTED |
-| 57 | Operator Management | High | NOT_STARTED |
-| 58 | Driver Monitoring | Medium | NOT_STARTED |
-| 59 | Commuter User Monitoring | Medium | NOT_STARTED |
-| 60 | Jeepney & Fleet Group Monitoring | High | NOT_STARTED |
-| 61 | Official Transit Route & Direction Management | High | NOT_STARTED |
-| 62 | Route Polyline / Corridor / Geofence Management | High | NOT_STARTED |
-| 63 | GPS Device Management & Mapping | High | NOT_STARTED |
-| 64 | GPS Setup Request Approval & Installation Status | High | NOT_STARTED |
-| 65 | Global Live Tracking Map | High | NOT_STARTED |
-| 66 | Route Deviation Monitoring | High | NOT_STARTED |
-| 67 | Basic Reports, Export & System Health | Medium | NOT_STARTED |
+| 56 | Admin Login & Dashboard | High | READY_FOR_REVIEW; real authenticated acceptance gated |
+| 57 | Operator Management | High | READY_FOR_REVIEW at account level; G1 gated |
+| 58 | Driver Monitoring | Medium | READY_FOR_REVIEW at account level; G1/G2 gated |
+| 59 | Commuter User Monitoring | Medium | READY_FOR_REVIEW; real mutation acceptance gated |
+| 60 | Jeepney & Fleet Group Monitoring | High | READY_FOR_REVIEW read-only; G1–G3 gated |
+| 61 | Official Transit Route & Direction Management | High | READY_FOR_REVIEW; Agent A D3 remains |
+| 62 | Route Polyline / Corridor / Geofence Management | High | READY_FOR_REVIEW bounded existing-direction geometry foundation; corridor/geofence gated |
+| 63 | GPS Device Management & Mapping | High | READY_FOR_REVIEW; G10/hardware gated |
+| 64 | GPS Setup Request Approval & Installation Status | High | READY_FOR_REVIEW; real API/hardware gated |
+| 65 | Global Live Tracking Map | High | BLOCKED on Agent B contracts |
+| 66 | Route Deviation Monitoring | High | BLOCKED on Agent B contracts |
+| 67 | Basic Reports, Export & System Health | Medium | READY_FOR_REVIEW bounded transit snapshot; broader reports/health blocked |
 
 ## Navigation scope
 
@@ -75,7 +75,6 @@ A formal stop registry is not currently authorized. Booking, fare/payment, reven
 
 ## Current gates
 
-- The full approved Version 1.0 baseline DOCX and standalone 71-item checklist were not found in the inspected repositories; the canonical handoffs contain the reconciled Agent E checklist.
-- Agent A contracts are implemented on a feature branch/PR and were not represented as Tech Lead-accepted in the inspected status.
+- The exact remaining contract and owner gates are maintained in `docs/testing/AGENT_E_UI_INDEPENDENT_CLOSURE_AUDIT.md`.
 - Agent B latest-state, route-compliance, realtime, and tracking contracts remain in progress or proposed.
 - Real Admin credentials, live external providers, and physical GPS/Traccar verification are owner/operator gates.

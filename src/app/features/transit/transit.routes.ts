@@ -32,4 +32,10 @@ export const TRANSIT_ROUTES: Routes = [
     canDeactivate: [unsavedChangesGuard],
     loadComponent: () => import('./direction-form.page').then((m) => m.DirectionFormPage),
   },
+  {
+    path: 'directions/:directionId/geometry',
+    title: 'Edit route line · Valryde Admin',
+    canDeactivate: [unsavedChangesGuard],
+    loadComponent: () => import('./geometry-editor.page').then((m) => m.GeometryEditorPage),
+  },
 ];
