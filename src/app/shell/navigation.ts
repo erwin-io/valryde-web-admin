@@ -42,6 +42,9 @@ export const NAVIGATION: NavGroup[] = [
   },
   {
     label: 'System Administration',
-    items: [{ label: 'Transit snapshot', icon: 'table_view', route: '/system/reports/transit' }],
+    items: [
+      { label: 'Operational snapshot', icon: 'monitor_heart', route: '/system/reports/operations' },
+      { label: 'Transit snapshot', icon: 'table_view', route: '/system/reports/transit' },
+    ],
   },
 ];

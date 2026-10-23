@@ -74,15 +74,28 @@ describe('fleet group pages', () => {
   });
 
   describe('GroupDetailPage', () => {
-    it('shows group fields, the operator record, and the membership gate', async () => {
+    it('reconciles the parent group and members when Angular reuses the detail component', async () => {
+      const f = create(GroupDetailPage); f.componentRef.setInput('groupId', 'g1');
+      await flush(f, { groups: [north, south] });
+      const old = http.expectOne(r => r.url === '/api/fleet-groups/g1/members');
+      f.componentRef.setInput('groupId', 'g2'); await f.whenStable();
+      expect(old.cancelled).toBe(true);
+      http.expectOne('/api/fleet-groups').flush({ groups: [north, south] }); await f.whenStable();
+      http.expectOne(r => r.url === '/api/fleet-groups/g2/members').flush({ members: [], pagination: { page: 1, pageSize: 20, total: 0, totalPages: 0 } });
+      await f.whenStable();
+      expect((f.nativeElement as HTMLElement).querySelector('h1')?.textContent).toBe('South Line');
+    });
+    it('shows group fields, the operator record, and G2 members', async () => {
       const f = create(GroupDetailPage);
       f.componentRef.setInput('groupId', 'g2');
       await flush(f, { groups: [north, south] });
+      http.expectOne(r => r.url === '/api/fleet-groups/g2/members').flush({ members: [], pagination: { page: 1, pageSize: 20, total: 0, totalPages: 0 } });
+      await f.whenStable();
       const text = (f.nativeElement as HTMLElement).textContent ?? '';
       expect(text).toContain('South Line');
       expect(text).toContain('No description');
       expect(text).toContain(south.operatorId);
-      expect(text).toContain('Members not available yet');
+      expect(text).toContain('Group members');
     });
 
     it('shows not-found for an unknown group', async () => {

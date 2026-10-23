@@ -2,42 +2,48 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23 09:30 +08:00
-- Agent / module: E — Administrative Web Development / Valryde Admin
-- Repository: `valryde-web-admin`
-- Branch / implementation SHA: `feat/62-67-independent-ui-closure` (PR #8) from `2c6a4f2`; E8-01/E8-02 correction commit follows this record
-- Checklist IDs: 56–67
-- GitHub issues / PRs: PRs #1–#7 merged. [PR #8](https://github.com/erwin-io/valryde-web-admin/pull/8) is open for final independent UI closure. No issue assigned.
-- Implementation progress: READY_FOR_REVIEW
-- Tech Lead review decision (if actually issued): PRs #1–#7 merged. PR #8: CHANGES REQUIRED by Agent G (E8-01 save concurrency, E8-02 canvas clarity) — corrected, awaiting re-review. Production acceptance remains OPERATOR-GATED.
-- Current objective: `AGENT_E_PR8_GEOMETRY_CORRECTED_READY_FOR_REVIEW`.
-- Last confirmed result: E8-01/E8-02 corrected. Clean `npm ci` (npm 11.6.2, Node v24.15.0); lint, strict app/spec typecheck, 23 files / 154 tests, production build, prod audit 0, diff check and Markdown links pass; browser acceptance at 1440×900, 768×1024, 375×812 against a synthetic stub.
-- Next concrete action: Agent G re-review of PR #8; owner/upstream agents resolve backend, tracking, basemap-provider and hardware gates.
-- Blocked by / decision owner: Real authenticated API evidence still requires an approved Admin fixture/credentials. G1/G2/G3/G10/G11 and D3 belong to Agent A; IDs 65–66 and tracking/health/history contracts belong to Agent B; hardware and physical verification remain Agent F/owner gates.
-- Execution agent: Claude (takeover round 2, `VALRYDE-CLAUDE-E-TAKEOVER-ROUND2-001`, sole active Agent E owner); Codex paused. Codex takeover history preserved.
-- Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
-
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T11:16:00+08:00
+- Agent / module: E — Admin Web, Codex; VALRYDE-E-RAPID-DELIVERY-004.
+- Repository/workspace: erwin-io/valryde-web-admin; C:/Development/valryde/valryde-web-admin. Source slices are isolated under .worktrees/.
+- Branch / HEAD SHA: codex/admin-operational-summary from 1eb94279f5670ad71078b2ec27ba117905a75898; tested implementation dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514; final evidence is a documentation-only follow-up. Tested implementation heads for existing slices below.
+- Checklist IDs: primary 57/58/59/61/63/64; secondary progress 56/60/63/67 plus 65/66 preparation.
+- GitHub PRs: #9 directories e33baf46950a3e2b1011ca4cad2b9b3f6efad497; #10 transit e315d1f682be61bd65b35b142727b0b312c64a6a; #11 GPS cba601b7912558b3504afbe4620552c79818d66f; #12 tracking preparation 423f31aff5bf082aa128ce08328e7eeb934be9cc; #13 account races 03c3864349dec6a9d5d90e5134e43d27b1e666f5 OPEN. Operational summary/evidence #14 OPEN; tested source dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514.
+- Implementation progress: READY_FOR_REVIEW for independently testable slices. Target six accepted/completion-ready checklist items NOT MET; authenticated acceptance, missing contracts and G review prevent that claim.
+- Tech Lead decision: pending for all new PRs; do not label checklist items Completed or self-assign ACCEPTED/OPERATOR-GATED.
+- Current objective: real authenticated acceptance of #9 then #13/#10/#11; operator must supply current-process masked fixture password. Independent combined verification complete.
+- Last confirmed result: Rapid 004 reviewed combined source passed lint, strict typecheck, 28 files/211 tests and production build; six synthetic browser scenarios passed on source fingerprint c9bc64b4dc336be2ca14049723182ccdb9500d31c18dc5a3518e7084a03e13c8. Fresh #9 full gate 156 tests passed; production audit 0, full audit 4 development-tool packages (1 low/3 high).
+- Live verification: LOCAL_API_CONNECTED; health 200/database ok and five unauthenticated boundaries 401. Approved runtime HEAD 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479, Node processes reference runtime. Health does not attest deployed SHA/database name. CREDENTIAL_SOURCE_APPROVED_INTERACTIVE; AUTHENTICATED_ACCEPTANCE_PENDING; runners return CREDENTIALS_NOT_CONFIGURED. No credential files read.
+- Next action: operator runs PR #9 scripts/Invoke-DirectoryAcceptance.ps1 from interactive PowerShell (masked password, process-only variables), then optional -Browser. No new checklist ID recommended Completed. G retains review/merge authority.
+- Recovery: original Claude checkout untouched/clean at 8138c9739756b9d922f824c64bc7383146775a0e; recovered unfinished G1 source/tests/status reused. No initial stashes/unpushed commits. Seven linked worktrees preserve original plus six Codex slices. No destructive Git operations, branch deletion, stash application, force push, other-repository writes, self-merge or deployment.
+- Execution ownership: no admin-referencing Claude command line or concurrent edits observed; process-level Claude inactivity cannot be conclusively proven. Current user authorizes takeover; original checkout preserved and all edits isolated.
+- References/dependencies: API origin/main 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479 reverified against GitHub on resume; B proposal 149cefc82d0ccea3c1efe06aebaf157a607c1d8e is not a released gateway contract; A API/fixtures, B gateway, F physical evidence, G acceptance/merge. Full standalone V1 DOCX/71-item checklist unavailable; canonical API Agent E handoff reviewed.
 ## Checklist coverage
 
-| Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
-|---:|---|---|---|---|
-| 56 | Admin Login & Dashboard | READY_FOR_REVIEW | Shell/auth, safe return URLs, session/401/RBAC tests, dashboard pending-work counts and synthetic browser flow | Real Admin login BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
-| 57 | Operator Management | READY_FOR_REVIEW (merged `075b377`) | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | Fleet context gated on Agent A G1 |
-| 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | Assignment/membership gated on Agent A G1/G2 |
-| 59 | Commuter User Monitoring | READY_FOR_REVIEW (merged `fc55582`; production acceptance operator-gated) | User Accounts list (search, role/status filters, sort, pagination), detail, enable/disable with confirmation and self-disable guard; `src/app/features/identity`; unit tests + security review fixes S1–S3 | Tech Lead review; real-API check is an owner gate |
-| 60 | Jeepney & Fleet Group Monitoring | READY_FOR_REVIEW (merged `812bbab`) | Read-only `/fleet/jeepneys`, `/fleet/jeepneys/:id` (with effective route), `/fleet/groups`, `/fleet/groups/:id`; `src/app/features/fleet/{fleet.models,fleet.service,jeepney-*,group-*}`; unit tests | Membership/driver/operator names gated on Agent A G1–G3; create/edit is a later slice |
-| 61 | Official Transit Route & Direction Management | READY_FOR_REVIEW (merged `8018e88`; regression rerun) | Route list/detail/create/edit, direction metadata/status editor, geometry entry link; expanded 146-test suite | Agent A D3 duplicate direction-label conflict semantics |
-| 62 | Route Polyline / Corridor / Geofence Management | READY_FOR_REVIEW (bounded foundation) | MapLibre LineString editor, accessible vertex controls, undo/redo, bounded import/validation, exact geometry PATCH; deterministic and browser tests | Corridor/geofence persistence, G11 assignment impact, approved external basemap and Philippines bounds remain gated |
-| 63 | GPS Device Management & Mapping | READY_FOR_REVIEW (merged `341ebc77`) | PR #6 device mapping + verification; verified 130-test combined suite | Mapping read/update/unmap missing (G10); hardware gates |
-| 64 | GPS Setup Request Approval & Installation Status | READY_FOR_REVIEW (merged `341ebc77`) | PR #6 application review, transitions and queues; verified 130-test combined suite | Real API BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
-| 65 | Global Live Tracking Map | BLOCKED | Tracking integration gate recorded; no fabricated UI | Agent B REST/Pusher contract approval and implementation |
-| 66 | Route Deviation Monitoring | BLOCKED | Tracking integration gate recorded; no fabricated UI | Agent B compliance/event contract approval and implementation |
-| 67 | Basic Reports, Export & System Health | READY_FOR_REVIEW (bounded subset) | Current transit snapshot, reusable summary, explicit-field CSV, formula protection, print/states, responsive browser evidence | Historical reports, audit, Traccar/component health and broad/private exports remain blocked |
+| ID | Feature / delivered source | Source progress | Remaining completion gate |
+|---:|---|---|---|
+| 56 | Existing auth/dashboard plus operational-count/health entry | READY_FOR_REVIEW, bounded | Real Admin session acceptance; live aggregates need B gateway |
+| 57 | G1 Operator business directory, fleet counts, account lifecycle link; PR #9 | READY_FOR_REVIEW, bounded | Real permission/lifecycle checks; operator profile create/update API absent; no approval-of-account-creation operation invented |
+| 58 | G1 Driver ownership, assigned jeepney, group and separate business/account state; G2 member lists | READY_FOR_REVIEW | Authenticated server scope/negative acceptance and G review |
+| 59 | Role/status/search user monitoring and account status; PR #13 reused-route/late-response/duplicate-action fix | READY_FOR_REVIEW | Real authenticated administration/denial acceptance and G review |
+| 60 | Existing fleet/effective-route records plus G2 member filter/pagination/links | READY_FOR_REVIEW, bounded | Fleet mutation UX is not claimed; actual tracking status requires gateway |
+| 61 | Route CRUD metadata/status/color; explicit unused-color suggestion; direction creation from GeoJSON; D3 conflict handling; PR #10 | READY_FOR_REVIEW | Real authenticated color/status/direction persistence and negative authorization evidence; G review |
+| 62 | Existing MapLibre editor, GeoJSON bounds, corridor PATCH, fresh G11 confirmation and save locks; PR #10 | READY_FOR_REVIEW, bounded | Standalone geofence API absent; approved basemap/configuration and real persistence/compliance evidence; no full completion-ready claim |
+| 63 | Mapping create/read reconciliation and verification; PR #11 | READY_FOR_REVIEW, bounded | Mapping update/unmap absent; physical tracker status/installation requires F/owner and B gateway |
+| 64 | Approval/rejection/schedule/install lifecycle, allowed actions, mapping reconciliation, duplicate-action guards; PR #11 | READY_FOR_REVIEW | Real authenticated API lifecycle/permission acceptance; physical installation recorded separately, not a UI pass |
+| 65 | Guarded adapter-driven global map, null production provider, bounds/last-known labels; PR #12 | IN_PROGRESS — preparation only | Released and integrated B REST/auth/Pusher gateway; actual authorized map rendering/provider/device evidence |
+| 66 | Current server OFF_ROUTE list, expiry/disconnect UNKNOWN; PR #12 | IN_PROGRESS — preparation only | Real compliance gateway, event/re-entry/history privacy contracts and authenticated integration |
+| 67 | Transit and operational count snapshots, CSV/print-PDF, API/database readiness, explicit unmeasured components | READY_FOR_REVIEW, bounded | Historical reports/events, wider exports and Traccar/Bridge/device health contracts remain absent; real integration and G review |
 
+No new ID is legitimately marked Completed from this batch. Review-ready source and synthetic regression are distinct from complete functional/integration acceptance.
 ## Latest verification
 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
+| Rapid directories / transit / GPS / tracking / identity / secondary source gates | Windows Node v24.19.0; npm/Angular; pinned lockfile | PASSED | 2026-10-23 | Full suites 156 / 176 / 158 / 167 / 159 / 165 respectively; lint/typecheck/build pass; do not sum shared tests |
+| Synthetic browser regression at 1440x900 and 375x812 | Installed Chrome, temporary profile; all API responses explicitly synthetic | PASSED | 2026-10-23 | Per-scenario source SHA, dirty flag, checks and screenshots in rapid-delivery evidence; summary refreshed at committed dcb5d6d, sourceDirty false |
+| Real read-only API health and unauthenticated boundaries | localhost:3000, no credentials or writes | PARTIAL_PASS | 2026-10-23 10:12 +08:00 | Health 200/database ok; 5 protected surfaces 401; no authenticated acceptance claim |
+| node scripts/admin-api-acceptance.mjs (full mode) | Missing fixture configuration | BLOCKED / NOT_RUN | 2026-10-23 | No tests/login ran; needs secure fixture password and explicit API URL |
+| npm audit --omit=dev --audit-level=high | Current unchanged lockfile | PASSED | 2026-10-23 | 0 production vulnerabilities |
 | PR #8 E8-01/E8-02 correction: clean `npm ci` (npm 11.6.2), lint, typecheck (app + spec), `npm test`, build, audits, diff check, Markdown links | Local Windows, Node v24.15.0 | PASSED | 2026-10-23 09:20 +08:00 | 23 files / 154 tests (+8); 7 of the new tests fail on the pre-fix code; initial 392.86 kB; prod audit 0; full audit 4 dev-only (MCP SDK via @angular/cli, vite via @angular/build); 35 Markdown files, no broken links |
 | PR #8 browser acceptance (save lock, canvas notice, responsive) | `ng serve` + synthetic stub (3 s delayed PATCH) | PASSED | 2026-10-23 09:25 +08:00 | `docs/testing/evidence/2026-10-23-pr8-geometry-corrections/` |
 | Final clean release gate | Local Windows, Node v24.19.0, npm 11.6.2 | PASSED | 2026-10-22 14:00 +08:00 | Clean `npm ci` (615 packages); lint; app/spec TypeScript; 23 files / 146 tests; production build initial 392.86 kB, geometry lazy chunk 1.09 MB; `git diff --check`; 35-file relative Markdown link check; same-origin worker present in build. |
@@ -104,6 +110,125 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 11:16 +08:00 — Acceptance recovery decision mapping
+
+- Tech Lead directs continued development with no reduction to MVP criteria. Recorded four-state classification and smallest next evidence in docs/testing/RAPID004_PR_AUDIT.md: 57/61/63 CONTRACT BLOCKED; 58/59 CODE COMPLETE / ACCEPTANCE PENDING; 64 DEVICE/OWNER GATED with authenticated acceptance also pending; zero FULLY ACCEPTED. PR #12 remains unavailable without released B gateway.
+- PRs #9–#14 descriptions updated with Rapid 004 evidence; each remains open/mergeable with GitGuardian success. All seven worktrees clean, zero stashes/unpushed commits. Credential/runtime attestation gate remains; no credential-file access, positive business DB writes, self-merge, deployment or other-repo source edits.
+
+### 2026-10-23 11:05 +08:00 — Rapid 004 dependency audit and combined verification
+
+- Continued completed audit after truncated directive recovery. All six PRs share current main base and zero behind. No package/lock/config changes. Shared status all six, matrices #9/#11, disjoint route insertions #12/#14. Acceptance order #9 → #13 → #10 → #11; #14 G2 supports context and #12 stays unavailable. Full audit/dependencies: docs/testing/RAPID004_PR_AUDIT.md.
+- Added PR #9 real G1 API/browser acceptance and masked PowerShell launcher; current-process credentials only, no credential-file access. Missing-config paths return CREDENTIALS_NOT_CONFIGURED with zero authenticated tests. Node and PowerShell syntax checks passed. Fresh #9 lint/typecheck/156-test suite/build/prod audit passed. Browser logout selector/source restore scenario corrected by source review; live browser assertions still NOT RUN.
+- LOCAL_API_CONNECTED: health 200/database ok, five protected unauthenticated reads 401. Runtime checkout matches approved 810c8a1; Node references runtime. Fixture password absent; Tech Lead explicitly approves interactive prompt only. No authenticated test or business database write performed.
+- Reviewed src/scripts patches applied to ignored validation export in order #9/#13/#10/#11/#14/#12, without source conflicts. Initial git archive exceeded Node default output buffer; preserved failed empty export and rebuilt separately with explicit 32 MiB limit. No branch/PR merges, resets or other-repository edits.
+- Combined ESLint/strict app+spec typecheck/28 files 211 tests/production build (393.48 kB) passed. All six synthetic Chrome production-bundle scenarios passed at desktop/mobile with no page errors; source fingerprint and input heads in new evidence. Parent HEAD intentionally not substituted for the composite source.
+- Full npm audit remains nonclean: 4 dev-tool packages, 1 low/3 high; production audit zero. No dependency rewrite. Shared documentation requires normal G reconciliation; positive lifecycle/persistence, permission/tenant/race integration, device/gateway and missing-contract gates remain. No new ID Completed; no self-merge/deployment.
+
+### 2026-10-23 10:28 +08:00 — Six PR review handoff
+
+- PR #14 published with consolidated synthetic evidence and API runners; committed-source summary browser PASS, sourceDirty false, no page errors. Screenshots visually checked. PRs #9–#14 remain open, no self-merge/deployment. Existing PR descriptions now reference final scope and evidence. Consolidated status preserves all recovered branch activity; shared status/contract documents may need normal reconciliation during G review. No source change since each reported passing gate. Full authenticated acceptance still blocked; no new checklist item Completed.
+
+### 2026-10-23 10:22 +08:00 — Final secondary source gate
+
+- Group-detail route reuse now cancels the previous read and clears stale group/member scope; added a regression test. Final full gate passed: lint, strict typecheck, 25 files / 165 tests, production build and whitespace check. Committed-source browser evidence follows; real authenticated acceptance remains blocked by missing secure fixture configuration.
+
+### 2026-10-23 10:14 +08:00 — Resume audit and final rapid-delivery reconciliation
+- Recovered the interrupted secondary worktree unchanged. Original checkout and five already-pushed source branches preserved; no stashes or unpushed commits at resume. Admin origin/main still 1eb9427; API GitHub main still 810c8a1, verified read-only. No API/other agent repository writes.
+- Local API is now reachable: health 200/database ok; real unauthenticated G1 directories, Admin users/routes and G10 mapping surfaces correctly return 401. Added explicit --unauthenticated mode to the safe API runner, executed PARTIAL_PASS (6 checks); full authenticated mode remains BLOCKED before any login because no fixture credentials are configured. Earlier unavailable-runtime entries are historical, not the current gate.
+- Completed synthetic Chromium flows for directories, final transit direction creation/color/corridor/geometry, GPS lifecycle/mapping reload, account SPA reuse, G2 membership/report exports and default-unconfigured tracking. Desktop/mobile captures wait for drawer transitions; no page errors. Non-Admin sign-in rejects the session in the synthetic browser. Reports identify full source heads and sourceDirty; real integration is not inferred.
+- Source quality gates: PR #9 156 tests; final #10 176; #11 158; #12 167; #13 159; operational source 165. Each lint/typecheck/build passed. Production audit 0 vulnerabilities. Failed initial test/setup/browser harness attempts preserved in earlier activity; repaired, rerun and separated from final passes.
+- Target six accepted/completion-ready IDs is not met: no Tech Lead acceptance or real authenticated integration. Operator profile create/update, standalone geofence CRUD, actual B gateway/events/history/provider health and physical GPS remain explicit dependencies. Independent progress delivered for 56/60/63/67, plus 65/66 preparation.
+- Next: commit/rerun final secondary source, open PR, refresh consolidated evidence/PR descriptions, verify remote heads and clean worktrees; do not self-merge/deploy.
+
+### 2026-10-23 03:45 +08:00 — Expanded transit release gates passed
+- Final lint, strict app/spec typecheck, full Angular/Vitest maxWorkers:2 run: 24 files / 176 tests PASSED; production build 392.86 kB initial PASSED; diff check PASSED.
+- New direction form and explicit unused color suggestion now close independent route-management gaps. Retained missing-runner-config startup failure and stale old assertion failure as historical evidence; neither is counted as a passing run.
+- Push follow-up to existing PR #10, refresh browser evidence at committed source HEAD and rewrite PR description around final scope. No real authenticated API/persistence, geofence or hardware acceptance claim.
+
+### 2026-10-23 03:44 +08:00 — Direction creation and explicit color suggestion
+- Added guarded new-direction page from route detail: required metadata, default Draft, integer corridor, one LineString or Feature converted to geometry-only body, WGS84/finite/2–10000-vertex/1MiB bounds, draft guard, local/server duplicate-label handling and rejection retention. Uses only existing Admin POST /transit-routes/{id}/directions; no new API/shared contract.
+- Added optional unused palette color suggestion from current canonical route list. Never silently overwrites Admin input; Admin explicitly chooses suggested color. Route create/edit now locks across confirmation/write and rejects duplicate submission; immutable route code remains disabled after edit retry/cancellation.
+- Focused direction creation: 8 tests passed. Lint/typecheck/build passed. First full runner startup failed because the ignored local runner config had not been created in this worktree; created it and reran. Next full run had 175 pass / 1 stale baseline assertion rejecting the newly supported New direction link. Updated that assertion and outdated scope copy; full release gate rerunning. No final 176-test pass claimed yet.
+- Current PR #10 remains open; follow-up source uncommitted until gates pass. Other rapid-delivery PRs #9/#11/#12/#13 remain independent. Source/browser evidence will be refreshed at the final source head; no real API/hardware/completion claim.
+
+### 2026-10-23 03:42 +08:00 — Account detail release gates passed
+- Corrected missing provideRouter test setup. Focused 5 tests passed. Full rerun after browser load settled: lint, strict typecheck, 24 files / 159 tests and production build (392.86 kB initial) passed; diff check passed. Initial failed full run retained above/below as historical evidence.
+- Five added tests cover input reuse/read cancellation, duplicate status action, late response isolation and denied record actions. Existing auth/role/self-disable regressions stay intact; no token policy/backend change.
+- Submit focused ID 59 PR and run synthetic SPA route-reuse browser regression against committed production source. Real authenticated API remains blocked by runtime/fixture credentials; no accepted/completion-ready claim.
+
+### 2026-10-23 03:34 +08:00 — ID 59 account detail race correction
+- Inspection found OnInit-only detail loading: Angular reuse for another userId could keep the previous account visible. Late prior-account status responses could also replace the current record. These are UI defects, separate from external auth/provider gates.
+- Implemented input-driven reload, cancellation of previous read, clear old record/action error during load, captured ID lookup, status-response/error identity guard, and busy guard/disabled button across confirmation/write. API role/status semantics unchanged.
+- Added five regressions: reused input, canceled read, duplicate action, late status response, denial/error recovery. Initial full run failed because new test omitted provideRouter; fixed the test setup. Baseline timing failures/cascading TestBed failures retained as failed evidence. Lint/typecheck passed; corrected focused run pending. No real API/hardware acceptance claim.
+- Concurrent browser evidence in the separate secondary worktree is explicitly synthetic. Directory/transit/GPS/summary/default tracking flows have passed earlier runs; harness improvements add settled responsive layout and non-Admin login rejection. Source remains isolated and original Claude work untouched.
+
+### 2026-10-23 03:28 +08:00 — Secondary operational scope and acceptance runners
+- Implemented operational report with G1 directory server totals, complete permitted jeepney/group/route counts, explicit non-atomic read timestamp, CSV allowlist/formula-safe serializer and browser print/PDF. API and application DB readiness are checked separately from explicitly unmeasured Traccar/Bridge/device health; injected repository never certifies a real DB.
+- Implemented G2 group members, member-type filter, server pagination, distinct business IDs/assigned jeepney links, loading/empty/403/error/retry and scope cancellation. Updated group detail and dashboard navigation. No membership mutation, private user-ID guess or tracking availability inference.
+- Lint, strict typecheck, 25 files/164 tests and production build (393.02 kB initial) passed. New real API acceptance runner validates loopback fixtures, normal login/refresh/logout, Admin vs non-Admin reads/negative writes and G1/G2/G10/G11; no seeding/API repo writes. Syntax passed; actual run BLOCKED before any checks due missing URL/password. Earlier direct localhost:3000 probe failed to connect.
+- Added explicit synthetic browser harness to exercise production bundles and record source SHA/screenshots. First path-boundary check caught Windows slash normalization (fixed). Bundled Playwright Chromium/headless-shell binaries absent; no install/download done. Retrying with the installed Chrome binary using a temporary automated profile. No browser result claimed until actual success.
+- All four existing PRs remain OPEN; no autonomous merge/deploy. Primary six IDs cannot be labeled completion-ready without actual authenticated integration and G acceptance; operator profile/geofence APIs and B runtime are separate missing dependencies.
+
+### 2026-10-23 03:22 +08:00 — Tracking preparation release gates passed
+- `npm run lint`, `npm run typecheck`, full Angular/Vitest run with ignored local maxWorkers:2 runner config (24 files / 167 tests), `npm run build` (393.30 kB initial), and diff check PASSED.
+- Default provider remains null and production navigation unchanged. Admin-only direct preparation routes are implemented; synthetic records exist only in tests. Real B gateway/Pusher authorization, coalescing/poll adapter, historical events and actual map/provider/hardware acceptance remain future integration work.
+- Submit source for review without claiming IDs 65/66 operational or complete. PRs #9/#10/#11 remain separate review slices; no autonomous merge/deployment.
+
+### 2026-10-23 03:18 +08:00 — Proposal-driven Admin tracking screens
+- Read B gateway design pinned at 149cefc: complete bounded snapshots, per-vehicle decimal revisions, authoritative removals even with equal revision, invalidation-only events and scoped reauthorization. No released endpoint/DTO/auth signer exists; did not invent an API or connect to Traccar.
+- Added internal projection gateway token, default null, guarded `/tracking/live` and `/tracking/deviations` routes. Production navigation unchanged until integration. Null provider explicitly displays unavailable, never synthetic vehicles.
+- Map/deviation screens accept injected projections only; Philippines bounds from G6; current vs last-known/UNKNOWN labels, server-reported compliance, selection/fleet links, fresh complete replacements, superseded-request cancellation, reconnect refresh, expiry, scope-cap/duplicate/revision validation, 401/403 clears data and stops automatic retry, component timer/map cleanup.
+- Synthetic telemetry exists only in component tests. No Pusher key/signature, raw provider ID, private device credential, route-compliance calculation, event history or operational live-tracking claim.
+- Strict typecheck and 13 focused component tests PASSED. Full release gates running. Missing real gateway, API runtime and credentials remain exact blockers; physical GPS remains F/owner gate.
+
+### 2026-10-23 03:16 +08:00 — GPS quality gates passed after constrained rerun
+- `npm run typecheck` PASSED. Initial `npm test`: 157 passed / 1 failed due unchanged baseline directory test timing out at 5000ms under parallel load; all GPS tests passed. No source change or timeout increase was used to hide the failure.
+- Full rerun `node node_modules/@angular/cli/bin/ng.js test --watch=false --runner-config=.angular/rapid-vitest.config.mjs --reporters=dot`, ignored local config `{test:{maxWorkers:2}}`: 23 files / 158 tests PASSED. `npm run lint`, `npm run build` (392.86 kB initial) and diff check PASSED.
+- Contract matrix and acceptance row updated for merged G10. Mapping read failure is distinct from no mapping; unauthorized operations remain server-controlled. Submit for G review; real API credentials, service availability and physical evidence remain absent.
+- PR #9 directories and PR #10 transit are separate main-based slices; no autonomous merge/deploy.
+
+### 2026-10-23 03:04 +08:00 — Transit release gates passed
+- `npm run lint`, `npm run typecheck`, `npm test -- --include=...` (npm 10 consumed include flags; full suite ran), 23 files / 166 tests PASSED; `npm run build` PASSED (392.86 kB initial); `git diff --check` PASSED.
+- Submitting bounded IDs 61/62 changes for review. No authenticated API/browser persistence or real compliance-engine validation performed; no full completion-ready/acceptance claim. Mapping/geofence/tracking/provider/device gates remain separate.
+- Directory PR #9 remains independent from this main-based branch; canonical status snapshot/history will need ordinary reconciliation when Agent G merges either branch. No shared policy/history deleted.
+
+### 2026-10-23 03:03 +08:00 — GPS mapping re-read and workflow safety
+- Implemented G10 GET mapping after permitted request/fleet lists; confirmed null means unmapped, read failure hides all actions, successful mapping/conflict reconciles authoritative mapping on reload. Stored mapping survives a fresh visit; stale no-read-contract copy removed.
+- Added action/state guards, locks across confirmation and write, cancellation unlock, transition allowlist checks and invalid scheduling-date validation. Server still owns authorization/state transitions/activation; installer checkboxes never claim physical evidence.
+- Added component tests for fresh visit, exact mapping GET/read-after-write, read denial/failure and retry, duplicate writes, cancellation and 403. Existing approval/rejection/schedule/install/mapping/verification tests retained.
+- Typecheck passed; GPS full tests running. API probe failed to connect; no credential variables available. No real API/browser/hardware acceptance claimed.
+- Separate worktree/branch created from remote main; dependencies reused via ignored junction. No other repository writes or destructive Git commands.
+
+### 2026-10-23 03:01 +08:00 — Transit rapid-delivery implementation
+- Preserved original clean Claude checkout at 8138c9739756b9d922f824c64bc7383146775a0e; zero stashes/unpushed commits at audit. Recovered unfinished directory work in admin-takeover worktree, corrected Angular template type error and submitted PR #9 after lint, strict typecheck, 156 tests and build passed.
+- Separate worktree transit-corridor, branch codex/admin-corridor-impact from origin/main 1eb9427. Reuses installed dependency tree through an ignored junction; no other repository modified. Initial relative junction creation failed harmlessly, absolute target succeeded.
+- Implemented integer corridor 1–5000m persistence through existing direction PATCH. Fresh G11 impact GET required before confirmation for geometry/corridor, showing authoritative aggregate counts, snapshot limitation, no client precedence calculation. Impact 403/409/error blocks PATCH and preserves draft. Edit/duplicate-save locks preserved. D3 server 409 maps to the direction name field alongside request ID.
+- Tests added for validation/bounds, exact PATCH, cancelled confirmation, duplicate submit, impact denial/conflict/failure, destroy cancellation and concurrent D3 conflict. Strict typecheck/focused tests running, no acceptance result claimed yet.
+- Real API and browser tests pending credentials/setup; no operational tracking, physical GPS, merge or deployment claim.
+
+### 2026-10-23 02:55 +08:00 — G1 directory quality gates passed
+- Current directive VALRYDE-E-RAPID-DELIVERY-003 confirms Agent E/admin; the intervening Agent C directive is superseded.
+- `npm run lint`, `npm run typecheck`, `npm test`: 23 files / 156 tests, `npm run build`: 392.87 kB initial, and `git diff --check` passed on the recovered directory tree. Initial TS7053 test-compilation failure was fixed before rerun.
+- No actual browser, authenticated API or hardware acceptance claimed. Submit directory slice independently; IDs 57/58 remain READY_FOR_REVIEW, not accepted/completed.
+- Separate clean worktree `.worktrees/transit-corridor` created from origin/main for IDs 61/62; dependency junction points to the same exact installed lockfile tree. First relative junction attempt failed harmlessly; absolute junction succeeded. No source yet changed there.
+- Next: push/open directory PR for Agent G; implement corridor persistence/assignment-impact and GPS mapping re-read, then tracking adapters where contract permits.
+
+### 2026-10-23 02:54 +08:00 — Recovered directory implementation and verified merged contracts
+- Current user names this session Agent E. Re-ran all recovery commands, found original checkout clean at 8138c97, and existing isolated Codex branch at 1eb9427 with four modified and two untracked directory/status files. No stash or unpushed commit. Original checkout has no content difference from remote main. No open admin PR.
+- Preserved and continued recovered G1 work in `.worktrees/admin-takeover`; no destructive Git operations or changes to other repositories. Running Claude processes have no command-line reference to admin; no concurrent edits observed. Full process-level inactivity remains unprovable; takeover authorization and isolated checkout provide ownership boundary.
+- Verified API origin/main 810c8a1 matches GitHub main; local API main is stale. Source inspection only, no fetch/checkout/write in API repository. Full standalone Version 1.0 document and checklist remain unavailable; canonical API handoff supplies exact IDs/acceptance.
+- Changed: typed G1 adapters and operator/driver directory with server pagination/filtering, separate business/account statuses and IDs, counts, context links, explicit states, stale-request cancellation. Contract/acceptance docs updated.
+- Initial typecheck passed but Angular test compilation exposed TS7053 in Material row template. Fixed using typed badge accessor; lint now passes. Full tests/build still running. No browser/real API/hardware verification claimed.
+- Next: complete gates and open review PR, then remaining priority slices; no self-merge/deploy.
+
+### 2026-10-23 02:48 +08:00 — Emergency recovery and G1 adoption started
+- Audit: all directive Git commands ran. Original checkout `feat/62-67-independent-ui-closure` at `8138c97`, clean tracked/untracked state; zero stashes and unpushed commits; one original worktree. Eight local development/bootstrap branches preserved, all remote-backed and reachable from merged main. Local main behind remote main by five commits; original HEAD has no content diff from remote main. PR #8 merged at `1eb9427`.
+- Relevant ignored filenames only: `.claude/launch.json`, `.angular/` cache, `node_modules/`, `dist/`; no secret contents read. Existing tests/evidence preserved; no unfinished test edits.
+- Codex managed-worktree tool failed because chat cwd is the non-Git parent. Used native `git worktree add` within assigned repo, new branch `codex/admin-takeover-g1-g6` from origin/main; local Git exclude prevents nested worktree appearing untracked.
+- API reference main `810c8a1` matches GitHub. G1 directories, G2 memberships, G3/G4 assignments, G10 mapping reads, G11 impact and D3 now available. User requests G1–G6; merged implementation, rather than stale status prose, is authoritative.
+- Dependency setup: shell npm 10.9.1 `npm ci` failed on optional @emnapi entries. Retrying declared npm 11.6.2; lockfile unchanged.
+- Next: preserve server pagination, distinguish business/account IDs and statuses, expose returned assignment/group context; regression tests and PR for Agent G.
 
 ### 2026-10-23 09:30 +08:00 — Claude takeover round 2: PR #8 corrections E8-01 and E8-02
 

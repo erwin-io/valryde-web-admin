@@ -1,0 +1,144 @@
+{
+  "mode": "transit",
+  "state": "PASS",
+  "evidence": "SYNTHETIC_BROWSER_ONLY",
+  "sourceHead": "e315d1f682be61bd65b35b142727b0b312c64a6a",
+  "sourceDirty": false,
+  "checks": [
+    "Protected URL returns after synthetic Admin sign-in",
+    "Unused color suggestion preserves Admin choice until explicitly selected and saved",
+    "Direction creation from validated GeoJSON persists in canonical route re-read",
+    "Corridor impact confirmation and synthetic persistence after fresh read",
+    "MapLibre geometry canvas initializes",
+    "Commuter status confirmation and Admin self-disable guard",
+    "Synthetic authenticated non-Admin sign-in is rejected without storing a session"
+  ],
+  "pageErrors": [],
+  "requests": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes/00000000-0000-4000-8000-000000000006",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes/00000000-0000-4000-8000-000000000006/directions",
+      "method": "POST",
+      "status": 201
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/route-directions/00000000-0000-4000-8000-000000000005/assignment-impact",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/route-directions/00000000-0000-4000-8000-000000000005",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/00000000-0000-4000-8000-000000000002/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/logout",
+      "method": "POST",
+      "status": 204
+    }
+  ]
+}

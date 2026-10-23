@@ -1,0 +1,31 @@
+{
+  "base": "1eb94279f5670ad71078b2ec27ba117905a75898",
+  "manifest": [
+    {
+      "branch": "codex/admin-takeover-g1-g6",
+      "head": "7d190d5cbc60f9d471f5ccccb5fa37d1cb08fd35"
+    },
+    {
+      "branch": "codex/admin-account-detail-races",
+      "head": "03c3864349dec6a9d5d90e5134e43d27b1e666f5"
+    },
+    {
+      "branch": "codex/admin-corridor-impact",
+      "head": "e315d1f682be61bd65b35b142727b0b312c64a6a"
+    },
+    {
+      "branch": "codex/admin-gps-mapping-read",
+      "head": "cba601b7912558b3504afbe4620552c79818d66f"
+    },
+    {
+      "branch": "codex/admin-operational-summary",
+      "head": "c3fafa423ba8b6d45f54a87628ff1345279ae4b2"
+    },
+    {
+      "branch": "codex/admin-tracking-readiness",
+      "head": "423f31aff5bf082aa128ce08328e7eeb934be9cc"
+    }
+  ],
+  "srcSha256": "c9bc64b4dc336be2ca14049723182ccdb9500d31c18dc5a3518e7084a03e13c8",
+  "application": "Reviewed src/scripts patches only; all applied without conflict; documentation conflicts excluded; no branch merges"
+}

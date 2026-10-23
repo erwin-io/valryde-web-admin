@@ -1,0 +1,107 @@
+{
+  "mode": "summary",
+  "state": "PASS",
+  "evidence": "SYNTHETIC_BROWSER_ONLY",
+  "sourceHead": "dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514",
+  "sourceDirty": false,
+  "checks": [
+    "Protected URL returns after synthetic Admin sign-in",
+    "Counts CSV and component-specific health labels",
+    "G2 group membership rendered",
+    "Commuter status confirmation and Admin self-disable guard",
+    "Synthetic authenticated non-Admin sign-in is rejected without storing a session"
+  ],
+  "pageErrors": [],
+  "requests": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/operators",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/drivers",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/fleet-groups",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/transit-routes",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/fleet-groups",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/fleet-groups/00000000-0000-4000-8000-000000000009/members",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/00000000-0000-4000-8000-000000000002/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/logout",
+      "method": "POST",
+      "status": 204
+    }
+  ]
+}

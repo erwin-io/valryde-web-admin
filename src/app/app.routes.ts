@@ -91,6 +91,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/reports/transit-snapshot.page').then((m) => m.TransitSnapshotPage),
       },
+      {
+        path: 'system/reports/operations',
+        title: 'Operational snapshot · Valryde Admin',
+        loadComponent: () => import('./features/reports/operational-snapshot.page').then(m => m.OperationalSnapshotPage),
+      },
     ],
   },
   { path: '**', redirectTo: 'dashboard' },

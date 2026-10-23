@@ -76,8 +76,8 @@ interface AttentionItem {
     <section aria-labelledby="summary-title">
       <h2 id="summary-title">Operational summary</h2>
       <p class="muted">
-        Fleet, route, and live tracking summaries will appear here once their backend data contracts are
-        approved. No figures are estimated in the meantime.
+        <a routerLink="/system/reports/operations">View registered fleet/transit counts and API/database readiness.</a>
+        Live tracking summaries require the tracking gateway.
       </p>
     </section>
   `,
