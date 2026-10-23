@@ -1,0 +1,176 @@
+{
+  "mode": "gps",
+  "state": "PASS",
+  "evidence": "SYNTHETIC_BROWSER_ONLY",
+  "sourceHead": "cba601b7912558b3504afbe4620552c79818d66f",
+  "sourceDirty": false,
+  "checks": [
+    "Protected URL returns after synthetic Admin sign-in",
+    "Approve/schedule/install/map with read-after-write and fresh-visit mapping restoration",
+    "Commuter status confirmation and Admin self-disable guard",
+    "Synthetic authenticated non-Admin sign-in is rejected without storing a session"
+  ],
+  "pageErrors": [],
+  "requests": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "POST",
+      "status": 201
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/00000000-0000-4000-8000-000000000002/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/logout",
+      "method": "POST",
+      "status": 204
+    }
+  ]
+}

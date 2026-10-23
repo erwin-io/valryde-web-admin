@@ -1,0 +1,71 @@
+{
+  "mode": "identity",
+  "state": "PASS",
+  "evidence": "SYNTHETIC_BROWSER_ONLY",
+  "sourceHead": "03c3864349dec6a9d5d90e5134e43d27b1e666f5",
+  "sourceDirty": false,
+  "checks": [
+    "Protected URL returns after synthetic Admin sign-in",
+    "SPA account-route reuse loads the new identity and preserves self-disable guard",
+    "Commuter status confirmation and Admin self-disable guard",
+    "Synthetic authenticated non-Admin sign-in is rejected without storing a session"
+  ],
+  "pageErrors": [],
+  "requests": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/00000000-0000-4000-8000-000000000002/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/logout",
+      "method": "POST",
+      "status": 204
+    }
+  ]
+}

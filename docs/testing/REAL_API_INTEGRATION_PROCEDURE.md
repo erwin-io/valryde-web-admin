@@ -1,7 +1,7 @@
 # Real API Integration Procedure — Admin web
 
 **Purpose:** repeatable verification of the Admin web (IDs 56, 59 from PR #2; 60; 61 from PR #5; 63–64 from PR #6) against a real local `valryde-api`, replacing the synthetic stubs used so far.
-**State:** `BACKEND_FIXTURE_BLOCKED` — not yet run. Per Tech Lead direction (2026-10-22), test identities must come from **Agent A's approved development fixtures**, not owner-created accounts. Fixture PR #15 is open/mergeable at `be8d6d0` but is not on `valryde-api` `main` `827738c`. After it merges, its seed and cleanup instructions supersede the manual reference below.
+**State:** `AUTHENTICATED_ACCEPTANCE_BLOCKED` as of rapid-delivery verification. Agent A fixtures and G1/G2/G10/G11/D3 are merged on API main `810c8a13356ddbf0e28a4faf5ad7f86ce0a30479`. The remaining gate is a running, isolated, already-seeded local API and temporary fixture credentials; On resume localhost:3000 returned health 200/database ok and five protected surfaces returned unauthenticated 401. Credential environment variables remain absent; no real authenticated tests have passed in this session.
 **Never** run this against production, a shared database, or real user records.
 
 ## 1. Preconditions (owner/operator)
@@ -32,14 +32,32 @@ npm run dev
 
 Check `http://127.0.0.1:3000/api/health` returns `{"status":"ok","database":"ok"}`.
 
-## 3. Test accounts (local database only)
+## 3. Approved fixture accounts
 
-Use Agent A's development fixtures once approved; the steps below are the current manual reference from Agent A's handoff and are superseded by the fixtures.
+Use only Agent A's already-seeded isolated development fixtures. Follow the merged API `docs/development/DEVELOPMENT_FIXTURES.md`; do not bootstrap unrelated accounts or run against shared/production data. Agent E does not modify, seed, migrate or start another agent's repository in this session. The fixture password is supplied at seed time and is not committed or known to the UI repository.
 
-- **A1 (first Admin):** `npm run admin:bootstrap` with `ADMIN_BOOTSTRAP_EMAIL`, `ADMIN_BOOTSTRAP_DISPLAY_NAME`, `ADMIN_BOOTSTRAP_PASSWORD`, `ADMIN_BOOTSTRAP_CONFIRM=CREATE_FIRST_ADMIN` set as temporary shell variables (never in `.env`). Works only on an empty Admin set.
-- **U1:** `POST /api/auth/register` with role `COMMUTER`, then verify through Mailpit (`http://127.0.0.1:8025`) and `POST /api/auth/verify-email`.
-- **A2 (optional, for cases 9–10):** there is no API to grant `ADMIN`; the owner decides whether a second local Admin is created and how. Skip cases 9–10 otherwise.
+The automated real API runner uses `dev.admin@valryde.test` and `dev.commuter@valryde.test` by default, ordinary login/refresh/logout and bearer tokens. Tokens stay in memory. It logs check names and HTTP statuses only, never credentials or response bodies. Loopback and reserved fixture account restrictions are enforced. Rejected self-disable, unauthorized writes, invalid geometry/corridor and duplicate-label operations are negative tests; positive lifecycle/persistence remains separate browser/API acceptance.
 
+```powershell
+$env:VALRYDE_E2E_API_URL = 'http://127.0.0.1:3000'
+$env:VALRYDE_E2E_PASSWORD = Read-Host 'Temporary fixture password' -MaskInput
+try { node scripts/admin-api-acceptance.mjs }
+finally { Remove-Item Env:VALRYDE_E2E_PASSWORD -ErrorAction SilentlyContinue }
+```
+
+A missing configuration produces `BLOCKED` before any test, not a pass. Missing required workflow fixtures produces `INCOMPLETE`, not full acceptance. The runner never seeds fixtures or touches the API repository.
+
+## Synthetic browser regression
+
+`scripts/admin-ui-smoke.cjs` serves the chosen production bundle on an ephemeral loopback port and intercepts API requests with explicit synthetic responses. Scenarios: `directory`, `transit`, `gps`, `identity`, `summary`, `tracking`. It exercises real forms, dialogs, routing, guards, responsive layout and non-Admin rejection, but it does not test the real backend or hardware.
+
+Make Playwright available through the local tooling environment or set `VALRYDE_PLAYWRIGHT_MODULE` to its installed module directory. Set `VALRYDE_BROWSER_EXECUTABLE` to an installed Chromium/Chrome executable when bundled browser binaries are unavailable. `VALRYDE_BROWSER_WORKSPACE` selects an assigned admin worktree with a completed production build. The runner refuses workspaces outside this repository. No browser install or personal browser profile is required.
+
+```powershell
+node scripts/admin-ui-smoke.cjs directory
+```
+
+Reports/screenshots in `docs/testing/evidence/2026-10-23-rapid-delivery` explicitly identify synthetic evidence, full tested source HEAD and whether source files were dirty. Mobile captures wait for drawer layout to settle. These are regression evidence, not authenticated integration acceptance. Exact tested heads and source limitations are listed in the evidence README.
 ## 4. Start Valryde Admin (Agent E or operator, in `valryde-web-admin`)
 
 ```bash
@@ -73,11 +91,11 @@ Record pass/fail, time, and request IDs only. Use browser DevTools → Network t
 | 17 | ID 61 | Create route `ZZ-TEST-1` (test-only code), then open it | `POST /api/admin/transit-routes` 201; detail shows Draft; list re-read includes it |
 | 18 | ID 61 | Create `ZZ-TEST-1` again | `409 CONFLICT` shown on the route-code field; values kept |
 | 19 | ID 61 | Edit the test route name and status → Inactive | Only changed fields in the PATCH body; confirmation shown; detail re-read shows the change |
-| 20 | ID 61 | On a route with ≥ 2 directions, rename one to the other's label | Blocked client-side; no PATCH sent (Agent A D3 would return 500) |
+| 20 | ID 61 | On a route with ≥ 2 directions, rename one to the other's label | Blocked client-side; a concurrent duplicate from another tab returns merged D3 `409 CONFLICT` and retains values |
 | 21 | ID 64 | As U1 (Operator), submit a vehicle application for a test jeepney; as A1 approve it | Review PATCH 200; status re-read Approved; jeepney status updated by server |
 | 22 | ID 64 | Approve the same application again from a second stale tab | `409 CONFLICT`; page re-reads and shows the existing decision |
 | 23 | ID 63–64 | As U1 request GPS setup; as A1 approve, schedule (date), mark installed | Each transition confirmed and re-read; invalid transition attempts return 409 |
-| 24 | ID 63 | Map a test device (test IMEI/serial/Traccar ID only) | 201; mapping shown once; repeating with the same IMEI → `409 DEVICE_MAPPING_CONFLICT` |
+| 24 | ID 63 | Map a test device (test IMEI/serial/Traccar ID only) | 201; mapping re-read through G10 on reload; repeating with the same IMEI → `409 DEVICE_MAPPING_CONFLICT` |
 | 25 | ID 63 | Verify with one check failing, then with all four passing | First → Failed; second → Verified and jeepney Active. Physical device reporting is **not** proven by this; that is a hardware gate |
 | 26 | RBAC | Repeat any Admin write with U1's token (DevTools) | `403 FORBIDDEN`; nothing changes |
 
@@ -88,3 +106,5 @@ Test data for cases 17–25 must use obviously synthetic values (route codes sta
 - Save sanitized screenshots (test addresses only) under `docs/testing/evidence/<date>-real-api/`.
 - Update the acceptance matrix and `docs/agent-status/AGENT_E_STATUS.md` with the results and the `valryde-api` SHA used.
 - Remove or disable the local test accounts afterwards if the database is not disposable.
+
+Read-only boundary smoke: `node scripts/admin-api-acceptance.mjs --unauthenticated`. A `PARTIAL_PASS` means only health and unauthenticated 401 checks ran; it is never authenticated or checklist acceptance.

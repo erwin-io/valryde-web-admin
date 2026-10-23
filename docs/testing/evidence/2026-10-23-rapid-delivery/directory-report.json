@@ -1,0 +1,88 @@
+{
+  "mode": "directory",
+  "state": "PASS",
+  "evidence": "SYNTHETIC_BROWSER_ONLY",
+  "sourceHead": "e33baf46950a3e2b1011ca4cad2b9b3f6efad497",
+  "sourceDirty": false,
+  "checks": [
+    "Protected URL returns after synthetic Admin sign-in",
+    "G1 server counts and business/account link",
+    "Operator deep link filters Driver directory and displays assignment/group",
+    "Directory 403 displays permission state",
+    "Commuter status confirmation and Admin self-disable guard",
+    "Synthetic authenticated non-Admin sign-in is rejected without storing a session"
+  ],
+  "pageErrors": [],
+  "requests": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/operators",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/drivers",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/drivers",
+      "method": "GET",
+      "status": 403
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/drivers",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/00000000-0000-4000-8000-000000000002/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/logout",
+      "method": "POST",
+      "status": 204
+    }
+  ]
+}

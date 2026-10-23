@@ -41,7 +41,7 @@
           <dt>Operator</dt>
           <dd>
             Operator record <code>{{ g.operatorId }}</code>
-            <span class="unavailable note-line">Name not available until the operator directory API exists.</span>
+            <a class="note-line" routerLink="/fleet/operators">View operator directory</a>
           </dd>
           <dt>Created</dt>
           <dd>{{ g.createdAt | date: 'medium' }}</dd>
@@ -52,13 +52,13 @@
         </dl>
       </section>
 
+      <app-group-members [groupId]="g.id" />
       <aside class="contract-gate details" aria-labelledby="gate-title">
         <mat-icon aria-hidden="true">lock_clock</mat-icon>
         <div>
-          <h2 id="gate-title">Members not available yet</h2>
+          <h2 id="gate-title">Route and tracking context</h2>
           <p>
-            The drivers and jeepneys in this group, and any route assigned to it, are not shown. The current API
-            has no read endpoint for group membership or group route assignment.
+            Open a jeepney record to view its effective route. Live tracking status requires the authorized tracking gateway.
           </p>
         </div>
       </aside>
