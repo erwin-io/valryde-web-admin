@@ -9,7 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import * as maplibregl from 'maplibre-gl';
 import { GeoJSONSource, LngLatBounds, Map, MapMouseEvent, Marker, StyleSpecification } from 'maplibre-gl';
-import { filter, finalize, of, switchMap } from 'rxjs';
+import { filter, finalize, switchMap } from 'rxjs';
 
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
 import { HasUnsavedChanges } from '../../shared/forms/unsaved-changes.guard';
@@ -249,25 +249,17 @@ export class GeometryEditorPage implements OnInit, OnDestroy, HasUnsavedChanges 
     if (this.saving() || !direction || !route || !this.dirty() || !this.validation().valid) return;
 
     const submitted = clonePositions(this.positions());
-    const confirmation: ConfirmDialogData | null = direction.status === 'ACTIVE' || route.status === 'ACTIVE'
-      ? {
-          title: 'Save commuter-visible route line?',
-          message:
-            'This direction or its route is Active. The canonical route line changes immediately. Assignment-specific impact cannot be listed because that read contract is not available.',
-          confirmLabel: 'Save route line',
-        }
-      : null;
-    const confirmed$ = confirmation
-      ? this.dialog
-          .open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, { data: confirmation })
-          .afterClosed()
-          .pipe(filter((confirmed) => confirmed === true))
-      : of(true);
-
     this.saveProblem.set(null);
     this.setSaving(true);
-    confirmed$
+    this.service.assignmentImpact(direction.id)
       .pipe(
+        switchMap(({ impact }) => this.dialog
+          .open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, { data: {
+            title: 'Save canonical route line?',
+            message: `${direction.status === 'ACTIVE' || route.status === 'ACTIVE' ? 'This direction or its route is Active. ' : ''}Server preview: ${impact.affectedJeepneyCount} affected jeepneys; ${impact.activeDirectAssignmentCount} active direct assignments; ${impact.activeGroupAssignmentCount} active group assignments. The canonical line changes immediately. This is a current snapshot; assignments can change before saving.`,
+            confirmLabel: 'Save route line',
+          } }).afterClosed()),
+        filter((confirmed) => confirmed === true),
         switchMap(() => this.service.updateDirection(direction.id, { geometry: asLineString(submitted) })),
         // Runs on success, failure, cancelled confirmation, and destroy (takeUntilDestroyed unsubscribes).
         finalize(() => this.setSaving(false)),

@@ -94,7 +94,7 @@ describe('transit route pages', () => {
       expect(el.querySelector(`a[href="/transit/directions/${direction().id}/edit"]`)).not.toBeNull();
       expect(el.querySelector(`a[href="/transit/directions/${direction().id}/geometry"]`)).not.toBeNull();
       expect(el.querySelector('.contract-gate')?.textContent).toContain('Geometry scope is intentionally bounded');
-      expect(text(f)).not.toMatch(/add direction|new direction/i);
+      expect(el.querySelector(`a[href="/transit/routes/${transitRoute().id}/directions/new"]`)).not.toBeNull();
     });
 
     it('explains a route without directions or description', async () => {

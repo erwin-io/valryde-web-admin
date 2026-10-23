@@ -65,3 +65,15 @@ Agent B consumes canonical route direction/corridor data for tracking compliance
 - Approved external basemap style URL, tile-provider privacy terms, hosting CSP and attribution.
 - Tech Lead acceptance of the generic active-route warning while G11 remains open.
 - Separate corridor persistence, direction-creation, and assignment-impact product decisions.
+
+## Rapid-delivery update — API origin/main 810c8a1
+
+The current directive VALRYDE-E-RAPID-DELIVERY-003 authorizes corridor persistence and assignment-impact adoption. Prior gate statements below describe the historical foundation.
+
+- Edit corridor in direction details: integer 1–5,000 metres; unchanged fields are omitted from PATCH.
+- Before every geometry/corridor save, `GET /api/admin/route-directions/{id}/assignment-impact?page=1&pageSize=20` supplies total affected jeepneys and direct/group assignment counts. Totals come from the server and are not inferred from the bounded page. The confirmation identifies this as a current snapshot, not a transaction lock.
+- A denied, conflicting or failed preview prevents saving and retains the draft. Confirmation cancellation and component destruction release edit locks; duplicate submits are rejected.
+- D3 concurrent rename conflicts return `409 CONFLICT` and are shown at the name field with request ID; local uniqueness validation remains a convenience.
+- No standalone geofence read/write contract exists. Map style/bounds remain unchanged; no provider, tracking threshold, geometry authority or backend change.
+
+Direction creation is now implemented through the existing POST contract from route detail. The creation form accepts one validated LineString/Feature with metadata/corridor, creates Draft directions and preserves input after 403/409. Route colors offer an optional unused palette candidate from the current list; the Admin explicitly chooses it. No uniqueness lock or geofence API is implied.

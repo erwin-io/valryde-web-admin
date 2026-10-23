@@ -77,11 +77,20 @@
           </mat-form-field>
           <input
             type="color"
+            [disabled]="saving()"
             aria-label="Pick route color"
             [value]="form.controls.routeColorHex.valid ? form.controls.routeColorHex.value : '#000000'"
             (input)="setColor($any($event.target).value)"
           />
         </div>
+          <div>
+            <button mat-button type="button" (click)="suggestColor()" [disabled]="suggestingColor() || saving()">Suggest unused color</button>
+            @if (suggestedColor(); as color) {
+              <p>Suggested unused color: <code>{{ color }}</code>. This reflects the current route list; Admin chooses the final color.</p>
+              <button mat-button type="button" (click)="setColor(color)" [disabled]="saving()">Use suggested color</button>
+            }
+            @if (colorProblem(); as p) { <p role="alert">Color suggestion unavailable. {{ p.message }} @if (p.requestId) { ({{ p.requestId }}) }</p> }
+          </div>
 
         @if (isEdit()) {
           <mat-form-field appearance="outline">

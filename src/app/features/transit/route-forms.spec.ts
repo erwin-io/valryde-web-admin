@@ -58,6 +58,24 @@ describe('transit forms', () => {
       return f;
     }
 
+    it('suggests an unused color without silently changing the Admin choice', async () => {
+      const f = await newForm();
+      const page = f.componentInstance as unknown as { suggestColor(): void; setColor(color: string): void };
+      setValue(f, 'routeColorHex', '#123456'); page.suggestColor();
+      http.expectOne(LIST).flush({ routes: [transitRoute({ routeColorHex: '#006b67' })] });
+      await f.whenStable(); expect(text(f)).toContain('#1E88E5');
+      const input = (f.nativeElement as HTMLElement).querySelector<HTMLInputElement>('[formcontrolname="routeColorHex"]')!;
+      expect(input.value).toBe('#123456'); page.setColor('#1E88E5'); await f.whenStable(); expect(input.value).toBe('#1E88E5');
+    });
+
+    it('guards duplicate route creation and preserves entered values after failure', async () => {
+      const f = await newForm(); setValue(f, 'routeCode', 'NEW'); setValue(f, 'publicName', 'New route');
+      await submit(f); await submit(f);
+      http.expectOne(LIST).flush(apiError('FORBIDDEN', 'Denied', 'req-route'), { status: 403, statusText: 'Forbidden' });
+      await f.whenStable(); expect(text(f)).toContain('req-route');
+      expect((f.nativeElement as HTMLElement).querySelector<HTMLInputElement>('[formcontrolname="publicName"]')!.value).toBe('New route');
+    });
+
     it('blocks invalid input without calling the API', async () => {
       const f = await newForm();
       setValue(f, 'routeColorHex', 'green');
@@ -189,7 +207,7 @@ describe('transit forms', () => {
       return f;
     }
 
-    it('blocks a duplicate label on the same route before calling the API (Agent A D3 returns 500)', async () => {
+    it('blocks a duplicate label on the same route before calling the API', async () => {
       const f = await directionForm();
       setValue(f, 'directionLabel', 'Southbound');
       await submit(f);
@@ -197,7 +215,7 @@ describe('transit forms', () => {
       http.expectNone(`/api/admin/route-directions/${north.id}`);
     });
 
-    it('patches only changed metadata and never sends geometry or corridor', async () => {
+    it('patches only changed metadata and omits unchanged geometry and corridor', async () => {
       const f = await directionForm();
       setValue(f, 'originName', ' Bulacao Terminal ');
       await submit(f);
@@ -226,6 +244,76 @@ describe('transit forms', () => {
     it('shows not-found for an unknown direction', async () => {
       const f = await directionForm('missing');
       expect(text(f)).toContain('Record not found');
+    });
+
+    it.each(['', '0', '5001', '12.5'])('rejects invalid corridor %s before requesting impact or saving', async value => {
+      const f = await directionForm();
+      setValue(f, 'corridorM', value);
+      await submit(f);
+      expect(text(f)).toContain('Enter a whole number');
+      http.expectNone(r => r.url.includes('assignment-impact') || r.method === 'PATCH');
+    });
+
+    function preview() {
+      const req = http.expectOne(r => r.url.endsWith('/assignment-impact'));
+      expect(req.request.params.get('page')).toBe('1');
+      req.flush({ impact: { routeDirectionId: north.id, activeDirectAssignmentCount: 2,
+        activeGroupAssignmentCount: 3, affectedJeepneyCount: 42, affectedJeepneys: [] },
+        pagination: { page: 1, pageSize: 20, total: 42, totalPages: 3 } });
+    }
+
+    it('confirms server totals before persisting a corridor-only patch', async () => {
+      const f = await directionForm();
+      setValue(f, 'corridorM', '150');
+      await submit(f);
+      http.expectNone(`/api/admin/route-directions/${north.id}`);
+      preview();
+      expect(dialogOpen.mock.calls[0][1].data.message).toContain('42 affected jeepneys');
+      expect(dialogOpen.mock.calls[0][1].data.message).toContain('100 m to 150 m');
+      const req = http.expectOne(`/api/admin/route-directions/${north.id}`);
+      expect(req.request.body).toEqual({ corridorM: 150 });
+      req.flush({ direction: direction({ corridorM: 150 }) });
+      await f.whenStable();
+      expect(navigate).toHaveBeenCalled();
+    });
+
+    it('keeps the corridor draft after cancelled confirmation and blocks duplicate submissions', async () => {
+      const f = await directionForm();
+      setValue(f, 'corridorM', '5000');
+      confirm = false;
+      await submit(f);
+      await submit(f);
+      preview();
+      await f.whenStable();
+      http.expectNone(`/api/admin/route-directions/${north.id}`);
+      expect((f.componentInstance as DirectionFormPage).hasUnsavedChanges()).toBe(true);
+      expect((f.nativeElement as HTMLElement).querySelector<HTMLInputElement>('[formcontrolname="corridorM"]')!.disabled).toBe(false);
+    });
+
+    it.each([403, 409, 500])('keeps corridor unsaved when impact returns %s', async status => {
+      const f = await directionForm();
+      setValue(f, 'corridorM', '150');
+      await submit(f);
+      http.expectOne(r => r.url.endsWith('/assignment-impact')).flush(apiError(
+        status === 409 ? 'ROUTE_ASSIGNMENT_CONFLICT' : 'FORBIDDEN', 'Preview unavailable', 'req-preview'),
+        { status, statusText: 'Failure' });
+      await f.whenStable();
+      http.expectNone(`/api/admin/route-directions/${north.id}`);
+      expect(text(f)).toContain('req-preview');
+      expect((f.componentInstance as DirectionFormPage).hasUnsavedChanges()).toBe(true);
+    });
+
+    it('maps a concurrent D3 server duplicate-label 409 to the name field and retains the draft', async () => {
+      const f = await directionForm();
+      setValue(f, 'directionLabel', 'New name');
+      await submit(f);
+      http.expectOne(`/api/admin/route-directions/${north.id}`).flush(
+        apiError('CONFLICT', 'Direction label already exists for this route', 'req-d3'),
+        { status: 409, statusText: 'Conflict' });
+      await f.whenStable();
+      expect(text(f)).toContain('Another direction on this route already uses this name');
+      expect(text(f)).toContain('req-d3');
+      expect((f.componentInstance as DirectionFormPage).hasUnsavedChanges()).toBe(true);
     });
   });
 });

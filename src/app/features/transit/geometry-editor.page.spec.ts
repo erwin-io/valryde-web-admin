@@ -8,6 +8,7 @@ import { Observable, Subject, of } from 'rxjs';
 import { apiError, direction, transitRoute } from '../../../testing/fixtures';
 import { Position } from './geometry-editor.utils';
 import { GEOMETRY_MAP_ENABLED, GeometryEditorPage } from './geometry-editor.page';
+import { TransitService } from './transit.service';
 
 const LIST = '/api/admin/transit-routes';
 const PATCH = `/api/admin/route-directions/${direction().id}`;
@@ -32,6 +33,11 @@ describe('GeometryEditorPage', () => {
       ],
     });
     http = TestBed.inject(HttpTestingController);
+    vi.spyOn(TestBed.inject(TransitService), 'assignmentImpact').mockReturnValue(of({
+      impact: { routeDirectionId: direction().id, activeDirectAssignmentCount: 2,
+        activeGroupAssignmentCount: 1, affectedJeepneyCount: 5, affectedJeepneys: [] },
+      pagination: { page: 1, pageSize: 20, total: 5, totalPages: 1 },
+    }));
     fixture = TestBed.createComponent(GeometryEditorPage);
     fixture.componentRef.setInput('directionId', direction().id);
     await fixture.whenStable();
@@ -40,6 +46,36 @@ describe('GeometryEditorPage', () => {
   });
 
   afterEach(() => http.verify());
+
+  it('reads fresh assignment impact before any PATCH and fails closed on a conflict', async () => {
+    vi.mocked(TestBed.inject(TransitService).assignmentImpact).mockRestore();
+    page().selectedIndex.set(1);
+    page().nudgeSelected(0.001, 0);
+    page().save();
+    const req = http.expectOne(r => r.url === `${PATCH}/assignment-impact`);
+    expect(req.request.params.get('pageSize')).toBe('20');
+    expect(page().saving()).toBe(true);
+    http.expectNone(PATCH);
+    req.flush(apiError('ROUTE_ASSIGNMENT_CONFLICT', 'Ambiguous inherited assignments', 'req-impact'), {
+      status: 409, statusText: 'Conflict',
+    });
+    await fixture.whenStable();
+    expect(page().dirty()).toBe(true);
+    expect(page().saving()).toBe(false);
+    expect(page().saveProblem()?.message).toContain('Ambiguous');
+    http.expectNone(PATCH);
+  });
+
+  it('cancels a pending impact preview on destroy', () => {
+    vi.mocked(TestBed.inject(TransitService).assignmentImpact).mockRestore();
+    page().selectedIndex.set(1);
+    page().nudgeSelected(0.001, 0);
+    page().save();
+    const req = http.expectOne(r => r.url === `${PATCH}/assignment-impact`);
+    fixture.destroy();
+    expect(req.cancelled).toBe(true);
+    http.expectNone(PATCH);
+  });
 
   const page = () => fixture.componentInstance as unknown as {
     positions: () => Position[];

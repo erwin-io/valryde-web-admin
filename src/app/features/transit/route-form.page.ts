@@ -18,7 +18,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
-import { Observable, filter, of, switchMap } from 'rxjs';
+import { Observable, filter, finalize, of, switchMap } from 'rxjs';
 
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
 import { HasUnsavedChanges } from '../../shared/forms/unsaved-changes.guard';
@@ -76,6 +76,9 @@ export class RouteFormPage implements OnInit, HasUnsavedChanges {
   protected readonly saveProblem = signal<ApiProblem | null>(null);
   protected readonly saving = signal(false);
   protected readonly original = signal<AdminTransitRoute | null>(null);
+  protected readonly suggestingColor = signal(false);
+  protected readonly suggestedColor = signal<string | null>(null);
+  protected readonly colorProblem = signal<ApiProblem | null>(null);
   private saved = false;
 
   protected readonly form = inject(NonNullableFormBuilder).group({
@@ -149,11 +152,27 @@ export class RouteFormPage implements OnInit, HasUnsavedChanges {
   }
 
   protected setColor(value: string): void {
+    if (this.saving()) return;
     this.form.controls.routeColorHex.setValue(value.toUpperCase());
     this.form.controls.routeColorHex.markAsDirty();
   }
 
+  protected suggestColor(): void {
+    if (this.suggestingColor() || this.saving()) return;
+    this.suggestingColor.set(true); this.colorProblem.set(null); this.suggestedColor.set(null);
+    this.service.listRoutes().pipe(finalize(() => this.suggestingColor.set(false)), takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: routes => {
+        const used = new Set(routes.map(route => route.routeColorHex.toUpperCase()));
+        this.suggestedColor.set(['#006B67', '#1E88E5', '#D81B60', '#8E24AA', '#F4511E', '#5E35B1', '#00897B', '#6D4C41']
+          .find(color => !used.has(color)) ?? null);
+        if (!this.suggestedColor()) this.snackBar.open('All suggested palette colors are in use. Choose a color manually.', 'Dismiss', { duration: 5000 });
+      },
+      error: (error: unknown) => this.colorProblem.set(toApiProblem(error)),
+    });
+  }
+
   protected submit(): void {
+    if (this.saving()) return;
     this.saveProblem.set(null);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -165,6 +184,7 @@ export class RouteFormPage implements OnInit, HasUnsavedChanges {
 
     const confirmation =
       route && patch.status ? statusChangeConfirmation('route', route.routeCode, route.status, patch.status) : null;
+    this.saving.set(true); this.form.disable();
     const confirmed$: Observable<unknown> = confirmation
       ? this.dialog
           .open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, { data: confirmation })
@@ -175,8 +195,11 @@ export class RouteFormPage implements OnInit, HasUnsavedChanges {
     confirmed$
       .pipe(
         switchMap(() => {
-          this.saving.set(true);
           return route ? this.service.updateRoute(route.id, patch) : this.create();
+        }),
+        finalize(() => {
+          this.saving.set(false);
+          if (this.form.disabled) this.enableForm();
         }),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -205,10 +228,16 @@ export class RouteFormPage implements OnInit, HasUnsavedChanges {
 
   private onSaveError(problem: ApiProblem): void {
     this.saving.set(false);
+    this.enableForm();
     if (problem.status === 409 && !this.isEdit()) {
       this.form.controls.routeCode.setErrors({ duplicate: true });
       this.form.controls.routeCode.markAsTouched();
     }
     this.saveProblem.set(problem);
+  }
+
+  private enableForm(): void {
+    this.form.enable();
+    if (this.isEdit()) this.form.controls.routeCode.disable();
   }
 }

@@ -37,6 +37,24 @@ export interface AdminTransitRoute extends TransitRoute {
   directions: RouteDirection[];
 }
 
+/** G11, merged API main 810c8a1; counts and precedence are server-owned. */
+export interface AssignmentImpactResponse {
+  impact: {
+    routeDirectionId: string;
+    activeDirectAssignmentCount: number;
+    activeGroupAssignmentCount: number;
+    affectedJeepneyCount: number;
+    affectedJeepneys: {
+      jeepneyId: string;
+      plateNo: string;
+      source: 'DIRECT' | 'GROUP';
+      assignmentId: string;
+      groupId: string | null;
+    }[];
+  };
+  pagination: { page: number; pageSize: number; total: number; totalPages: number };
+}
+
 /** POST /admin/transit-routes body. `routeCode` is immutable after creation. */
 export interface CreateRouteInput {
   routeCode: string;
@@ -44,6 +62,9 @@ export interface CreateRouteInput {
   description?: string;
   routeColorHex: string;
 }
+
+export type CreateDirectionInput = Pick<RouteDirection,
+  'directionLabel' | 'originName' | 'destinationName' | 'geometry' | 'corridorM'>;
 
 /** PATCH /admin/transit-routes/{id}: at least one field. */
 export type UpdateRouteInput = Partial<{
