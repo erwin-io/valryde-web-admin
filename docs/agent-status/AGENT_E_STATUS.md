@@ -2,16 +2,16 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23T10:14:28+08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T10:26:00+08:00
 - Agent / module: E — Admin Web, Codex; VALRYDE-E-RAPID-DELIVERY-003.
 - Repository/workspace: erwin-io/valryde-web-admin; C:/Development/valryde/valryde-web-admin. Source slices are isolated under .worktrees/.
-- Branch / HEAD SHA: codex/admin-operational-summary from 1eb94279f5670ad71078b2ec27ba117905a75898; final implementation/evidence commit pending. Full remote heads for existing slices below.
+- Branch / HEAD SHA: codex/admin-operational-summary from 1eb94279f5670ad71078b2ec27ba117905a75898; tested implementation dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514; final evidence is a documentation-only follow-up. Tested implementation heads for existing slices below.
 - Checklist IDs: primary 57/58/59/61/62/64; secondary progress 56/60/63/67 plus 65/66 preparation.
-- GitHub PRs: #9 directories e33baf46950a3e2b1011ca4cad2b9b3f6efad497; #10 transit e315d1f682be61bd65b35b142727b0b312c64a6a; #11 GPS cba601b7912558b3504afbe4620552c79818d66f; #12 tracking preparation 423f31aff5bf082aa128ce08328e7eeb934be9cc; #13 account races 03c3864349dec6a9d5d90e5134e43d27b1e666f5 OPEN. Operational summary PR next.
+- GitHub PRs: #9 directories e33baf46950a3e2b1011ca4cad2b9b3f6efad497; #10 transit e315d1f682be61bd65b35b142727b0b312c64a6a; #11 GPS cba601b7912558b3504afbe4620552c79818d66f; #12 tracking preparation 423f31aff5bf082aa128ce08328e7eeb934be9cc; #13 account races 03c3864349dec6a9d5d90e5134e43d27b1e666f5 OPEN. Operational summary PR is being published from codex/admin-operational-summary.
 - Implementation progress: READY_FOR_REVIEW for independently testable slices. Target six accepted/completion-ready checklist items NOT MET; authenticated acceptance, missing contracts and G review prevent that claim.
 - Tech Lead decision: pending for all new PRs; do not label checklist items Completed or self-assign ACCEPTED/OPERATOR-GATED.
 - Current objective: submit final operational summary/G2 membership/evidence PR and hand all six unmerged source slices to G.
-- Last confirmed result: each source slice passed lint, strict typecheck, full unit suite and build. Counts: directories 156, final transit 176, GPS 158, tracking 167, account races 159, secondary summary 165 (counts include shared baseline and must not be summed as unique tests). Synthetic browser scenarios passed at 1440x900/375x812 with no page errors. Operational summary source will be rerun at committed head.
+- Last confirmed result: each source slice passed lint, strict typecheck, full unit suite and build. Counts: directories 156, final transit 176, GPS 158, tracking 167, account races 159, secondary summary 165 (counts include shared baseline and must not be summed as unique tests). Synthetic browser scenarios passed at 1440x900/375x812 with no page errors. Operational summary browser rerun passed at committed dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514, sourceDirty false.
 - Live verification on resume: localhost:3000 health 200/database ok; unauthenticated operators, drivers, Admin users, Admin routes and G10 mapping read all 401. Full authenticated runner BLOCKED before login because fixture password/source not provided. No private response bodies or credentials logged.
 - Next action: Agent G review/merge; provide already-seeded isolated API fixture credentials through a secure local source, then run real authenticated and positive lifecycle/persistence acceptance. Backend/gateway/hardware gates below remain.
 - Recovery: original Claude checkout untouched/clean at 8138c9739756b9d922f824c64bc7383146775a0e; recovered unfinished G1 source/tests/status reused. No initial stashes/unpushed commits. Seven linked worktrees preserve original plus six Codex slices. No destructive Git operations, branch deletion, stash application, force push, other-repository writes, self-merge or deployment.
@@ -40,7 +40,7 @@ No new ID is legitimately marked Completed from this batch. Review-ready source 
 | Command / check | Environment | Result | Date/time | Evidence / notes |
 |---|---|---|---|---|
 | Rapid directories / transit / GPS / tracking / identity / secondary source gates | Windows Node v24.19.0; npm/Angular; pinned lockfile | PASSED | 2026-10-23 | Full suites 156 / 176 / 158 / 167 / 159 / 165 respectively; lint/typecheck/build pass; do not sum shared tests |
-| Synthetic browser regression at 1440x900 and 375x812 | Installed Chrome, temporary profile; all API responses explicitly synthetic | PASSED | 2026-10-23 | Per-scenario source SHA, dirty flag, checks and screenshots in rapid-delivery evidence; summary will be refreshed after source commit |
+| Synthetic browser regression at 1440x900 and 375x812 | Installed Chrome, temporary profile; all API responses explicitly synthetic | PASSED | 2026-10-23 | Per-scenario source SHA, dirty flag, checks and screenshots in rapid-delivery evidence; summary refreshed at committed dcb5d6d, sourceDirty false |
 | Real read-only API health and unauthenticated boundaries | localhost:3000, no credentials or writes | PARTIAL_PASS | 2026-10-23 10:12 +08:00 | Health 200/database ok; 5 protected surfaces 401; no authenticated acceptance claim |
 | node scripts/admin-api-acceptance.mjs (full mode) | Missing fixture configuration | BLOCKED / NOT_RUN | 2026-10-23 | No tests/login ran; needs secure fixture password and explicit API URL |
 | npm audit --omit=dev --audit-level=high | Current unchanged lockfile | PASSED | 2026-10-23 | 0 production vulnerabilities |

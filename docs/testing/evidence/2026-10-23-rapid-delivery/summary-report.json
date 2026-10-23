@@ -2,8 +2,8 @@
   "mode": "summary",
   "state": "PASS",
   "evidence": "SYNTHETIC_BROWSER_ONLY",
-  "sourceHead": "1eb94279f5670ad71078b2ec27ba117905a75898",
-  "sourceDirty": true,
+  "sourceHead": "dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514",
+  "sourceDirty": false,
   "checks": [
     "Protected URL returns after synthetic Admin sign-in",
     "Counts CSV and component-specific health labels",

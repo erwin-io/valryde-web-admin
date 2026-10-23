@@ -13,7 +13,7 @@ Each source slice passed Angular lint, strict app/spec typecheck, a full unit/co
 | G10 mapping reconciliation and GPS action guards | [11](https://github.com/erwin-io/valryde-web-admin/pull/11) | `cba601b7912558b3504afbe4620552c79818d66f` | 158 |
 | Tracking/deviation adapter preparation | [12](https://github.com/erwin-io/valryde-web-admin/pull/12) | `423f31aff5bf082aa128ce08328e7eeb934be9cc` | 167 |
 | Account-detail scope/response races | [13](https://github.com/erwin-io/valryde-web-admin/pull/13) | `03c3864349dec6a9d5d90e5134e43d27b1e666f5` | 159 |
-| Operational report, component health and G2 members | Separate operational-summary PR | See `summary-report.json` after the committed-source rerun | 165 |
+| Operational report, component health and G2 members | Operational-summary PR | `dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514` | 165 |
 
 The constrained full runs used an ignored local `.angular/rapid-vitest.config.mjs` containing `export default { test: { maxWorkers: 2 } };`:
 
