@@ -2,28 +2,28 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23 09:30 +08:00
-- Agent / module: E — Administrative Web Development / Valryde Admin
-- Repository: `valryde-web-admin`
-- Branch / implementation SHA: `feat/62-67-independent-ui-closure` (PR #8) from `2c6a4f2`; E8-01/E8-02 correction commit follows this record
-- Checklist IDs: 56–67
-- GitHub issues / PRs: PRs #1–#7 merged. [PR #8](https://github.com/erwin-io/valryde-web-admin/pull/8) is open for final independent UI closure. No issue assigned.
-- Implementation progress: READY_FOR_REVIEW
-- Tech Lead review decision (if actually issued): PRs #1–#7 merged. PR #8: CHANGES REQUIRED by Agent G (E8-01 save concurrency, E8-02 canvas clarity) — corrected, awaiting re-review. Production acceptance remains OPERATOR-GATED.
-- Current objective: `AGENT_E_PR8_GEOMETRY_CORRECTED_READY_FOR_REVIEW`.
-- Last confirmed result: E8-01/E8-02 corrected. Clean `npm ci` (npm 11.6.2, Node v24.15.0); lint, strict app/spec typecheck, 23 files / 154 tests, production build, prod audit 0, diff check and Markdown links pass; browser acceptance at 1440×900, 768×1024, 375×812 against a synthetic stub.
-- Next concrete action: Agent G re-review of PR #8; owner/upstream agents resolve backend, tracking, basemap-provider and hardware gates.
-- Blocked by / decision owner: Real authenticated API evidence still requires an approved Admin fixture/credentials. G1/G2/G3/G10/G11 and D3 belong to Agent A; IDs 65–66 and tracking/health/history contracts belong to Agent B; hardware and physical verification remain Agent F/owner gates.
-- Execution agent: Claude (takeover round 2, `VALRYDE-CLAUDE-E-TAKEOVER-ROUND2-001`, sole active Agent E owner); Codex paused. Codex takeover history preserved.
-- Dependencies / affected agents: Agent A (auth/RBAC/domain APIs), Agent B (tracking/latest state/realtime/compliance), Agent F (GPS runbooks and hardware evidence), Agent G (contract/review governance).
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T10:57:00+08:00
+- Agent / module: E — Administrative Web Development; current user explicitly confirms Agent E.
+- Repository: `erwin-io/valryde-web-admin`
+- Branch / HEAD SHA: `codex/admin-takeover-g1-g6`; tested application source `e33baf46950a3e2b1011ca4cad2b9b3f6efad497`; Rapid 004 acceptance tooling follow-up.
+- Checklist IDs: 57, 58 first; retain existing 56–67 coverage below.
+- GitHub issues / PRs: #9–#14 open; all individually mergeable with GitGuardian success at Rapid 004 audit. G review pending. Consolidated history/coverage remains in PR #14.
+- Implementation progress: READY_FOR_REVIEW (G1 directory slice); remaining rapid-delivery scope in progress.
+- Tech Lead review decision: no decision on this new slice; existing acceptance gates remain.
+- Current objective: VALRYDE-CODEX-UI-EMERGENCY-TAKEOVER-002; recover safely and adopt merged API contracts.
+- Last confirmed result: lint, strict app/spec typecheck, all 156 tests (23 files), production build (392.87 kB initial), and diff check passed for G1 directory slice. Authenticated/browser acceptance pending.
+- Next concrete action: finish verification and submit IDs 57–58 G1 directory PR; continue route/GPS contract adoption.
+- Blocked by / decision owner: full Version 1.0 documentation and standalone 71-item checklist unavailable in assigned repo; approved API Agent E handoff supplies scope. Real API, physical GPS and deployment acceptance remain owner gates.
+- Execution agent: Codex under current user takeover directive. Claude desktop processes exist; no process command line referencing this admin repository observed. Admin-session inactivity cannot be conclusively established from process inventory; original checkout preserved and development isolated in `.worktrees/admin-takeover`.
+- Dependencies / affected agents: A contracts read-only, B tracking, F hardware, G review/merge. No other repository modified.
 
 ## Checklist coverage
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
 |---:|---|---|---|---|
 | 56 | Admin Login & Dashboard | READY_FOR_REVIEW | Shell/auth, safe return URLs, session/401/RBAC tests, dashboard pending-work counts and synthetic browser flow | Real Admin login BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
-| 57 | Operator Management | READY_FOR_REVIEW (merged `075b377`) | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | Fleet context gated on Agent A G1 |
-| 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | Assignment/membership gated on Agent A G1/G2 |
+| 57 | Operator Management | READY_FOR_REVIEW (merged `075b377`) | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | G1 directory/counts implemented in current Codex slice; real API and Tech Lead acceptance pending |
+| 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | G1 operator/assignment/group context implemented in current Codex slice; real API and Tech Lead acceptance pending |
 | 59 | Commuter User Monitoring | READY_FOR_REVIEW (merged `fc55582`; production acceptance operator-gated) | User Accounts list (search, role/status filters, sort, pagination), detail, enable/disable with confirmation and self-disable guard; `src/app/features/identity`; unit tests + security review fixes S1–S3 | Tech Lead review; real-API check is an owner gate |
 | 60 | Jeepney & Fleet Group Monitoring | READY_FOR_REVIEW (merged `812bbab`) | Read-only `/fleet/jeepneys`, `/fleet/jeepneys/:id` (with effective route), `/fleet/groups`, `/fleet/groups/:id`; `src/app/features/fleet/{fleet.models,fleet.service,jeepney-*,group-*}`; unit tests | Membership/driver/operator names gated on Agent A G1–G3; create/edit is a later slice |
 | 61 | Official Transit Route & Direction Management | READY_FOR_REVIEW (merged `8018e88`; regression rerun) | Route list/detail/create/edit, direction metadata/status editor, geometry entry link; expanded 146-test suite | Agent A D3 duplicate direction-label conflict semantics |
@@ -104,6 +104,43 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 11:07 +08:00 — Real browser runner source review
+
+- Corrected prepared real-browser logout to open the actual user menu and select its menuitem; added actual reload/refresh-restoration check. Node syntax and missing-credential path passed; no authenticated browser run or new application source change. Credential entry remains operator-interactive only.
+
+### 2026-10-23 10:57 +08:00 — Rapid 004 directory acceptance preparation
+
+- Added real G1 API/browser runners and masked PowerShell launcher; all credentials are current-process-only. No credential files read, no seed or positive business mutation. Missing credentials report CREDENTIALS_NOT_CONFIGURED before login. Both missing-credential paths and Node/PowerShell syntax checked.
+- Fresh lint, strict typecheck, full 23-file/156-test suite, production build (392.87 kB) and production dependency audit (0 findings) passed. Browser/API authenticated assertions are prepared but NOT RUN.
+- LOCAL_API_CONNECTED: approved runtime checkout HEAD 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; Node processes reference runtime; health 200/database ok, five unauthenticated protected boundaries 401. Running service revision/database name not attested by health. Tech Lead approved interactive masked fixture-password input; credential source absent in process.
+- PR dependency audit: all six based on current frontend main 1eb9427, zero behind, no dependency/config changes. Shared status all six; matrices #9/#11; disjoint route insertions #12/#14. #13 is a behavioral follow-up for account lifecycle reached through #9. No merges/deployments or other repository writes.
+
+### 2026-10-23 02:55 +08:00 — G1 directory quality gates passed
+- Current directive VALRYDE-E-RAPID-DELIVERY-003 confirms Agent E/admin; the intervening Agent C directive is superseded.
+- `npm run lint`, `npm run typecheck`, `npm test`: 23 files / 156 tests, `npm run build`: 392.87 kB initial, and `git diff --check` passed on the recovered directory tree. Initial TS7053 test-compilation failure was fixed before rerun.
+- No actual browser, authenticated API or hardware acceptance claimed. Submit directory slice independently; IDs 57/58 remain READY_FOR_REVIEW, not accepted/completed.
+- Separate clean worktree `.worktrees/transit-corridor` created from origin/main for IDs 61/62; dependency junction points to the same exact installed lockfile tree. First relative junction attempt failed harmlessly; absolute junction succeeded. No source yet changed there.
+- Next: push/open directory PR for Agent G; implement corridor persistence/assignment-impact and GPS mapping re-read, then tracking adapters where contract permits.
+
+
+### 2026-10-23 02:54 +08:00 — Recovered directory implementation and verified merged contracts
+- Current user names this session Agent E. Re-ran all recovery commands, found original checkout clean at 8138c97, and existing isolated Codex branch at 1eb9427 with four modified and two untracked directory/status files. No stash or unpushed commit. Original checkout has no content difference from remote main. No open admin PR.
+- Preserved and continued recovered G1 work in `.worktrees/admin-takeover`; no destructive Git operations or changes to other repositories. Running Claude processes have no command-line reference to admin; no concurrent edits observed. Full process-level inactivity remains unprovable; takeover authorization and isolated checkout provide ownership boundary.
+- Verified API origin/main 810c8a1 matches GitHub main; local API main is stale. Source inspection only, no fetch/checkout/write in API repository. Full standalone Version 1.0 document and checklist remain unavailable; canonical API handoff supplies exact IDs/acceptance.
+- Changed: typed G1 adapters and operator/driver directory with server pagination/filtering, separate business/account statuses and IDs, counts, context links, explicit states, stale-request cancellation. Contract/acceptance docs updated.
+- Initial typecheck passed but Angular test compilation exposed TS7053 in Material row template. Fixed using typed badge accessor; lint now passes. Full tests/build still running. No browser/real API/hardware verification claimed.
+- Next: complete gates and open review PR, then remaining priority slices; no self-merge/deploy.
+
+
+### 2026-10-23 02:48 +08:00 — Emergency recovery and G1 adoption started
+- Audit: all directive Git commands ran. Original checkout `feat/62-67-independent-ui-closure` at `8138c97`, clean tracked/untracked state; zero stashes and unpushed commits; one original worktree. Eight local development/bootstrap branches preserved, all remote-backed and reachable from merged main. Local main behind remote main by five commits; original HEAD has no content diff from remote main. PR #8 merged at `1eb9427`.
+- Relevant ignored filenames only: `.claude/launch.json`, `.angular/` cache, `node_modules/`, `dist/`; no secret contents read. Existing tests/evidence preserved; no unfinished test edits.
+- Codex managed-worktree tool failed because chat cwd is the non-Git parent. Used native `git worktree add` within assigned repo, new branch `codex/admin-takeover-g1-g6` from origin/main; local Git exclude prevents nested worktree appearing untracked.
+- API reference main `810c8a1` matches GitHub. G1 directories, G2 memberships, G3/G4 assignments, G10 mapping reads, G11 impact and D3 now available. User requests G1–G6; merged implementation, rather than stale status prose, is authoritative.
+- Dependency setup: shell npm 10.9.1 `npm ci` failed on optional @emnapi entries. Retrying declared npm 11.6.2; lockfile unchanged.
+- Next: preserve server pagination, distinguish business/account IDs and statuses, expose returned assignment/group context; regression tests and PR for Agent G.
+
 
 ### 2026-10-23 09:30 +08:00 — Claude takeover round 2: PR #8 corrections E8-01 and E8-02
 
