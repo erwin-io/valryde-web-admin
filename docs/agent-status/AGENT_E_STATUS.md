@@ -2,18 +2,18 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23T03:34:00+08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T15:13:00+08:00
 - Agent / module: E — Admin Web; Codex; VALRYDE-E-RAPID-DELIVERY-003.
 - Repository: erwin-io/valryde-web-admin.
-- Branch / HEAD SHA: codex/admin-account-detail-races, base 1eb94279f5670ad71078b2ec27ba117905a75898, working changes.
+- Branch / HEAD SHA: codex/admin-account-detail-races; see PR #13 for current pushed HEAD.
 - Checklist IDs: 59 (also protects account lifecycle entry for 57).
-- GitHub issues / PRs: #9 directories, #10 transit, #11 GPS, #12 tracking preparation OPEN; no acceptance on new changes.
+- GitHub issues / PRs: #9 directories, #10 transit, #11 GPS, #12 tracking preparation, #13 account races OPEN; authenticated acceptance pending.
 - Implementation progress: READY_FOR_REVIEW (account detail correction).
 - Tech Lead review decision: pending.
-- Current objective: fix route-reused account detail, stale list/status responses and duplicate confirmation/write actions.
-- Last confirmed result: corrected focused five-test run passed, followed by lint, strict typecheck, full 24-file/159-test suite, production build (392.86 kB initial) and diff check. Initial setup/timing failures are preserved in history. Synthetic SPA browser check pending committed source; real API remains blocked.
-- Next concrete action: finish identity tests/build and synthetic SPA route-reuse browser regression; submit focused PR and exact acceptance evidence.
-- Blocked by / decision owner: real API unavailable at localhost:3000 and temporary fixture credentials absent. Authenticated acceptance remains blocked; user was asked for API URL/secure credential source without secrets. Operator profile editing/geofence API and actual B gateway remain absent; physical GPS/deployment are external gates.
+- Current objective: prevent duplicate account-status actions on the user list while #9 authenticated acceptance remains operator-gated.
+- Last confirmed result: list-status duplicate-action regression passed (10 focused tests); lint, strict typecheck, 24-file/160-test suite, production build (392.86 kB initial), and diff check passed. Earlier results remain in the activity log.
+- Next concrete action: push #13 update for review; operator runs existing PR #9 masked launcher for authenticated acceptance.
+- Blocked by / decision owner: local API health and unauthenticated boundaries reachable, but no fixture credentials configured. Authenticated acceptance remains pending; operator profile editing/geofence API and actual B gateway remain absent; physical GPS/deployment are external gates.
 - Recovery/ownership: original clean Claude checkout at 8138c97 preserved; zero initial stashes/unpushed commits. Recovered unfinished G1 files in isolated worktree. Seven linked worktrees now preserve separate E feature slices; no other repo modified. No admin-referencing Claude command line/concurrent edit observed; process-level inactivity unprovable.
 - Dependencies: API origin/main read-only at 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; B proposed gateway; F physical evidence; G review/merge. Standalone baseline DOCX/checklist unavailable; canonical E handoff reviewed.
 ## Checklist coverage
@@ -103,6 +103,11 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 15:13 +08:00 — User-list account-status race correction
+- Prevented overlapping confirmation dialogs and PATCH requests while an account status action is pending, and rejected stale row actions after an account status changes. A pending action disables row menus and the menu mutation entry. No API or authorization contract changed.
+- Focused user-list tests: 10/10. Lint, app/spec TypeScript, full 24-file/160-test suite, production build (392.86 kB initial), and `git diff --check`: passed. Authenticated acceptance remains pending fixture credentials; existing masked launcher in PR #9 is the sole operator path.
+- Checklist 59 remains READY_FOR_REVIEW and acceptance pending; PR #13 is the review vehicle. Next: push commit and request substantive review.
 
 ### 2026-10-23 03:42 +08:00 — Account detail release gates passed
 - Corrected missing provideRouter test setup. Focused 5 tests passed. Full rerun after browser load settled: lint, strict typecheck, 24 files / 159 tests and production build (392.86 kB initial) passed; diff check passed. Initial failed full run retained above/below as historical evidence.

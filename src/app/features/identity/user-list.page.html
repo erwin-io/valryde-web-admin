@@ -112,6 +112,7 @@
               <button
                 mat-icon-button
                 type="button"
+                [disabled]="actionBusy()"
                 [matMenuTriggerFor]="rowMenu"
                 [matMenuTriggerData]="{ user }"
                 [attr.aria-label]="'Actions for ' + user.displayName"
@@ -135,7 +136,7 @@
       <mat-icon>visibility</mat-icon> View details
     </a>
     @if (statusChange.canChange(user)) {
-      <button mat-menu-item type="button" (click)="changeStatus(user)">
+      <button mat-menu-item type="button" [disabled]="actionBusy()" (click)="changeStatus(user)">
         <mat-icon>{{ user.status === 'ACTIVE' ? 'block' : 'check_circle' }}</mat-icon>
         {{ user.status === 'ACTIVE' ? 'Disable account' : 'Enable account' }}
       </button>

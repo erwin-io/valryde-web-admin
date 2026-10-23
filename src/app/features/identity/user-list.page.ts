@@ -22,6 +22,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
 import { PublicUser, ROLES } from '../../core/auth/auth.models';
@@ -80,6 +81,7 @@ export class UserListPage {
   protected readonly state = signal<LoadState>('loading');
   protected readonly problem = signal<ApiProblem | null>(null);
   protected readonly actionProblem = signal<ApiProblem | null>(null);
+  protected readonly actionBusy = signal(false);
   protected readonly users = signal<PublicUser[]>([]);
   protected readonly filters = signal<UserFilters>(EMPTY_FILTERS);
   protected readonly filtered = computed(() => filterUsers(this.users(), this.filters()));
@@ -134,10 +136,15 @@ export class UserListPage {
   }
 
   protected changeStatus(user: PublicUser): void {
+    if (this.state() !== 'ready' || this.actionBusy() || !this.statusChange.canChange(user)) return;
+    const current = this.users().find((candidate) => candidate.id === user.id);
+    if (!current || current.status !== user.status) return;
+
+    this.actionBusy.set(true);
     this.actionProblem.set(null);
     this.statusChange
       .confirmAndApply(user)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(finalize(() => this.actionBusy.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updated) =>
           this.users.update((users) => users.map((u) => (u.id === updated.id ? updated : u))),
