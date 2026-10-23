@@ -58,4 +58,27 @@ describe('Create canonical direction', () => {
     await fixture.whenStable(); expect(text()).toContain('You do not have permission');
     expect((fixture.nativeElement as HTMLElement).querySelector('form')).toBeNull();
   });
+  it('clears the old route and draft when the router reuses the create page', async () => {
+    await ready(); values();
+    const nextRoute = transitRoute({ id: 'route-next', routeCode: 'NEXT' });
+    fixture.componentRef.setInput('routeId', nextRoute.id);
+    await fixture.whenStable();
+    expect(text()).toContain('Loading route');
+    page().submit();
+    http.expectNone(`${LIST}/${nextRoute.id}/directions`);
+    expect(fixture.componentInstance.hasUnsavedChanges()).toBe(false);
+    http.expectOne(LIST).flush({ routes: [transitRoute(), nextRoute] });
+    await fixture.whenStable();
+    expect(text()).toContain('NEXT');
+    expect((fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>('[formcontrolname="directionLabel"]')!.value).toBe('');
+  });
+  it('cancels an old parent-route read before applying a new route ID', async () => {
+    const old = http.expectOne(LIST);
+    fixture.componentRef.setInput('routeId', 'route-next');
+    await fixture.whenStable();
+    expect(old.cancelled).toBe(true);
+    http.expectOne(LIST).flush({ routes: [transitRoute({ id: 'route-next', routeCode: 'NEXT' })] });
+    await fixture.whenStable();
+    expect(text()).toContain('NEXT');
+  });
 });

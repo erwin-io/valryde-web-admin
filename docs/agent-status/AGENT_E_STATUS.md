@@ -2,7 +2,7 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23T03:01:00+08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T16:08:00+08:00
 - Agent / module: E — Admin Web; Codex, VALRYDE-E-RAPID-DELIVERY-003.
 - Repository: erwin-io/valryde-web-admin.
 - Branch / HEAD SHA: codex/admin-corridor-impact; base 1eb94279f5670ad71078b2ec27ba117905a75898, working changes.
@@ -11,7 +11,7 @@
 - Implementation progress: READY_FOR_REVIEW (transit slice); overall rapid-delivery batch in progress.
 - Tech Lead review decision: no decision on new rapid-delivery slices; no new acceptance claimed.
 - Current objective: finish direction creation, explicit unused-color suggestion, corridor persistence, G11 confirmation and D3 conflict handling. PR #10 open; current follow-up changes under verification.
-- Last confirmed result: final expanded transit lint, strict app/spec typecheck, full 176 tests (24 files), production build (392.86 kB initial) and diff check passed, including direction creation and unused color suggestion. Earlier startup/stale-assertion failures preserved in activity history.
+- Last confirmed result: route-ID reuse correction passed focused 10/10 tests, lint, strict typecheck, production build and diff check. A concurrent full run passed 167 tests but failed 11 unrelated GPS detail tests after one timeout; no new full-suite pass claimed.
 - Next concrete action: finish transit verification/PR, GPS mapping re-read and tracking preparation; authenticated acceptance when fixture credentials are available.
 - Blocked by / decision owner: no authenticated fixture credentials provided; geofence API absent; tracking REST/Pusher DTOs are proposed/unreleased; physical GPS and deployment are owner gates. Full standalone Version 1.0 document/checklist unavailable; exact API Agent E handoff reviewed.
 - Execution ownership: current user confirms E. Original checkout unchanged; no admin-referencing Claude command line/concurrent edit observed; process-level inactivity cannot be conclusively proven.
@@ -103,6 +103,10 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 16:08 +08:00 — Direction creation route identity correction
+- Reused create-page navigation now cancels an old route read, clears its draft and context, and blocks creation until the requested route has loaded. Added two identity regressions. Focused 10/10 tests, lint, typecheck, build and diff check passed.
+- The accidentally unfiltered full suite had an unrelated GPS detail test timeout followed by TestBed cascade: 167 passed, 11 failed. The route-create spec passed in isolation; no full-suite pass asserted for this change.
 
 ### 2026-10-23 03:45 +08:00 — Expanded transit release gates passed
 - Final lint, strict app/spec typecheck, full Angular/Vitest maxWorkers:2 run: 24 files / 176 tests PASSED; production build 392.86 kB initial PASSED; diff check PASSED.

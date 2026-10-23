@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { Subscription, finalize } from 'rxjs';
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
 import { HasUnsavedChanges } from '../../shared/forms/unsaved-changes.guard';
 import { PageHeader } from '../../shared/ui/page-header';
@@ -56,10 +56,11 @@ import { TransitService } from './transit.service';
     }
   `,
 })
-export class DirectionCreatePage implements OnInit, HasUnsavedChanges {
+export class DirectionCreatePage implements HasUnsavedChanges {
   private readonly service = inject(TransitService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
+  private request?: Subscription;
   readonly routeId = input.required<string>();
   protected readonly route = signal<AdminTransitRoute | null>(null);
   protected readonly state = signal<'loading' | 'ready' | 'error' | 'denied' | 'not-found'>('loading');
@@ -75,17 +76,28 @@ export class DirectionCreatePage implements OnInit, HasUnsavedChanges {
     corridorM: [100, [Validators.required, Validators.min(1), Validators.max(5000), Validators.pattern(/^\d+$/)]],
     geojson: ['', [Validators.required, Validators.maxLength(MAX_GEOJSON_BYTES)]],
   });
-  ngOnInit(): void { this.load(); }
+  constructor() {
+    effect(() => {
+      const routeId = this.routeId();
+      untracked(() => {
+        this.saved = false;
+        this.geometryProblem.set(null);
+        this.form.reset({ directionLabel: '', originName: '', destinationName: '', corridorM: 100, geojson: '' });
+        this.load(routeId);
+      });
+    });
+  }
   hasUnsavedChanges(): boolean { return this.form.dirty && !this.saved; }
-  protected load(): void {
-    this.state.set('loading'); this.problem.set(null);
-    this.service.listRoutes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: routes => { const route = routes.find(r => r.id === this.routeId()) ?? null; this.route.set(route); this.state.set(route ? 'ready' : 'not-found'); },
+  protected load(routeId = this.routeId()): void {
+    this.request?.unsubscribe();
+    this.state.set('loading'); this.problem.set(null); this.route.set(null);
+    this.request = this.service.listRoutes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: routes => { const route = routes.find(r => r.id === routeId) ?? null; this.route.set(route); this.state.set(route ? 'ready' : 'not-found'); },
       error: (error: unknown) => { const p = toApiProblem(error); this.problem.set(p); this.state.set(p.status === 403 ? 'denied' : 'error'); },
     });
   }
   protected submit(): void {
-    if (this.saving() || this.state() !== 'ready' || !this.route()) return;
+    if (this.saving() || this.state() !== 'ready' || !this.route() || this.route()!.id !== this.routeId()) return;
     this.problem.set(null); this.geometryProblem.set(null);
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     const v = this.form.getRawValue();
@@ -101,12 +113,13 @@ export class DirectionCreatePage implements OnInit, HasUnsavedChanges {
       this.form.controls.geojson.setErrors({ geometry: true }); this.form.controls.geojson.markAsTouched(); return;
     }
     this.saving.set(true); this.form.disable();
-    this.service.createDirection(this.routeId(), { directionLabel: v.directionLabel.trim(), originName: v.originName.trim(),
+    const routeId = this.routeId();
+    this.service.createDirection(routeId, { directionLabel: v.directionLabel.trim(), originName: v.originName.trim(),
       destinationName: v.destinationName.trim(), corridorM: v.corridorM, geometry }).pipe(
       finalize(() => { this.saving.set(false); if (this.form.disabled) this.form.enable(); }),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
-      next: () => { this.saved = true; void this.router.navigate(['/transit/routes', this.routeId()]); },
+      next: () => { this.saved = true; void this.router.navigate(['/transit/routes', routeId]); },
       error: (error: unknown) => {
         this.form.enable(); const p = toApiProblem(error); this.problem.set(p);
         if (p.status === 409 && p.code === 'CONFLICT') { this.form.controls.directionLabel.setErrors({ duplicate: true }); this.form.controls.directionLabel.markAsTouched(); }
