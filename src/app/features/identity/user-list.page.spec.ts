@@ -4,7 +4,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 
 import { apiError, user } from '../../../testing/fixtures';
 import { AuthService } from '../../core/auth/auth.service';
@@ -22,9 +22,13 @@ describe('UserListPage', () => {
   let fixture: ComponentFixture<UserListPage>;
   let http: HttpTestingController;
   let confirm: boolean;
+  let dialogResult: Observable<boolean> | null;
+  let dialogOpens: number;
 
   beforeEach(() => {
     confirm = true;
+    dialogResult = null;
+    dialogOpens = 0;
     TestBed.configureTestingModule({
       imports: [UserListPage],
       providers: [
@@ -32,7 +36,10 @@ describe('UserListPage', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: AuthService, useValue: { user: signal(me) } },
-        { provide: MatDialog, useValue: { open: () => ({ afterClosed: () => of(confirm) }) } },
+        { provide: MatDialog, useValue: { open: () => {
+          dialogOpens++;
+          return { afterClosed: () => dialogResult ?? of(confirm) };
+        } } },
       ],
     });
     http = TestBed.inject(HttpTestingController);
@@ -112,6 +119,32 @@ describe('UserListPage', () => {
     req.flush({ user: { ...operator, status: 'DISABLED' } });
     await fixture.whenStable();
     expect(el().querySelectorAll('tr.mat-mdc-row')[1].textContent).toContain('Disabled');
+  });
+
+  it('prevents duplicate confirmation and writes while a status change is pending', async () => {
+    await load();
+    const confirmation = new Subject<boolean>();
+    dialogResult = confirmation;
+
+    component().changeStatus(operator);
+    component().changeStatus(operator);
+    expect(dialogOpens).toBe(1);
+    confirmation.next(true);
+    confirmation.complete();
+
+    component().changeStatus(operator);
+    expect(dialogOpens).toBe(1);
+    const request = http.expectOne(`/api/admin/users/${operator.id}/status`);
+    request.flush({ user: { ...operator, status: 'DISABLED' } });
+    await fixture.whenStable();
+
+    // The stale row cannot reverse the completed operation; the updated row can.
+    component().changeStatus(operator);
+    expect(dialogOpens).toBe(1);
+    dialogResult = of(false);
+    component().changeStatus({ ...operator, status: 'DISABLED' });
+    expect(dialogOpens).toBe(2);
+    http.expectNone(`/api/admin/users/${operator.id}/status`);
   });
 
   it('sends nothing when the confirmation is cancelled', async () => {

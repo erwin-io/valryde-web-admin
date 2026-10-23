@@ -2,20 +2,20 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23T10:57:00+08:00
-- Agent / module: E — Administrative Web Development; current user explicitly confirms Agent E.
-- Repository: `erwin-io/valryde-web-admin`
-- Branch / HEAD SHA: `codex/admin-takeover-g1-g6`; tested application source `e33baf46950a3e2b1011ca4cad2b9b3f6efad497`; Rapid 004 acceptance tooling follow-up.
-- Checklist IDs: 57, 58 first; retain existing 56–67 coverage below.
-- GitHub issues / PRs: #9–#14 open; all individually mergeable with GitGuardian success at Rapid 004 audit. G review pending. Consolidated history/coverage remains in PR #14.
-- Implementation progress: READY_FOR_REVIEW (G1 directory slice); remaining rapid-delivery scope in progress.
-- Tech Lead review decision: no decision on this new slice; existing acceptance gates remain.
-- Current objective: VALRYDE-CODEX-UI-EMERGENCY-TAKEOVER-002; recover safely and adopt merged API contracts.
-- Last confirmed result: lint, strict app/spec typecheck, all 156 tests (23 files), production build (392.87 kB initial), and diff check passed for G1 directory slice. Authenticated/browser acceptance pending.
-- Next concrete action: finish verification and submit IDs 57–58 G1 directory PR; continue route/GPS contract adoption.
-- Blocked by / decision owner: full Version 1.0 documentation and standalone 71-item checklist unavailable in assigned repo; approved API Agent E handoff supplies scope. Real API, physical GPS and deployment acceptance remain owner gates.
-- Execution agent: Codex under current user takeover directive. Claude desktop processes exist; no process command line referencing this admin repository observed. Admin-session inactivity cannot be conclusively established from process inventory; original checkout preserved and development isolated in `.worktrees/admin-takeover`.
-- Dependencies / affected agents: A contracts read-only, B tracking, F hardware, G review/merge. No other repository modified.
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T15:56:00+08:00
+- Agent / module: E — Admin Web; Codex; VALRYDE-E-RAPID-DELIVERY-003.
+- Repository: erwin-io/valryde-web-admin.
+- Branch / HEAD SHA: codex/admin-account-detail-races; stacked on PR #9 for review, see PR #13 for pushed HEAD.
+- Checklist IDs: 58 and 59 (account lifecycle entry also supports 57).
+- GitHub issues / PRs: #9 directories, #10 transit, #11 GPS, #12 tracking preparation, #13 account races OPEN; authenticated acceptance pending.
+- Implementation progress: READY_FOR_REVIEW (account detail correction).
+- Tech Lead review decision: pending.
+- Current objective: review PR #9 G1 directories first, then PR #13 account lifecycle correction; authenticated acceptance remains operator-gated.
+- Last confirmed result: combined #9/#13 source passed lint, strict typecheck, 24-file/162-test suite and production build (392.87 kB initial). Authenticated acceptance is pending.
+- Next concrete action: verify merged #9/#13 source, push stacked #13 for review; operator runs existing PR #9 masked launcher for authenticated acceptance.
+- Blocked by / decision owner: local API health and unauthenticated boundaries reachable, but no fixture credentials configured. Authenticated acceptance remains pending; operator profile editing/geofence API and actual B gateway remain absent; physical GPS/deployment are external gates.
+- Recovery/ownership: original clean Claude checkout at 8138c97 preserved; zero initial stashes/unpushed commits. Recovered unfinished G1 files in isolated worktree. Seven linked worktrees now preserve separate E feature slices; no other repo modified. No admin-referencing Claude command line/concurrent edit observed; process-level inactivity unprovable.
+- Dependencies: API origin/main read-only at 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; B proposed gateway; F physical evidence; G review/merge. Standalone baseline DOCX/checklist unavailable; canonical E handoff reviewed.
 
 ## Checklist coverage
 
@@ -105,6 +105,22 @@
 
 ## Activity log (newest first; preserve prior entries)
 
+### 2026-10-23 15:13 +08:00 — User-list account-status race correction
+- Prevented overlapping confirmation dialogs and PATCH requests while an account status action is pending, and rejected stale row actions after an account status changes. A pending action disables row menus and the menu mutation entry. No API or authorization contract changed.
+- Focused user-list tests: 10/10. Lint, app/spec TypeScript, full 24-file/160-test suite, production build (392.86 kB initial), and `git diff --check`: passed. Authenticated acceptance remains pending fixture credentials; existing masked launcher in PR #9 is the sole operator path.
+- Checklist 59 remains READY_FOR_REVIEW and acceptance pending; PR #13 is the review vehicle. Next: push commit and request substantive review.
+
+### 2026-10-23 03:42 +08:00 — Account detail release gates passed
+- Corrected missing provideRouter test setup. Focused 5 tests passed. Full rerun after browser load settled: lint, strict typecheck, 24 files / 159 tests and production build (392.86 kB initial) passed; diff check passed. Initial failed full run retained above/below as historical evidence.
+- Five added tests cover input reuse/read cancellation, duplicate status action, late response isolation and denied record actions. Existing auth/role/self-disable regressions stay intact; no token policy/backend change.
+- Submit focused ID 59 PR and run synthetic SPA route-reuse browser regression against committed production source. Real authenticated API remains blocked by runtime/fixture credentials; no accepted/completion-ready claim.
+
+
+### 2026-10-23 03:34 +08:00 — ID 59 account detail race correction
+- Inspection found OnInit-only detail loading: Angular reuse for another userId could keep the previous account visible. Late prior-account status responses could also replace the current record. These are UI defects, separate from external auth/provider gates.
+- Implemented input-driven reload, cancellation of previous read, clear old record/action error during load, captured ID lookup, status-response/error identity guard, and busy guard/disabled button across confirmation/write. API role/status semantics unchanged.
+- Added five regressions: reused input, canceled read, duplicate action, late status response, denial/error recovery. Initial full run failed because new test omitted provideRouter; fixed the test setup. Baseline timing failures/cascading TestBed failures retained as failed evidence. Lint/typecheck passed; corrected focused run pending. No real API/hardware acceptance claim.
+- Concurrent browser evidence in the separate secondary worktree is explicitly synthetic. Directory/transit/GPS/summary/default tracking flows have passed earlier runs; harness improvements add settled responsive layout and non-Admin login rejection. Source remains isolated and original Claude work untouched.
 ### 2026-10-23 11:07 +08:00 — Real browser runner source review
 
 - Corrected prepared real-browser logout to open the actual user menu and select its menuitem; added actual reload/refresh-restoration check. Node syntax and missing-credential path passed; no authenticated browser run or new application source change. Credential entry remains operator-interactive only.

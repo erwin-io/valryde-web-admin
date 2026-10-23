@@ -4,14 +4,16 @@ import {
   Component,
   DestroyRef,
   computed,
+  effect,
   inject,
   input,
-  OnInit,
   signal,
+  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Subscription, finalize } from 'rxjs';
 
 import { ApiProblem, toApiProblem } from '../../core/api/api-problem';
 import { PublicUser } from '../../core/auth/auth.models';
@@ -32,9 +34,10 @@ type LoadState = 'loading' | 'ready' | 'not-found' | 'error' | 'denied';
   templateUrl: './user-detail.page.html',
   styleUrl: './identity.scss',
 })
-export class UserDetailPage implements OnInit {
+export class UserDetailPage {
   private readonly service = inject(AdminUsersService);
   private readonly destroyRef = inject(DestroyRef);
+  private request?: Subscription;
   protected readonly statusChange = inject(UserStatusChange);
 
   readonly userId = input.required<string>();
@@ -45,25 +48,33 @@ export class UserDetailPage implements OnInit {
   protected readonly problem = signal<ApiProblem | null>(null);
   protected readonly actionProblem = signal<ApiProblem | null>(null);
   protected readonly user = signal<PublicUser | null>(null);
+  protected readonly actionBusy = signal(false);
   protected readonly breadcrumbs = computed(() => [
     { label: 'Identity & Access' },
     { label: 'User accounts', link: '/identity/users' },
     { label: this.user()?.displayName ?? 'Account' },
   ]);
 
-  ngOnInit(): void {
-    this.load();
+  constructor() {
+    effect(() => {
+      this.userId();
+      untracked(() => this.load());
+    });
   }
 
   protected load(): void {
+    const userId = this.userId();
+    this.request?.unsubscribe();
     this.state.set('loading');
     this.problem.set(null);
-    this.service
+    this.actionProblem.set(null);
+    this.user.set(null);
+    this.request = this.service
       .list()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (users) => {
-          const user = users.find((u) => u.id === this.userId()) ?? null;
+          const user = users.find((u) => u.id === userId) ?? null;
           this.user.set(user);
           this.state.set(user ? 'ready' : 'not-found');
         },
@@ -76,13 +87,15 @@ export class UserDetailPage implements OnInit {
   }
 
   protected changeStatus(user: PublicUser): void {
+    if (this.state() !== 'ready' || this.actionBusy() || user.id !== this.user()?.id) return;
     this.actionProblem.set(null);
+    this.actionBusy.set(true);
     this.statusChange
       .confirmAndApply(user)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(finalize(() => this.actionBusy.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (updated) => this.user.set(updated),
-        error: (err: unknown) => this.actionProblem.set(toApiProblem(err)),
+        next: (updated) => { if (this.userId() === updated.id) this.user.set(updated); },
+        error: (err: unknown) => { if (this.userId() === user.id) this.actionProblem.set(toApiProblem(err)); },
       });
   }
 }
