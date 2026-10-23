@@ -2,27 +2,28 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23T15:13:00+08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T15:56:00+08:00
 - Agent / module: E — Admin Web; Codex; VALRYDE-E-RAPID-DELIVERY-003.
 - Repository: erwin-io/valryde-web-admin.
-- Branch / HEAD SHA: codex/admin-account-detail-races; see PR #13 for current pushed HEAD.
-- Checklist IDs: 59 (also protects account lifecycle entry for 57).
+- Branch / HEAD SHA: codex/admin-account-detail-races; stacked on PR #9 for review, see PR #13 for pushed HEAD.
+- Checklist IDs: 58 and 59 (account lifecycle entry also supports 57).
 - GitHub issues / PRs: #9 directories, #10 transit, #11 GPS, #12 tracking preparation, #13 account races OPEN; authenticated acceptance pending.
 - Implementation progress: READY_FOR_REVIEW (account detail correction).
 - Tech Lead review decision: pending.
-- Current objective: prevent duplicate account-status actions on the user list while #9 authenticated acceptance remains operator-gated.
-- Last confirmed result: list-status duplicate-action regression passed (10 focused tests); lint, strict typecheck, 24-file/160-test suite, production build (392.86 kB initial), and diff check passed. Earlier results remain in the activity log.
-- Next concrete action: push #13 update for review; operator runs existing PR #9 masked launcher for authenticated acceptance.
+- Current objective: review PR #9 G1 directories first, then PR #13 account lifecycle correction; authenticated acceptance remains operator-gated.
+- Last confirmed result: combined #9/#13 source passed lint, strict typecheck, 24-file/162-test suite and production build (392.87 kB initial). Authenticated acceptance is pending.
+- Next concrete action: verify merged #9/#13 source, push stacked #13 for review; operator runs existing PR #9 masked launcher for authenticated acceptance.
 - Blocked by / decision owner: local API health and unauthenticated boundaries reachable, but no fixture credentials configured. Authenticated acceptance remains pending; operator profile editing/geofence API and actual B gateway remain absent; physical GPS/deployment are external gates.
 - Recovery/ownership: original clean Claude checkout at 8138c97 preserved; zero initial stashes/unpushed commits. Recovered unfinished G1 files in isolated worktree. Seven linked worktrees now preserve separate E feature slices; no other repo modified. No admin-referencing Claude command line/concurrent edit observed; process-level inactivity unprovable.
 - Dependencies: API origin/main read-only at 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; B proposed gateway; F physical evidence; G review/merge. Standalone baseline DOCX/checklist unavailable; canonical E handoff reviewed.
+
 ## Checklist coverage
 
 | Checklist ID | Feature / slice | Progress | Evidence (files/tests/PR) | Blocker / next action |
 |---:|---|---|---|---|
 | 56 | Admin Login & Dashboard | READY_FOR_REVIEW | Shell/auth, safe return URLs, session/401/RBAC tests, dashboard pending-work counts and synthetic browser flow | Real Admin login BACKEND_FIXTURE_BLOCKED on Agent A PR #15 |
-| 57 | Operator Management | READY_FOR_REVIEW (merged `075b377`) | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | Fleet context gated on Agent A G1 |
-| 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | Assignment/membership gated on Agent A G1/G2 |
+| 57 | Operator Management | READY_FOR_REVIEW (merged `075b377`) | `/fleet/operators` account-level list (search, status filter, sort, pagination) linking to the account record; `src/app/features/fleet/role-directory.page.*`; unit tests | G1 directory/counts implemented in current Codex slice; real API and Tech Lead acceptance pending |
+| 58 | Driver Monitoring | READY_FOR_REVIEW (merged `075b377`) | `/fleet/drivers` account-level list, same component; unit tests | G1 operator/assignment/group context implemented in current Codex slice; real API and Tech Lead acceptance pending |
 | 59 | Commuter User Monitoring | READY_FOR_REVIEW (merged `fc55582`; production acceptance operator-gated) | User Accounts list (search, role/status filters, sort, pagination), detail, enable/disable with confirmation and self-disable guard; `src/app/features/identity`; unit tests + security review fixes S1–S3 | Tech Lead review; real-API check is an owner gate |
 | 60 | Jeepney & Fleet Group Monitoring | READY_FOR_REVIEW (merged `812bbab`) | Read-only `/fleet/jeepneys`, `/fleet/jeepneys/:id` (with effective route), `/fleet/groups`, `/fleet/groups/:id`; `src/app/features/fleet/{fleet.models,fleet.service,jeepney-*,group-*}`; unit tests | Membership/driver/operator names gated on Agent A G1–G3; create/edit is a later slice |
 | 61 | Official Transit Route & Direction Management | READY_FOR_REVIEW (merged `8018e88`; regression rerun) | Route list/detail/create/edit, direction metadata/status editor, geometry entry link; expanded 146-test suite | Agent A D3 duplicate direction-label conflict semantics |
@@ -120,6 +121,41 @@
 - Implemented input-driven reload, cancellation of previous read, clear old record/action error during load, captured ID lookup, status-response/error identity guard, and busy guard/disabled button across confirmation/write. API role/status semantics unchanged.
 - Added five regressions: reused input, canceled read, duplicate action, late status response, denial/error recovery. Initial full run failed because new test omitted provideRouter; fixed the test setup. Baseline timing failures/cascading TestBed failures retained as failed evidence. Lint/typecheck passed; corrected focused run pending. No real API/hardware acceptance claim.
 - Concurrent browser evidence in the separate secondary worktree is explicitly synthetic. Directory/transit/GPS/summary/default tracking flows have passed earlier runs; harness improvements add settled responsive layout and non-Admin login rejection. Source remains isolated and original Claude work untouched.
+### 2026-10-23 11:07 +08:00 — Real browser runner source review
+
+- Corrected prepared real-browser logout to open the actual user menu and select its menuitem; added actual reload/refresh-restoration check. Node syntax and missing-credential path passed; no authenticated browser run or new application source change. Credential entry remains operator-interactive only.
+
+### 2026-10-23 10:57 +08:00 — Rapid 004 directory acceptance preparation
+
+- Added real G1 API/browser runners and masked PowerShell launcher; all credentials are current-process-only. No credential files read, no seed or positive business mutation. Missing credentials report CREDENTIALS_NOT_CONFIGURED before login. Both missing-credential paths and Node/PowerShell syntax checked.
+- Fresh lint, strict typecheck, full 23-file/156-test suite, production build (392.87 kB) and production dependency audit (0 findings) passed. Browser/API authenticated assertions are prepared but NOT RUN.
+- LOCAL_API_CONNECTED: approved runtime checkout HEAD 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; Node processes reference runtime; health 200/database ok, five unauthenticated protected boundaries 401. Running service revision/database name not attested by health. Tech Lead approved interactive masked fixture-password input; credential source absent in process.
+- PR dependency audit: all six based on current frontend main 1eb9427, zero behind, no dependency/config changes. Shared status all six; matrices #9/#11; disjoint route insertions #12/#14. #13 is a behavioral follow-up for account lifecycle reached through #9. No merges/deployments or other repository writes.
+
+### 2026-10-23 02:55 +08:00 — G1 directory quality gates passed
+- Current directive VALRYDE-E-RAPID-DELIVERY-003 confirms Agent E/admin; the intervening Agent C directive is superseded.
+- `npm run lint`, `npm run typecheck`, `npm test`: 23 files / 156 tests, `npm run build`: 392.87 kB initial, and `git diff --check` passed on the recovered directory tree. Initial TS7053 test-compilation failure was fixed before rerun.
+- No actual browser, authenticated API or hardware acceptance claimed. Submit directory slice independently; IDs 57/58 remain READY_FOR_REVIEW, not accepted/completed.
+- Separate clean worktree `.worktrees/transit-corridor` created from origin/main for IDs 61/62; dependency junction points to the same exact installed lockfile tree. First relative junction attempt failed harmlessly; absolute junction succeeded. No source yet changed there.
+- Next: push/open directory PR for Agent G; implement corridor persistence/assignment-impact and GPS mapping re-read, then tracking adapters where contract permits.
+
+
+### 2026-10-23 02:54 +08:00 — Recovered directory implementation and verified merged contracts
+- Current user names this session Agent E. Re-ran all recovery commands, found original checkout clean at 8138c97, and existing isolated Codex branch at 1eb9427 with four modified and two untracked directory/status files. No stash or unpushed commit. Original checkout has no content difference from remote main. No open admin PR.
+- Preserved and continued recovered G1 work in `.worktrees/admin-takeover`; no destructive Git operations or changes to other repositories. Running Claude processes have no command-line reference to admin; no concurrent edits observed. Full process-level inactivity remains unprovable; takeover authorization and isolated checkout provide ownership boundary.
+- Verified API origin/main 810c8a1 matches GitHub main; local API main is stale. Source inspection only, no fetch/checkout/write in API repository. Full standalone Version 1.0 document and checklist remain unavailable; canonical API handoff supplies exact IDs/acceptance.
+- Changed: typed G1 adapters and operator/driver directory with server pagination/filtering, separate business/account statuses and IDs, counts, context links, explicit states, stale-request cancellation. Contract/acceptance docs updated.
+- Initial typecheck passed but Angular test compilation exposed TS7053 in Material row template. Fixed using typed badge accessor; lint now passes. Full tests/build still running. No browser/real API/hardware verification claimed.
+- Next: complete gates and open review PR, then remaining priority slices; no self-merge/deploy.
+
+
+### 2026-10-23 02:48 +08:00 — Emergency recovery and G1 adoption started
+- Audit: all directive Git commands ran. Original checkout `feat/62-67-independent-ui-closure` at `8138c97`, clean tracked/untracked state; zero stashes and unpushed commits; one original worktree. Eight local development/bootstrap branches preserved, all remote-backed and reachable from merged main. Local main behind remote main by five commits; original HEAD has no content diff from remote main. PR #8 merged at `1eb9427`.
+- Relevant ignored filenames only: `.claude/launch.json`, `.angular/` cache, `node_modules/`, `dist/`; no secret contents read. Existing tests/evidence preserved; no unfinished test edits.
+- Codex managed-worktree tool failed because chat cwd is the non-Git parent. Used native `git worktree add` within assigned repo, new branch `codex/admin-takeover-g1-g6` from origin/main; local Git exclude prevents nested worktree appearing untracked.
+- API reference main `810c8a1` matches GitHub. G1 directories, G2 memberships, G3/G4 assignments, G10 mapping reads, G11 impact and D3 now available. User requests G1–G6; merged implementation, rather than stale status prose, is authoritative.
+- Dependency setup: shell npm 10.9.1 `npm ci` failed on optional @emnapi entries. Retrying declared npm 11.6.2; lockfile unchanged.
+- Next: preserve server pagination, distinguish business/account IDs and statuses, expose returned assignment/group context; regression tests and PR for Agent G.
 
 
 ### 2026-10-23 09:30 +08:00 — Claude takeover round 2: PR #8 corrections E8-01 and E8-02

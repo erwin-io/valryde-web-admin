@@ -4,8 +4,8 @@
 |---|---|---|---|
 | W-01 Admin sign-in | auth service, guard, interceptor, non-Admin rejection tests | keyboard and tablet shell | Implemented; unit tests passing; manual check against synthetic local API only |
 | W-02 Vehicle registry | typed adapter, loading/error/empty/filter tests | table at desktop/tablet | Implemented read-only (ID 60); unit tests passing; synthetic-stub screenshots at 1280/1024 px |
-| W-03 Operator context | role filtering and safe missing-contract state | related links | Account level implemented; unit tests passing; fleet links gated on G1 |
-| W-04 Driver context | role filtering and missing-assignment state | related links | Account level implemented; unit tests passing; assignments gated on G1/G2 |
+| W-03 Operator context | role filtering and safe missing-contract state | related links | G1 business directory implemented; server search/status/pagination, distinct business/account identity, counts and driver deep link tested; real API/browser acceptance pending |
+| W-04 Driver context | role filtering and missing-assignment state | related links | G1 driver directory implemented; ownership, assignment/group links, associated=false, cancellation, empty/403/retry tests; real API/browser acceptance pending |
 | W-05 Route details | nested direction rendering and failure states | hierarchy clarity | Implemented (ID 61); unit tests passing; synthetic-stub screenshots |
 | W-06 Geometry edit | LineString validation, dirty guard, save/error recovery | MapLibre pointer/keyboard checks | Proposal only (ID 62); dirty guard implemented for ID 61 forms |
 | W-07 Application review | allowed decisions, confirmation, 409 preservation | review layout | Implemented (ID 64); unit tests passing; stub browser flow |
