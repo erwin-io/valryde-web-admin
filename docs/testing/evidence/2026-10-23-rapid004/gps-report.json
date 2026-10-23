@@ -1,0 +1,207 @@
+{
+  "mode": "gps",
+  "state": "PASS",
+  "evidence": "SYNTHETIC_BROWSER_ONLY",
+  "sourceHead": null,
+  "sourceDirty": false,
+  "sourceComposite": {
+    "base": "1eb94279f5670ad71078b2ec27ba117905a75898",
+    "manifest": [
+      {
+        "branch": "codex/admin-takeover-g1-g6",
+        "head": "7d190d5cbc60f9d471f5ccccb5fa37d1cb08fd35"
+      },
+      {
+        "branch": "codex/admin-account-detail-races",
+        "head": "03c3864349dec6a9d5d90e5134e43d27b1e666f5"
+      },
+      {
+        "branch": "codex/admin-corridor-impact",
+        "head": "e315d1f682be61bd65b35b142727b0b312c64a6a"
+      },
+      {
+        "branch": "codex/admin-gps-mapping-read",
+        "head": "cba601b7912558b3504afbe4620552c79818d66f"
+      },
+      {
+        "branch": "codex/admin-operational-summary",
+        "head": "c3fafa423ba8b6d45f54a87628ff1345279ae4b2"
+      },
+      {
+        "branch": "codex/admin-tracking-readiness",
+        "head": "423f31aff5bf082aa128ce08328e7eeb934be9cc"
+      }
+    ],
+    "srcSha256": "c9bc64b4dc336be2ca14049723182ccdb9500d31c18dc5a3518e7084a03e13c8",
+    "application": "Reviewed src/scripts patches only; all applied without conflict; documentation conflicts excluded; no branch merges"
+  },
+  "checks": [
+    "Protected URL returns after synthetic Admin sign-in",
+    "Approve/schedule/install/map with read-after-write and fresh-visit mapping restoration",
+    "Commuter status confirmation and Admin self-disable guard",
+    "Synthetic authenticated non-Admin sign-in is rejected without storing a session"
+  ],
+  "pageErrors": [],
+  "requests": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "POST",
+      "status": 201
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/gps-setup-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/jeepneys",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/gps-setup-requests/00000000-0000-4000-8000-000000000010/device-mapping",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/00000000-0000-4000-8000-000000000002/status",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/admin/users/",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/auth/logout",
+      "method": "POST",
+      "status": 204
+    }
+  ]
+}

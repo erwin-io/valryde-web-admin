@@ -7,6 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { execFileSync } = require('node:child_process');
+const { createHash } = require('node:crypto');
 const { chromium } = require(process.env.VALRYDE_PLAYWRIGHT_MODULE || 'playwright');
 const workspace = fs.realpathSync(process.env.VALRYDE_BROWSER_WORKSPACE || process.cwd());
 const commonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: __dirname, encoding: 'utf8' }).trim();
@@ -16,11 +17,33 @@ const dist = path.join(workspace, 'dist/valryde-admin/browser');
 assert(fs.existsSync(path.join(dist, 'index.html')), 'Run the production build first');
 const mode = process.argv[2];
 assert(['directory', 'transit', 'gps', 'summary', 'tracking', 'identity'].includes(mode), 'Select an explicit synthetic scenario');
-const evidence = path.resolve(__dirname, '../docs/testing/evidence/2026-10-23-rapid-delivery');
+const evidenceRoot = path.resolve(__dirname, '../docs/testing/evidence');
+const evidence = process.env.VALRYDE_BROWSER_EVIDENCE_DIR
+  ? path.resolve(process.env.VALRYDE_BROWSER_EVIDENCE_DIR)
+  : path.join(evidenceRoot, '2026-10-23-rapid-delivery');
+assert(evidence.startsWith(evidenceRoot + path.sep), 'Evidence must stay under this repository testing directory');
 fs.mkdirSync(evidence, { recursive: true });
-const sourceHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workspace, encoding: 'utf8' }).trim();
-const sourceDirty = !!execFileSync('git', ['diff', 'HEAD', '--name-only', '--', 'src', 'angular.json', 'package.json', 'package-lock.json'], { cwd: workspace, encoding: 'utf8' }).trim() ||
+let sourceHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workspace, encoding: 'utf8' }).trim();
+let sourceDirty = !!execFileSync('git', ['diff', 'HEAD', '--name-only', '--', 'src', 'angular.json', 'package.json', 'package-lock.json'], { cwd: workspace, encoding: 'utf8' }).trim() ||
   !!execFileSync('git', ['ls-files', '--others', '--exclude-standard', 'src'], { cwd: workspace, encoding: 'utf8' }).trim();
+let sourceComposite;
+if (process.env.VALRYDE_BROWSER_SOURCE_MANIFEST) {
+  const manifestPath = path.resolve(process.env.VALRYDE_BROWSER_SOURCE_MANIFEST);
+  assert(manifestPath.startsWith(path.resolve(__dirname, '../.angular') + path.sep));
+  sourceComposite = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const hash = createHash('sha256');
+  const walk = directory => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const file = path.join(directory, entry.name);
+      if (entry.isDirectory()) walk(file);
+      else { hash.update(path.relative(workspace, file).replaceAll('\\', '/')); hash.update(fs.readFileSync(file)); }
+    }
+  };
+  walk(path.join(workspace, 'src'));
+  assert.equal(hash.digest('hex'), sourceComposite.srcSha256, 'Export source changed after manifest preparation');
+  // An assembled validation export has no single PR HEAD. Never mislabel its parent's Git HEAD.
+  sourceHead = null; sourceDirty = false;
+}
 const uid = n => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const stamp = '2026-10-22T00:00:00.000Z';
 const user = (n, role) => ({ id: uid(n), email: `${role.toLowerCase()}@example.test`, displayName: `Synthetic ${role}`,
@@ -190,7 +213,7 @@ let browser;
   checks.push('Synthetic authenticated non-Admin sign-in is rejected without storing a session');
   await nonAdminContext.close();
   assert.deepEqual(pageErrors, []);
-  const report = { mode, state: 'PASS', evidence: 'SYNTHETIC_BROWSER_ONLY', sourceHead, sourceDirty, checks, pageErrors, requests: logs };
+  const report = { mode, state: 'PASS', evidence: 'SYNTHETIC_BROWSER_ONLY', sourceHead, sourceDirty, sourceComposite, checks, pageErrors, requests: logs };
   fs.writeFileSync(path.join(evidence, `${mode}-report.json`), JSON.stringify(report, null, 2)); console.log(JSON.stringify({ ...report, requests: undefined }, null, 2));
 })().catch(error => { console.error('SYNTHETIC_BROWSER_FAILED:', error.message); process.exitCode = 1; }).finally(async () => {
   await browser?.close(); await new Promise(resolve => server.close(resolve));

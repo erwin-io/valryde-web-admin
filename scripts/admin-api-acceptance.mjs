@@ -13,7 +13,7 @@ function report(state, reason) {
   console.log(JSON.stringify({ suite: 'real-admin-api-acceptance', state, reason, results }, null, 2));
 }
 if (!base || (!password && !unauthenticatedOnly)) {
-  report('BLOCKED', 'Set VALRYDE_E2E_API_URL and temporary VALRYDE_E2E_PASSWORD for an already seeded isolated development API. No tests ran.');
+  report('CREDENTIALS_NOT_CONFIGURED', 'Set VALRYDE_E2E_API_URL and temporary VALRYDE_E2E_PASSWORD in the current process for the approved development API. No authenticated tests ran.');
   process.exit(2);
 }
 let url;

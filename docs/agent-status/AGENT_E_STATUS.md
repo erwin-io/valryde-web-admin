@@ -2,18 +2,18 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23T10:26:00+08:00
-- Agent / module: E — Admin Web, Codex; VALRYDE-E-RAPID-DELIVERY-003.
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T11:05:00+08:00
+- Agent / module: E — Admin Web, Codex; VALRYDE-E-RAPID-DELIVERY-004.
 - Repository/workspace: erwin-io/valryde-web-admin; C:/Development/valryde/valryde-web-admin. Source slices are isolated under .worktrees/.
 - Branch / HEAD SHA: codex/admin-operational-summary from 1eb94279f5670ad71078b2ec27ba117905a75898; tested implementation dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514; final evidence is a documentation-only follow-up. Tested implementation heads for existing slices below.
-- Checklist IDs: primary 57/58/59/61/62/64; secondary progress 56/60/63/67 plus 65/66 preparation.
+- Checklist IDs: primary 57/58/59/61/63/64; secondary progress 56/60/63/67 plus 65/66 preparation.
 - GitHub PRs: #9 directories e33baf46950a3e2b1011ca4cad2b9b3f6efad497; #10 transit e315d1f682be61bd65b35b142727b0b312c64a6a; #11 GPS cba601b7912558b3504afbe4620552c79818d66f; #12 tracking preparation 423f31aff5bf082aa128ce08328e7eeb934be9cc; #13 account races 03c3864349dec6a9d5d90e5134e43d27b1e666f5 OPEN. Operational summary/evidence #14 OPEN; tested source dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514.
 - Implementation progress: READY_FOR_REVIEW for independently testable slices. Target six accepted/completion-ready checklist items NOT MET; authenticated acceptance, missing contracts and G review prevent that claim.
 - Tech Lead decision: pending for all new PRs; do not label checklist items Completed or self-assign ACCEPTED/OPERATOR-GATED.
-- Current objective: hand six open, unmerged source PRs #9–#14 to G; complete real authenticated acceptance when secure fixture configuration is supplied.
-- Last confirmed result: each source slice passed lint, strict typecheck, full unit suite and build. Counts: directories 156, final transit 176, GPS 158, tracking 167, account races 159, secondary summary 165 (counts include shared baseline and must not be summed as unique tests). Synthetic browser scenarios passed at 1440x900/375x812 with no page errors. Operational summary browser rerun passed at committed dcb5d6d30bafb83ae3af4e93c56dc2ad28d86514, sourceDirty false.
-- Live verification on resume: localhost:3000 health 200/database ok; unauthenticated operators, drivers, Admin users, Admin routes and G10 mapping read all 401. Full authenticated runner BLOCKED before login because fixture password/source not provided. No private response bodies or credentials logged.
-- Next action: Agent G review/merge; provide already-seeded isolated API fixture credentials through a secure local source, then run real authenticated and positive lifecycle/persistence acceptance. Backend/gateway/hardware gates below remain.
+- Current objective: real authenticated acceptance of #9 then #13/#10/#11; operator must supply current-process masked fixture password. Independent combined verification complete.
+- Last confirmed result: Rapid 004 reviewed combined source passed lint, strict typecheck, 28 files/211 tests and production build; six synthetic browser scenarios passed on source fingerprint c9bc64b4dc336be2ca14049723182ccdb9500d31c18dc5a3518e7084a03e13c8. Fresh #9 full gate 156 tests passed; production audit 0, full audit 4 development-tool packages (1 low/3 high).
+- Live verification: LOCAL_API_CONNECTED; health 200/database ok and five unauthenticated boundaries 401. Approved runtime HEAD 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479, Node processes reference runtime. Health does not attest deployed SHA/database name. CREDENTIAL_SOURCE_APPROVED_INTERACTIVE; AUTHENTICATED_ACCEPTANCE_PENDING; runners return CREDENTIALS_NOT_CONFIGURED. No credential files read.
+- Next action: operator runs PR #9 scripts/Invoke-DirectoryAcceptance.ps1 from interactive PowerShell (masked password, process-only variables), then optional -Browser. No new checklist ID recommended Completed. G retains review/merge authority.
 - Recovery: original Claude checkout untouched/clean at 8138c9739756b9d922f824c64bc7383146775a0e; recovered unfinished G1 source/tests/status reused. No initial stashes/unpushed commits. Seven linked worktrees preserve original plus six Codex slices. No destructive Git operations, branch deletion, stash application, force push, other-repository writes, self-merge or deployment.
 - Execution ownership: no admin-referencing Claude command line or concurrent edits observed; process-level Claude inactivity cannot be conclusively proven. Current user authorizes takeover; original checkout preserved and all edits isolated.
 - References/dependencies: API origin/main 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479 reverified against GitHub on resume; B proposal 149cefc82d0ccea3c1efe06aebaf157a607c1d8e is not a released gateway contract; A API/fixtures, B gateway, F physical evidence, G acceptance/merge. Full standalone V1 DOCX/71-item checklist unavailable; canonical API Agent E handoff reviewed.
@@ -110,6 +110,15 @@ No new ID is legitimately marked Completed from this batch. Review-ready source 
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 11:05 +08:00 — Rapid 004 dependency audit and combined verification
+
+- Continued completed audit after truncated directive recovery. All six PRs share current main base and zero behind. No package/lock/config changes. Shared status all six, matrices #9/#11, disjoint route insertions #12/#14. Acceptance order #9 → #13 → #10 → #11; #14 G2 supports context and #12 stays unavailable. Full audit/dependencies: docs/testing/RAPID004_PR_AUDIT.md.
+- Added PR #9 real G1 API/browser acceptance and masked PowerShell launcher; current-process credentials only, no credential-file access. Missing-config paths return CREDENTIALS_NOT_CONFIGURED with zero authenticated tests. Node and PowerShell syntax checks passed. Fresh #9 lint/typecheck/156-test suite/build/prod audit passed. Browser logout selector/source restore scenario corrected by source review; live browser assertions still NOT RUN.
+- LOCAL_API_CONNECTED: health 200/database ok, five protected unauthenticated reads 401. Runtime checkout matches approved 810c8a1; Node references runtime. Fixture password absent; Tech Lead explicitly approves interactive prompt only. No authenticated test or business database write performed.
+- Reviewed src/scripts patches applied to ignored validation export in order #9/#13/#10/#11/#14/#12, without source conflicts. Initial git archive exceeded Node default output buffer; preserved failed empty export and rebuilt separately with explicit 32 MiB limit. No branch/PR merges, resets or other-repository edits.
+- Combined ESLint/strict app+spec typecheck/28 files 211 tests/production build (393.48 kB) passed. All six synthetic Chrome production-bundle scenarios passed at desktop/mobile with no page errors; source fingerprint and input heads in new evidence. Parent HEAD intentionally not substituted for the composite source.
+- Full npm audit remains nonclean: 4 dev-tool packages, 1 low/3 high; production audit zero. No dependency rewrite. Shared documentation requires normal G reconciliation; positive lifecycle/persistence, permission/tenant/race integration, device/gateway and missing-contract gates remain. No new ID Completed; no self-merge/deployment.
 
 ### 2026-10-23 10:28 +08:00 — Six PR review handoff
 
