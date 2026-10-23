@@ -17,6 +17,19 @@ Recommended acceptance order: #9 → #13 → #10 → #11; #14's G2 reads support
 
 ## Six target items — none newly Completed
 
+Tech Lead recovery checkpoint categories (2026-10-23):
+
+| ID | Category | Smallest next acceptance/correction |
+|---|---|---|
+| 57 | CONTRACT BLOCKED | Run G1/Admin account lifecycle tests; A/G must settle self-registration versus legacy Admin create/update/basic-profile scope and publish any missing contract. |
+| 58 | CODE COMPLETE / ACCEPTANCE PENDING | Run PR #9 real G1 API and browser checks with masked fixture credentials; require G review/merge after positive evidence. |
+| 59 | CODE COMPLETE / ACCEPTANCE PENDING | Run #13 real Admin/Commuter, role-filter/detail navigation and positive status persistence/restore tests; require G review/merge. Read-only and denied paths can precede positive fixture mutation. |
+| 61 | CONTRACT BLOCKED | Run #10 real create/edit/color/D3/G11/RBAC tests; A/G must resolve delete/archive and route-change request acceptance semantics. |
+| 63 | CONTRACT BLOCKED | Run #11 real G10 mapping read/create/conflict/RBAC tests; A/B must publish device status/freshness and any remap/unmap operation required by MVP. |
+| 64 | DEVICE/OWNER GATED | Run #11 real status/verification positive and negative tests; F/owner must supply physical installation/GPS evidence. Authenticated acceptance remains pending too. |
+
+No item is FULLY ACCEPTED. IDs 58 and 59 are the closest to a completion recommendation after authenticated functional/authorization checks, source review and merge. ID64 also needs owner evidence. The other three retain exact contract decisions below.
+
 | ID | Implemented source | Required real acceptance / missing scope |
 |---|---|---|
 | 57 | Real G1 adapter, business/owner identity, account state, existing Admin disable/enable link | G1 ownership/RBAC and account status persistence not authenticated here. Approved handoff has legacy create/update wording, while clarified model says self-registration and no account-creation approval. No approved Admin operator-create/basic-profile-update operation; do not claim full legacy scope or invent it. |
