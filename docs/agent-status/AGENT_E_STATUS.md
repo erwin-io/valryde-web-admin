@@ -105,6 +105,10 @@
 
 ## Activity log (newest first; preserve prior entries)
 
+### 2026-10-23 11:07 +08:00 — Real browser runner source review
+
+- Corrected prepared real-browser logout to open the actual user menu and select its menuitem; added actual reload/refresh-restoration check. Node syntax and missing-credential path passed; no authenticated browser run or new application source change. Credential entry remains operator-interactive only.
+
 ### 2026-10-23 10:57 +08:00 — Rapid 004 directory acceptance preparation
 
 - Added real G1 API/browser runners and masked PowerShell launcher; all credentials are current-process-only. No credential files read, no seed or positive business mutation. Missing credentials report CREDENTIALS_NOT_CONFIGURED before login. Both missing-credential paths and Node/PowerShell syntax checked.

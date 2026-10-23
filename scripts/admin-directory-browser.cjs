@@ -77,6 +77,10 @@ const contexts = [];
   assert.equal((await (await emptyResponse).json()).pagination.total, 0);
   await page.getByRole('button', { name: 'Clear filters', exact: true }).waitFor();
   checks.push('Real server search returns successful empty result');
+  const restoreResponse = page.waitForResponse(r => new URL(r.url()).pathname === '/api/auth/refresh' && r.status() === 200);
+  await page.reload(); await restoreResponse;
+  await page.getByRole('heading', { name: 'Drivers', exact: true }).waitFor();
+  checks.push('Reload restores the real session through refresh rotation');
   for (const width of [1440, 375]) {
     await page.setViewportSize({ width, height: width === 375 ? 812 : 900 });
     await page.waitForFunction(() => {
@@ -99,9 +103,10 @@ const contexts = [];
   assert.equal(await denied.evaluate(() => sessionStorage.length), 0);
   checks.push('Real non-Admin rejected by UI, issued refresh revoked and no stored session');
   await deniedContext.close();
-  // UI logout revokes the active session; refresh after reload is separately covered by the API runner.
+  // UI logout revokes the active session; menu controls use the actual application roles.
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.getByRole('button', { name: /sign out/i }).click();
+  await page.locator('.user-button').click();
+  await page.getByRole('menuitem', { name: /sign out/i }).click();
   await page.waitForURL('**/sign-in');
   assert.equal(await page.evaluate(() => sessionStorage.length), 0);
   checks.push('Real Admin UI logout clears session');
