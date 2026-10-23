@@ -2,12 +2,12 @@
 
 ## Current snapshot
 
-- Updated at (ISO 8601, Asia/Manila): 2026-10-23T02:48:00+08:00
+- Updated at (ISO 8601, Asia/Manila): 2026-10-23T10:57:00+08:00
 - Agent / module: E — Administrative Web Development; current user explicitly confirms Agent E.
 - Repository: `erwin-io/valryde-web-admin`
-- Branch / HEAD SHA: `codex/admin-takeover-g1-g6`, base `1eb9427`; implementation in progress.
+- Branch / HEAD SHA: `codex/admin-takeover-g1-g6`; tested application source `e33baf46950a3e2b1011ca4cad2b9b3f6efad497`; Rapid 004 acceptance tooling follow-up.
 - Checklist IDs: 57, 58 first; retain existing 56–67 coverage below.
-- GitHub issues / PRs: #1–#8 merged; no open admin PR at recovery.
+- GitHub issues / PRs: #9–#14 open; all individually mergeable with GitGuardian success at Rapid 004 audit. G review pending. Consolidated history/coverage remains in PR #14.
 - Implementation progress: READY_FOR_REVIEW (G1 directory slice); remaining rapid-delivery scope in progress.
 - Tech Lead review decision: no decision on this new slice; existing acceptance gates remain.
 - Current objective: VALRYDE-CODEX-UI-EMERGENCY-TAKEOVER-002; recover safely and adopt merged API contracts.
@@ -104,6 +104,13 @@
 - Gate: Live tracking/realtime integration. Required actor: Agents B/G. Requested evidence: approved REST DTOs, Pusher channels/events, authorization, freshness, ordering, and reconciliation contract. State: IN_PROGRESS upstream; not implemented by Agent E.
 
 ## Activity log (newest first; preserve prior entries)
+
+### 2026-10-23 10:57 +08:00 — Rapid 004 directory acceptance preparation
+
+- Added real G1 API/browser runners and masked PowerShell launcher; all credentials are current-process-only. No credential files read, no seed or positive business mutation. Missing credentials report CREDENTIALS_NOT_CONFIGURED before login. Both missing-credential paths and Node/PowerShell syntax checked.
+- Fresh lint, strict typecheck, full 23-file/156-test suite, production build (392.87 kB) and production dependency audit (0 findings) passed. Browser/API authenticated assertions are prepared but NOT RUN.
+- LOCAL_API_CONNECTED: approved runtime checkout HEAD 810c8a13356ddbf0e28a4faf5ad7f86ce0a30479; Node processes reference runtime; health 200/database ok, five unauthenticated protected boundaries 401. Running service revision/database name not attested by health. Tech Lead approved interactive masked fixture-password input; credential source absent in process.
+- PR dependency audit: all six based on current frontend main 1eb9427, zero behind, no dependency/config changes. Shared status all six; matrices #9/#11; disjoint route insertions #12/#14. #13 is a behavioral follow-up for account lifecycle reached through #9. No merges/deployments or other repository writes.
 
 ### 2026-10-23 02:55 +08:00 — G1 directory quality gates passed
 - Current directive VALRYDE-E-RAPID-DELIVERY-003 confirms Agent E/admin; the intervening Agent C directive is superseded.
